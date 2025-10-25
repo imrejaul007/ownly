@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Deal } from '@/types';
 import { dealAPI, investmentAPI, walletAPI } from '@/lib/api';
 import { formatCurrency, formatPercentage, getDealTypeLabel, calculateFundingProgress, formatDate } from '@/lib/utils';
+import ROICalculator from '@/components/ROICalculator';
 
 export default function DealDetailPage() {
   const params = useParams();
@@ -190,6 +191,17 @@ export default function DealDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* ROI Calculator */}
+          {deal.expected_roi && (
+            <ROICalculator
+              dealTitle={deal.title}
+              expectedROI={deal.expected_roi}
+              minInvestment={deal.min_ticket}
+              maxInvestment={deal.max_ticket || deal.min_ticket * 10}
+              holdingPeriod={deal.holding_period_months}
+            />
+          )}
 
           {/* OWNLY Shield - 7-Layer Trust Architecture */}
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg shadow-md p-6 border-2 border-green-200 dark:border-green-800">
