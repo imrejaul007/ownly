@@ -4,167 +4,82 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
-import { bundleAPI } from '@/lib/api';
 import {
   Package, TrendingUp, Shield, Clock, Users, Target, CheckCircle,
-  ArrowLeft, Zap, DollarSign, Calendar, BarChart3, AlertCircle
+  ArrowLeft, Zap, DollarSign, Calendar, BarChart3, AlertCircle, Percent
 } from 'lucide-react';
 
-interface Bundle {
-  bundle_id: string;
-  name: string;
+interface Deal {
+  id: string;
+  title: string;
+  slug: string;
   type: string;
-  investment_required: number;
-  duration_months: number;
-  expected_roi_annual: number;
-  distribution_frequency: string;
-  composition: { [key: string]: number };
-  included_deals: string[];
-  highlights: string[];
+  expected_roi: string;
+  BundleDeal?: {
+    allocation_percentage: string;
+    is_core: boolean;
+    weight: number;
+  };
 }
 
-const BUNDLES: Bundle[] = [
-  {
-    bundle_id: "BUN001",
-    name: "Smart Starter Bundle",
-    type: "Balanced Income",
-    investment_required: 1000,
-    duration_months: 12,
-    expected_roi_annual: 18,
-    distribution_frequency: "Monthly",
-    composition: {
-      "Fixed Yield": 40,
-      "Real Estate SPV": 30,
-      "Franchise SPV": 30
-    },
-    included_deals: ["FIX001", "REA001", "BUS001"],
-    highlights: [
-      "Perfect entry-level bundle for new investors",
-      "Auto-diversified and reinvested monthly",
-      "Capital protection through low-risk assets"
-    ]
-  },
-  {
-    bundle_id: "BUN002",
-    name: "Growth Mix Bundle",
-    type: "Moderate Growth",
-    investment_required: 5000,
-    duration_months: 24,
-    expected_roi_annual: 28,
-    distribution_frequency: "Quarterly",
-    composition: {
-      "Real Estate SPV": 30,
-      "Business SPV": 30,
-      "Luxury Asset": 20,
-      "Fixed Yield": 20
-    },
-    included_deals: ["REA002", "BUS002", "LUX002", "FIX002"],
-    highlights: [
-      "Blend of stable and growth-focused assets",
-      "Quarterly distribution of returns",
-      "Ideal for mid-tier investors"
-    ]
-  },
-  {
-    bundle_id: "BUN003",
-    name: "Alpha Investor Bundle",
-    type: "High Growth",
-    investment_required: 10000,
-    duration_months: 36,
-    expected_roi_annual: 45,
-    distribution_frequency: "Annual",
-    composition: {
-      "Tech Ventures": 40,
-      "Real Estate Development": 30,
-      "Luxury Assets": 20,
-      "Fixed Yield": 10
-    },
-    included_deals: ["DIG002", "REA002", "LUX001", "FIX001"],
-    highlights: [
-      "Designed for investors seeking long-term wealth creation",
-      "Equity-based upside potential",
-      "Reinvest auto-option available"
-    ]
-  },
-  {
-    bundle_id: "BUN004",
-    name: "Luxe Experience Bundle",
-    type: "Luxury Lifestyle",
-    investment_required: 20000,
-    duration_months: 30,
-    expected_roi_annual: 38,
-    distribution_frequency: "Quarterly",
-    composition: {
-      "Luxury Assets": 50,
-      "Retail and Wellness": 25,
-      "Real Estate": 15,
-      "Fixed Yield": 10
-    },
-    included_deals: ["LUX001", "BUS001", "REA001", "FIX002"],
-    highlights: [
-      "Luxury-driven yield and lifestyle access",
-      "Partial investment in yacht and car ownership",
-      "Quarterly returns from multiple income sources"
-    ]
-  },
-  {
-    bundle_id: "BUN005",
-    name: "Infrastructure Growth Bundle",
-    type: "Long-Term Real Assets",
-    investment_required: 50000,
-    duration_months: 48,
-    expected_roi_annual: 32,
-    distribution_frequency: "Annual",
-    composition: {
-      "Industrial Real Estate": 60,
-      "Business SPVs": 25,
-      "Fixed Yield": 15
-    },
-    included_deals: ["INF001", "BUS002", "FIX001"],
-    highlights: [
-      "Focus on tangible, asset-backed projects",
-      "High-value long-term development exposure",
-      "Ideal for serious wealth builders"
-    ]
-  },
-  {
-    bundle_id: "BUN006",
-    name: "Global Diversified Bundle",
-    type: "Multi-Sector",
-    investment_required: 10000,
-    duration_months: 36,
-    expected_roi_annual: 35,
-    distribution_frequency: "Quarterly",
-    composition: {
-      "Tech": 25,
-      "Real Estate": 25,
-      "Franchise": 20,
-      "Mobility": 15,
-      "Fixed Yield": 15
-    },
-    included_deals: ["DIG001", "REA001", "BUS002", "REN001", "FIX002"],
-    highlights: [
-      "Exposure to multiple revenue channels",
-      "Geo-diversified for stability",
-      "Ideal for experienced investors"
-    ]
-  }
-];
+interface Bundle {
+  id: string;
+  name: string;
+  slug: string;
+  bundle_type: string;
+  category: string;
+  description: string;
+  min_investment: string;
+  target_amount: string;
+  raised_amount: string;
+  investor_count: number;
+  expected_roi_min: string;
+  expected_roi_max: string;
+  holding_period_months: number;
+  status: string;
+  images: string[];
+  features: string[];
+  risk_level: string;
+  diversification_score: number;
+  deals?: Deal[];
+  creator?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
 
 export default function BundleDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showInvestModal, setShowInvestModal] = useState(false);
   const [investing, setInvesting] = useState(false);
   const [investmentError, setInvestmentError] = useState<string | null>(null);
   const [investmentSuccess, setInvestmentSuccess] = useState(false);
 
   useEffect(() => {
-    const bundleData = BUNDLES.find(b => b.bundle_id === params.id);
-    setBundle(bundleData || null);
-    setLoading(false);
+    const fetchBundle = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles/${params.id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setBundle(data.data);
+        } else {
+          setError('Bundle not found');
+        }
+      } catch (err) {
+        console.error('Error fetching bundle:', err);
+        setError('Failed to load bundle');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBundle();
   }, [params.id]);
 
   const handleInvest = async () => {
@@ -174,23 +89,29 @@ export default function BundleDetailPage() {
     setInvestmentError(null);
 
     try {
-      const response = await bundleAPI.invest(bundle.bundle_id, {
-        amount: bundle.investment_required
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles/${bundle.id}/invest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: parseFloat(bundle.min_investment)
+        })
       });
 
-      if (response.data.success) {
+      const data = await response.json();
+
+      if (data.success) {
         setInvestmentSuccess(true);
         setTimeout(() => {
           router.push('/portfolio');
         }, 2000);
+      } else {
+        setInvestmentError(data.message || 'Failed to process investment');
       }
     } catch (error: any) {
       console.error('Investment error:', error);
-      setInvestmentError(
-        error.response?.data?.message ||
-        error.message ||
-        'Failed to process investment. Please try again.'
-      );
+      setInvestmentError('Failed to process investment. Please try again.');
     } finally {
       setInvesting(false);
     }
@@ -207,12 +128,13 @@ export default function BundleDetailPage() {
     );
   }
 
-  if (!bundle) {
+  if (error || !bundle) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <div className="text-center py-12">
           <Package className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
           <h2 className="text-2xl font-bold text-white mb-4">Bundle Not Found</h2>
+          <p className="text-purple-300 mb-6">{error || 'The bundle you are looking for does not exist.'}</p>
           <Link href="/bundles" className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all">
             <ArrowLeft className="w-4 h-4" />
             Back to Bundles
@@ -222,8 +144,11 @@ export default function BundleDetailPage() {
     );
   }
 
-  const projectedReturns = (bundle.investment_required * bundle.expected_roi_annual) / 100;
-  const totalReturn = bundle.investment_required + projectedReturns;
+  const avgROI = (parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2;
+  const minInvestment = parseFloat(bundle.min_investment);
+  const projectedReturns = (minInvestment * avgROI) / 100;
+  const totalReturn = minInvestment + projectedReturns;
+  const fundingProgress = (parseFloat(bundle.raised_amount) / parseFloat(bundle.target_amount)) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -248,7 +173,7 @@ export default function BundleDetailPage() {
             <div className="flex-1">
               <div className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-1.5 mb-4">
                 <Package className="w-4 h-4 text-purple-300" />
-                <span className="text-purple-200 text-sm font-semibold">{bundle.type}</span>
+                <span className="text-purple-200 text-sm font-semibold capitalize">{bundle.bundle_type.replace('_', ' ')}</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-4">
@@ -258,18 +183,23 @@ export default function BundleDetailPage() {
               <div className="flex flex-wrap items-center gap-6 text-purple-200">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-green-400" />
-                  <span className="text-3xl font-bold text-green-400">{bundle.expected_roi_annual}%</span>
-                  <span className="text-sm">Annual ROI</span>
+                  <span className="text-3xl font-bold text-green-400">{avgROI.toFixed(1)}%</span>
+                  <span className="text-sm">Avg ROI</span>
                 </div>
                 <div className="w-px h-6 bg-white/10"></div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>{bundle.duration_months} months duration</span>
+                  <span>{bundle.holding_period_months} months</span>
                 </div>
                 <div className="w-px h-6 bg-white/10"></div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>{bundle.distribution_frequency} distributions</span>
+                  <Shield className="w-4 h-4" />
+                  <span className="capitalize">{bundle.risk_level} risk</span>
+                </div>
+                <div className="w-px h-6 bg-white/10"></div>
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  <span>{bundle.diversification_score}/100 diversification</span>
                 </div>
               </div>
             </div>
@@ -304,72 +234,116 @@ export default function BundleDetailPage() {
               </div>
             </div>
 
-            {/* Asset Allocation */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <BarChart3 className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-bold text-white">Asset Allocation</h2>
-              </div>
-
-              <div className="space-y-4">
-                {Object.entries(bundle.composition).map(([asset, percentage]) => (
-                  <div key={asset}>
-                    <div className="flex justify-between mb-2">
-                      <span className="font-semibold text-white">{asset}</span>
-                      <span className="text-purple-200">{percentage}%</span>
-                    </div>
-                    <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
-                      <div
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all"
-                        style={{ width: `${percentage}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-sm text-purple-300 mt-1">
-                      {formatCurrency((bundle.investment_required * percentage) / 100)} allocated
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Key Highlights */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <Zap className="w-6 h-6 text-yellow-400" />
-                <h2 className="text-2xl font-bold text-white">Key Highlights</h2>
-              </div>
-
-              <ul className="space-y-3">
-                {bundle.highlights.map((highlight, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-purple-100">{highlight}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Included Deals */}
+            {/* Description */}
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
               <div className="flex items-center gap-3 mb-4">
-                <Package className="w-6 h-6 text-blue-400" />
-                <h2 className="text-2xl font-bold text-white">Included Deals</h2>
+                <Package className="w-6 h-6 text-purple-400" />
+                <h2 className="text-2xl font-bold text-white">About This Bundle</h2>
               </div>
-
-              <div className="space-y-3">
-                {bundle.included_deals.map(dealId => (
-                  <div key={dealId} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between hover:border-purple-500/30 transition-all">
-                    <span className="font-mono text-sm text-purple-200">{dealId}</span>
-                    <Link
-                      href={`/deals/${dealId}`}
-                      className="text-purple-400 hover:text-purple-300 text-sm font-semibold transition-colors"
-                    >
-                      View Deal →
-                    </Link>
-                  </div>
-                ))}
-              </div>
+              <p className="text-purple-100 leading-relaxed">{bundle.description}</p>
             </div>
+
+            {/* Asset Allocation - Show deal allocation percentages */}
+            {bundle.deals && bundle.deals.length > 0 && (
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <BarChart3 className="w-6 h-6 text-purple-400" />
+                  <h2 className="text-2xl font-bold text-white">Deal Allocation</h2>
+                </div>
+
+                <div className="space-y-4">
+                  {bundle.deals.map((deal) => {
+                    const allocation = parseFloat(deal.BundleDeal?.allocation_percentage || '0');
+                    const isCore = deal.BundleDeal?.is_core || false;
+
+                    return (
+                      <div key={deal.id}>
+                        <div className="flex justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-white">{deal.title}</span>
+                            {isCore && (
+                              <span className="text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full px-2 py-0.5">
+                                CORE
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-purple-200">{allocation}%</span>
+                        </div>
+                        <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
+                          <div
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all"
+                            style={{ width: `${allocation}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-sm text-purple-300 mt-1 flex items-center justify-between">
+                          <span>{formatCurrency((minInvestment * allocation) / 100)} allocated</span>
+                          <span className="text-green-400">{deal.expected_roi}% ROI</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Key Features */}
+            {bundle.features && bundle.features.length > 0 && (
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <Zap className="w-6 h-6 text-yellow-400" />
+                  <h2 className="text-2xl font-bold text-white">Key Features</h2>
+                </div>
+
+                <ul className="space-y-3">
+                  {bundle.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-purple-100">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Included Deals */}
+            {bundle.deals && bundle.deals.length > 0 && (
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Package className="w-6 h-6 text-blue-400" />
+                  <h2 className="text-2xl font-bold text-white">Included Deals ({bundle.deals.length})</h2>
+                </div>
+
+                <div className="space-y-3">
+                  {bundle.deals.map(deal => (
+                    <Link
+                      key={deal.id}
+                      href={`/deals/${deal.slug}`}
+                      className="block bg-white/5 border border-white/10 rounded-xl p-4 hover:border-purple-500/30 transition-all hover:scale-102"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="font-semibold text-white mb-1">{deal.title}</div>
+                          <div className="flex items-center gap-3 text-sm text-purple-300">
+                            <span className="capitalize">{deal.type}</span>
+                            <span>•</span>
+                            <span className="text-green-400">{deal.expected_roi}% ROI</span>
+                            {deal.BundleDeal?.is_core && (
+                              <>
+                                <span>•</span>
+                                <span className="text-yellow-400">Core Holding</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-purple-400 font-semibold">
+                          {parseFloat(deal.BundleDeal?.allocation_percentage || '0')}% →
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -381,7 +355,7 @@ export default function BundleDetailPage() {
               <div className="mb-6">
                 <div className="text-sm text-purple-300 mb-2">Minimum Investment</div>
                 <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                  {formatCurrency(bundle.investment_required)}
+                  {formatCurrency(minInvestment)}
                 </div>
               </div>
 
@@ -398,17 +372,29 @@ export default function BundleDetailPage() {
 
               <div className="pt-4 border-t border-white/10 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-purple-300">Distribution</span>
-                  <span className="font-semibold text-white">{bundle.distribution_frequency}</span>
+                  <span className="text-purple-300">ROI Range</span>
+                  <span className="font-semibold text-white">{bundle.expected_roi_min}% - {bundle.expected_roi_max}%</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-purple-300">Duration</span>
-                  <span className="font-semibold text-white">{bundle.duration_months} months</span>
+                  <span className="font-semibold text-white">{bundle.holding_period_months} months</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-purple-300">Assets Included</span>
-                  <span className="font-semibold text-white">{bundle.included_deals.length} deals</span>
+                  <span className="text-purple-300">Risk Level</span>
+                  <span className="font-semibold text-white capitalize">{bundle.risk_level}</span>
                 </div>
+                {bundle.deals && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-purple-300">Deals Included</span>
+                    <span className="font-semibold text-white">{bundle.deals.length}</span>
+                  </div>
+                )}
+                {fundingProgress > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-purple-300">Funding Progress</span>
+                    <span className="font-semibold text-white">{fundingProgress.toFixed(1)}%</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -446,7 +432,7 @@ export default function BundleDetailPage() {
             ) : (
               <>
                 <p className="text-purple-200 mb-6">
-                  You are about to invest {formatCurrency(bundle.investment_required)} in this bundle.
+                  You are about to invest {formatCurrency(minInvestment)} in this bundle.
                 </p>
 
                 {investmentError && (
