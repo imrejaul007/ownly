@@ -8,6 +8,7 @@ import {
   Package, TrendingUp, Shield, Clock, Users, Target, CheckCircle,
   ArrowLeft, Zap, DollarSign, Calendar, BarChart3, AlertCircle, Percent
 } from 'lucide-react';
+import ROICalculator from '@/components/ROICalculator';
 
 interface Deal {
   id: string;
@@ -221,10 +222,10 @@ export default function BundleDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                   <div className="text-sm text-green-100 mb-2">You Invest</div>
-                  <div className="text-3xl font-bold text-white">{formatCurrency(bundle.investment_required)}</div>
+                  <div className="text-3xl font-bold text-white">{formatCurrency(parseFloat(bundle.min_investment))}</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  <div className="text-sm text-green-100 mb-2">Projected Returns ({bundle.duration_months} months)</div>
+                  <div className="text-sm text-green-100 mb-2">Projected Returns ({bundle.holding_period_months} months)</div>
                   <div className="text-3xl font-bold text-white">+{formatCurrency(projectedReturns)}</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
@@ -304,6 +305,14 @@ export default function BundleDetailPage() {
                 </ul>
               </div>
             )}
+
+            {/* ROI Calculator */}
+            <ROICalculator
+              minInvestment={parseFloat(bundle.min_investment)}
+              expectedROIMin={parseFloat(bundle.expected_roi_min)}
+              expectedROIMax={parseFloat(bundle.expected_roi_max)}
+              holdingPeriodMonths={bundle.holding_period_months}
+            />
 
             {/* Included Deals */}
             {bundle.deals && bundle.deals.length > 0 && (

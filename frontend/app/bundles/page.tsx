@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/utils';
 import {
   Package, TrendingUp, Shield, Clock, Users, Target,
-  Zap, CheckCircle, ArrowRight, Filter, Sparkles
+  Zap, CheckCircle, ArrowRight, Filter, Sparkles, GitCompare
 } from 'lucide-react';
 
 interface Bundle {
@@ -35,10 +36,13 @@ interface Bundle {
 }
 
 export default function BundlesPage() {
+  const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedBundles, setSelectedBundles] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchBundles = async () => {
@@ -67,6 +71,25 @@ export default function BundlesPage() {
     : bundles;
 
   const bundleTypes = ['category_based', 'roi_based', 'thematic', 'community', 'custom'];
+
+  const toggleBundleSelection = (bundleId: string) => {
+    setSelectedBundles(prev =>
+      prev.includes(bundleId)
+        ? prev.filter(id => id !== bundleId)
+        : [...prev, bundleId]
+    );
+  };
+
+  const handleCompare = () => {
+    if (selectedBundles.length >= 2) {
+      router.push(`/bundles/compare?ids=${selectedBundles.join(',')}`);
+    }
+  };
+
+  const toggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    setSelectedBundles([]);
+  };
 
   if (loading) {
     return (
@@ -181,9 +204,22 @@ export default function BundlesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* Filters */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Filter className="w-5 h-5 text-purple-300" />
-            <h3 className="text-lg font-semibold text-white">Filter by Type</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Filter className="w-5 h-5 text-purple-300" />
+              <h3 className="text-lg font-semibold text-white">Filter by Type</h3>
+            </div>
+            <button
+              onClick={toggleCompareMode}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                compareMode
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                  : 'bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10'
+              }`}
+            >
+              <GitCompare className="w-5 h-5" />
+              {compareMode ? 'Exit Compare Mode' : 'Compare Bundles'}
+            </button>
           </div>
 
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -228,8 +264,28 @@ export default function BundlesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBundles.map(bundle => (
-              <BundleCard key={bundle.id} bundle={bundle} />
+              <BundleCard
+                key={bundle.id}
+                bundle={bundle}
+                compareMode={compareMode}
+                isSelected={selectedBundles.includes(bundle.id)}
+                onToggleSelect={() => toggleBundleSelection(bundle.id)}
+              />
             ))}
+          </div>
+        )}
+
+        {/* Floating Compare Button */}
+        {compareMode && selectedBundles.length >= 2 && (
+          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+            <button
+              onClick={handleCompare}
+              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-bold shadow-2xl shadow-purple-500/50 transition-all flex items-center gap-3 hover:scale-105"
+            >
+              <GitCompare className="w-6 h-6" />
+              Compare {selectedBundles.length} Bundles
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
         )}
       </div>
@@ -247,7 +303,21 @@ export default function BundlesPage() {
   );
 }
 
-function BundleCard({ bundle }: { bundle: Bundle }) {
+interface BundleCardProps {
+  bundle: Bundle;
+  compareMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
+}
+
+function BundleCard({ bundle, compareMode = false, isSelected = false, onToggleSelect }: BundleCardProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (compareMode && onToggleSelect) {
+      e.preventDefault();
+      onToggleSelect();
+    }
+  };
+
   const getTypeColor = (type: string) => {
     const colors: any = {
       'category_based': 'from-green-500 to-emerald-600',
@@ -271,9 +341,31 @@ function BundleCard({ bundle }: { bundle: Bundle }) {
   const avgROI = (parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2;
   const fundingProgress = (parseFloat(bundle.raised_amount) / parseFloat(bundle.target_amount)) * 100;
 
-  return (
-    <Link href={`/bundles/${bundle.id}`}>
-      <div className="group bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all cursor-pointer overflow-hidden h-full flex flex-col hover:scale-105 duration-300">
+  const cardContent = (
+    <div
+      className={`group bg-white/5 backdrop-blur-xl rounded-2xl border transition-all cursor-pointer overflow-hidden h-full flex flex-col duration-300 relative ${
+        compareMode
+          ? isSelected
+            ? 'border-purple-500 scale-105 shadow-lg shadow-purple-500/30'
+            : 'border-white/10 hover:border-purple-500/30'
+          : 'border-white/10 hover:border-purple-500/30 hover:scale-105'
+      }`}
+      onClick={handleClick}
+    >
+      {/* Checkbox Overlay in Compare Mode */}
+      {compareMode && (
+        <div className="absolute top-4 right-4 z-10">
+          <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all ${
+            isSelected
+              ? 'bg-purple-500 border-purple-500'
+              : 'bg-white/10 border-white/30 group-hover:border-purple-400'
+          }`}>
+            {isSelected && (
+              <CheckCircle className="w-6 h-6 text-white" />
+            )}
+          </div>
+        </div>
+      )}
         {/* Header with Gradient */}
         <div className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} p-6 text-white relative overflow-hidden`}>
           <div className="absolute inset-0 bg-black/10"></div>
@@ -374,12 +466,29 @@ function BundleCard({ bundle }: { bundle: Bundle }) {
           </div>
 
           {/* CTA */}
-          <button className="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105">
-            View Bundle Details
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          {!compareMode && (
+            <button className="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105">
+              View Bundle Details
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
+          {compareMode && (
+            <div className="mt-6 w-full bg-white/10 border border-white/20 text-purple-200 py-3 rounded-xl font-semibold text-center">
+              {isSelected ? 'Selected for Comparison' : 'Click to Select'}
+            </div>
+          )}
         </div>
-      </div>
+    </div>
+  );
+
+  // Wrap with Link only if not in compare mode
+  if (compareMode) {
+    return cardContent;
+  }
+
+  return (
+    <Link href={`/bundles/${bundle.id}`}>
+      {cardContent}
     </Link>
   );
 }

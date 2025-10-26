@@ -398,7 +398,7 @@ export default function DealDetailPage() {
               </div>
             </div>
             <div className="text-xs text-purple-100 mt-2">
-              {(deal.holding_period_months / 12).toFixed(1)} years holding period
+              {((deal.holding_period_months || 0) / 12).toFixed(1)} years holding period
             </div>
           </div>
 
@@ -492,16 +492,7 @@ export default function DealDetailPage() {
               </div>
             </div>
 
-            {/* ROI Calculator */}
-            {deal.expected_roi && (
-              <ROICalculator
-                dealTitle={deal.title}
-                expectedROI={deal.expected_roi}
-                minInvestment={deal.min_ticket}
-                maxInvestment={deal.max_ticket || deal.min_ticket * 10}
-                holdingPeriod={deal.holding_period_months || 12}
-              />
-            )}
+            {/* ROI Calculator - Removed for now as it's designed for bundles with min/max ROI */}
 
             {/* OWNLY Shield - 7-Layer Trust Architecture */}
             <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-xl rounded-2xl p-6 border-2 border-green-500/30 shadow-2xl">

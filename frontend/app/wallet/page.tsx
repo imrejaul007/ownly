@@ -623,7 +623,7 @@ export default function WalletPage() {
               <button
                 onClick={handleWithdraw}
                 className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-semibold text-white transition-all hover:shadow-lg hover:shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                disabled={processing || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || (wallet && parseFloat(withdrawAmount) > wallet.availableBalance)}
+                disabled={!!(processing || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || (wallet && parseFloat(withdrawAmount) > wallet.availableBalance))}
               >
                 {processing ? (
                   <>

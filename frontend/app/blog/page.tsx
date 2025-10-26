@@ -19,7 +19,7 @@ const articles = [
   },
   {
     id: 2,
-    title: 'Beginner's Guide to Fractional Real Estate Investing',
+    title: 'Beginner\'s Guide to Fractional Real Estate Investing',
     excerpt: 'Everything you need to know about getting started with fractional property ownership and building your portfolio.',
     author: 'Sarah Rodriguez',
     date: 'December 12, 2024',

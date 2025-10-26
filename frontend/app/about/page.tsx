@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import {
   TrendingUp, Shield, Users, Globe, CheckCircle, Target, ArrowRight,
-  Building2, Car, Yacht, Package, Store, Home, Sparkles, DollarSign,
+  Building2, Car, Anchor, Package, Store, Home, Sparkles, DollarSign,
   Award, BarChart3, Zap, Lock, Eye, Briefcase, PieChart, LineChart,
   TrendingDown, Percent, ArrowUpRight, Clock, Star, AlertCircle,
   UserCircle, Code, Network, FileCheck, Calendar, TrendingUpDown,

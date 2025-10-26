@@ -58,7 +58,7 @@ export default function ListingDetailPage() {
 
   const fetchSimilarListings = async () => {
     try {
-      const response = await secondaryMarketAPI.getListings({});
+      const response = await secondaryMarketAPI.getActiveListings({});
       const allListings = response.data.data.listings || [];
       // Filter similar listings
       const similar = allListings

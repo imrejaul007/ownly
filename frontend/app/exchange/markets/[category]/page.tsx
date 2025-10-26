@@ -39,7 +39,7 @@ export default function MarketCategoryPage() {
 
   const [loading, setLoading] = useState(true);
   const [assets, setAssets] = useState([]);
-  const [marketStats, setMarketStats] = useState(null);
+  const [marketStats, setMarketStats] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('volume');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');

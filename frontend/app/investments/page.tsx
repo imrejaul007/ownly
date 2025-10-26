@@ -163,7 +163,7 @@ export default function InvestmentsPage() {
               Asset Allocation
             </h3>
             <div className="space-y-4">
-              {Object.entries(assetTypes).map(([type, amount]) => {
+              {Object.entries(assetTypes).map(([type, amount]: [string, any]) => {
                 const percentage = totalInvested > 0 ? ((amount / totalInvested) * 100).toFixed(1) : '0';
                 const colors: Record<string, string> = {
                   real_estate: 'from-blue-500 to-blue-600',
