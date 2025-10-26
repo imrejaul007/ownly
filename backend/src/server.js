@@ -32,6 +32,9 @@ const allowedOrigins = process.env.NODE_ENV === 'development'
       'http://localhost:3005',
       'http://localhost:3006',
       'http://localhost:3007',
+      'http://localhost:3008',
+      'http://localhost:3009',
+      'http://localhost:3010',
     ]
   : [process.env.FRONTEND_URL];
 
@@ -40,10 +43,10 @@ app.use(cors({
   credentials: true,
 }));
 
-// Rate limiting
+// Rate limiting (relaxed for development)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: process.env.NODE_ENV === 'production' ? 100 : 10000, // 10000 for dev, 100 for production
   message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api/', limiter);

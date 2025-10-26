@@ -1,233 +1,240 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
+import {
+  Package, TrendingUp, Shield, Clock, Users, Target,
+  Zap, CheckCircle, ArrowRight, Filter, Sparkles
+} from 'lucide-react';
 
 interface Bundle {
-  bundle_id: string;
+  id: string;
   name: string;
-  type: string;
-  investment_required: number;
-  duration_months: number;
-  expected_roi_annual: number;
-  distribution_frequency: string;
-  composition: { [key: string]: number };
-  included_deals: string[];
-  highlights: string[];
+  slug: string;
+  bundle_type: string;
+  category: string;
+  description: string;
+  min_investment: string;
+  target_amount: string;
+  raised_amount: string;
+  investor_count: number;
+  expected_roi_min: string;
+  expected_roi_max: string;
+  holding_period_months: number;
+  status: string;
+  images: string[];
+  features: string[];
+  risk_level: string;
+  diversification_score: number;
+  creator?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
-const BUNDLES: Bundle[] = [
-  {
-    bundle_id: "BUN001",
-    name: "Smart Starter Bundle",
-    type: "Balanced Income",
-    investment_required: 1000,
-    duration_months: 12,
-    expected_roi_annual: 18,
-    distribution_frequency: "Monthly",
-    composition: {
-      "Fixed Yield": 40,
-      "Real Estate SPV": 30,
-      "Franchise SPV": 30
-    },
-    included_deals: ["FIX001", "REA001", "BUS001"],
-    highlights: [
-      "Perfect entry-level bundle for new investors",
-      "Auto-diversified and reinvested monthly",
-      "Capital protection through low-risk assets"
-    ]
-  },
-  {
-    bundle_id: "BUN002",
-    name: "Growth Mix Bundle",
-    type: "Moderate Growth",
-    investment_required: 5000,
-    duration_months: 24,
-    expected_roi_annual: 28,
-    distribution_frequency: "Quarterly",
-    composition: {
-      "Real Estate SPV": 30,
-      "Business SPV": 30,
-      "Luxury Asset": 20,
-      "Fixed Yield": 20
-    },
-    included_deals: ["REA002", "BUS002", "LUX002", "FIX002"],
-    highlights: [
-      "Blend of stable and growth-focused assets",
-      "Quarterly distribution of returns",
-      "Ideal for mid-tier investors"
-    ]
-  },
-  {
-    bundle_id: "BUN003",
-    name: "Alpha Investor Bundle",
-    type: "High Growth",
-    investment_required: 10000,
-    duration_months: 36,
-    expected_roi_annual: 45,
-    distribution_frequency: "Annual",
-    composition: {
-      "Tech Ventures": 40,
-      "Real Estate Development": 30,
-      "Luxury Assets": 20,
-      "Fixed Yield": 10
-    },
-    included_deals: ["DIG002", "REA002", "LUX001", "FIX001"],
-    highlights: [
-      "Designed for investors seeking long-term wealth creation",
-      "Equity-based upside potential",
-      "Reinvest auto-option available"
-    ]
-  },
-  {
-    bundle_id: "BUN004",
-    name: "Luxe Experience Bundle",
-    type: "Luxury Lifestyle",
-    investment_required: 20000,
-    duration_months: 30,
-    expected_roi_annual: 38,
-    distribution_frequency: "Quarterly",
-    composition: {
-      "Luxury Assets": 50,
-      "Retail and Wellness": 25,
-      "Real Estate": 15,
-      "Fixed Yield": 10
-    },
-    included_deals: ["LUX001", "BUS001", "REA001", "FIX002"],
-    highlights: [
-      "Luxury-driven yield and lifestyle access",
-      "Partial investment in yacht and car ownership",
-      "Quarterly returns from multiple income sources"
-    ]
-  },
-  {
-    bundle_id: "BUN005",
-    name: "Infrastructure Growth Bundle",
-    type: "Long-Term Real Assets",
-    investment_required: 50000,
-    duration_months: 48,
-    expected_roi_annual: 32,
-    distribution_frequency: "Annual",
-    composition: {
-      "Industrial Real Estate": 60,
-      "Business SPVs": 25,
-      "Fixed Yield": 15
-    },
-    included_deals: ["INF001", "BUS002", "FIX001"],
-    highlights: [
-      "Focus on tangible, asset-backed projects",
-      "High-value long-term development exposure",
-      "Ideal for serious wealth builders"
-    ]
-  },
-  {
-    bundle_id: "BUN006",
-    name: "Global Diversified Bundle",
-    type: "Multi-Sector",
-    investment_required: 10000,
-    duration_months: 36,
-    expected_roi_annual: 35,
-    distribution_frequency: "Quarterly",
-    composition: {
-      "Tech": 25,
-      "Real Estate": 25,
-      "Franchise": 20,
-      "Mobility": 15,
-      "Fixed Yield": 15
-    },
-    included_deals: ["DIG001", "REA001", "BUS002", "REN001", "FIX002"],
-    highlights: [
-      "Exposure to multiple revenue channels",
-      "Geo-diversified for stability",
-      "Ideal for experienced investors"
-    ]
-  }
-];
-
 export default function BundlesPage() {
+  const [bundles, setBundles] = useState<Bundle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBundles = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles`);
+        const data = await response.json();
+
+        if (data.success) {
+          setBundles(data.data);
+        } else {
+          setError('Failed to load bundles');
+        }
+      } catch (err) {
+        console.error('Error fetching bundles:', err);
+        setError('Failed to load bundles');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBundles();
+  }, []);
 
   const filteredBundles = filter
-    ? BUNDLES.filter(b => b.type === filter)
-    : BUNDLES;
+    ? bundles.filter(b => b.bundle_type === filter)
+    : bundles;
+
+  const bundleTypes = ['category_based', 'roi_based', 'thematic', 'community', 'custom'];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-purple-200 text-lg">Loading bundles...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 text-lg">{error}</p>
+          <Link href="/" className="text-purple-400 hover:text-purple-300 mt-4 inline-block">
+            ← Return Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <Link href="/" className="text-primary-600 hover:text-primary-800 mb-4 inline-block">
-          ← Back to Marketplace
-        </Link>
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-          Investment Bundles
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Pre-curated investment portfolios for instant diversification
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)',
+          backgroundSize: '40px 40px'
+        }}></div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-purple-300 hover:text-white mb-6 transition-colors"
+          >
+            <ArrowRight className="w-4 h-4 rotate-180" />
+            Back to Marketplace
+          </Link>
+
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <Package className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent">
+                Investment Bundles
+              </h1>
+            </div>
+          </div>
+
+          <p className="text-xl text-purple-200 max-w-3xl">
+            Pre-curated investment portfolios for instant diversification
+          </p>
+        </div>
       </div>
 
-      {/* Benefits Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 mb-8 text-white">
-        <h2 className="text-2xl font-bold mb-4">Why Choose Investment Bundles?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start">
-            <div className="text-3xl mr-4">🎯</div>
-            <div>
-              <h3 className="font-bold mb-1">Instant Diversification</h3>
-              <p className="text-blue-100 text-sm">Spread risk across multiple deals automatically</p>
-            </div>
+      {/* Benefits Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-12">
+        <div className="bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <Sparkles className="w-6 h-6 text-yellow-300" />
+            <h2 className="text-2xl font-bold text-white">Why Choose Investment Bundles?</h2>
           </div>
-          <div className="flex items-start">
-            <div className="text-3xl mr-4">💰</div>
-            <div>
-              <h3 className="font-bold mb-1">Professional Curation</h3>
-              <p className="text-blue-100 text-sm">Expert-selected deals optimized for returns</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                <Target className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white mb-1">Instant Diversification</h3>
+                <p className="text-blue-100 text-sm">Spread risk across multiple deals automatically</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start">
-            <div className="text-3xl mr-4">⚡</div>
-            <div>
-              <h3 className="font-bold mb-1">One-Click Investing</h3>
-              <p className="text-blue-100 text-sm">Start building wealth in seconds</p>
+
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white mb-1">Professional Curation</h3>
+                <p className="text-blue-100 text-sm">Expert-selected deals optimized for returns</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white mb-1">One-Click Investing</h3>
+                <p className="text-blue-100 text-sm">Start building wealth in seconds</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 flex gap-3 overflow-x-auto pb-2">
-        <button
-          onClick={() => setFilter('')}
-          className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition ${
-            filter === ''
-              ? 'bg-primary-600 text-white'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300'
-          }`}
-        >
-          All Bundles
-        </button>
-        {['Balanced Income', 'Moderate Growth', 'High Growth', 'Luxury Lifestyle', 'Long-Term Real Assets', 'Multi-Sector'].map(type => (
-          <button
-            key={type}
-            onClick={() => setFilter(type)}
-            className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition ${
-              filter === type
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300'
-            }`}
-          >
-            {type}
-          </button>
-        ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        {/* Filters */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <Filter className="w-5 h-5 text-purple-300" />
+            <h3 className="text-lg font-semibold text-white">Filter by Type</h3>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <button
+              onClick={() => setFilter('')}
+              className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+                filter === ''
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                  : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+              }`}
+            >
+              All Bundles
+            </button>
+            {bundleTypes.map(type => (
+              <button
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all capitalize ${
+                  filter === type
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+                }`}
+              >
+                {type.replace('_', ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Bundles Grid */}
+        {filteredBundles.length === 0 ? (
+          <div className="text-center py-20">
+            <Package className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
+            <p className="text-purple-200 text-lg">No bundles found.</p>
+            <button
+              onClick={() => setFilter('')}
+              className="mt-4 text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredBundles.map(bundle => (
+              <BundleCard key={bundle.id} bundle={bundle} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Bundles Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredBundles.map(bundle => (
-          <BundleCard key={bundle.bundle_id} bundle={bundle} />
-        ))}
-      </div>
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }
@@ -235,26 +242,45 @@ export default function BundlesPage() {
 function BundleCard({ bundle }: { bundle: Bundle }) {
   const getTypeColor = (type: string) => {
     const colors: any = {
-      'Balanced Income': 'from-green-500 to-emerald-600',
-      'Moderate Growth': 'from-blue-500 to-cyan-600',
-      'High Growth': 'from-purple-500 to-pink-600',
-      'Luxury Lifestyle': 'from-yellow-500 to-orange-600',
-      'Long-Term Real Assets': 'from-gray-600 to-slate-700',
-      'Multi-Sector': 'from-indigo-500 to-purple-600',
+      'category_based': 'from-green-500 to-emerald-600',
+      'roi_based': 'from-blue-500 to-cyan-600',
+      'thematic': 'from-purple-500 to-pink-600',
+      'community': 'from-yellow-500 to-orange-600',
+      'custom': 'from-gray-600 to-slate-700',
     };
     return colors[type] || 'from-gray-500 to-gray-600';
   };
 
+  const getRiskColor = (risk: string) => {
+    const colors: any = {
+      'low': 'text-green-400 bg-green-500/10 border-green-500/20',
+      'medium': 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
+      'high': 'text-red-400 bg-red-500/10 border-red-500/20',
+    };
+    return colors[risk] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+  };
+
+  const avgROI = (parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2;
+  const fundingProgress = (parseFloat(bundle.raised_amount) / parseFloat(bundle.target_amount)) * 100;
+
   return (
-    <Link href={`/bundles/${bundle.bundle_id}`}>
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden h-full flex flex-col">
+    <Link href={`/bundles/${bundle.id}`}>
+      <div className="group bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all cursor-pointer overflow-hidden h-full flex flex-col hover:scale-105 duration-300">
         {/* Header with Gradient */}
-        <div className={`bg-gradient-to-r ${getTypeColor(bundle.type)} p-6 text-white`}>
-          <div className="text-sm font-semibold mb-2 opacity-90">{bundle.type}</div>
-          <h3 className="text-2xl font-bold mb-2">{bundle.name}</h3>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold">{bundle.expected_roi_annual}%</span>
-            <span className="text-sm opacity-90">Annual ROI</span>
+        <div className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} p-6 text-white relative overflow-hidden`}>
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative">
+            <div className="text-xs font-semibold mb-2 opacity-90 uppercase tracking-wider">
+              {bundle.bundle_type.replace('_', ' ')}
+            </div>
+            <h3 className="text-2xl font-bold mb-3 line-clamp-2">{bundle.name}</h3>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold">{avgROI.toFixed(1)}%</span>
+              <span className="text-sm opacity-90">Avg ROI</span>
+            </div>
+            <div className="text-xs opacity-75 mt-1">
+              {bundle.expected_roi_min}% - {bundle.expected_roi_max}% range
+            </div>
           </div>
         </div>
 
@@ -262,61 +288,87 @@ function BundleCard({ bundle }: { bundle: Bundle }) {
         <div className="p-6 flex-1 flex flex-col">
           {/* Key Metrics */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Min. Investment</div>
-              <div className="font-bold text-lg">{formatCurrency(bundle.investment_required)}</div>
+            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                Min. Investment
+              </div>
+              <div className="font-bold text-white">{formatCurrency(parseFloat(bundle.min_investment))}</div>
             </div>
-            <div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Duration</div>
-              <div className="font-bold text-lg">{bundle.duration_months} months</div>
+
+            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                Duration
+              </div>
+              <div className="font-bold text-white">{bundle.holding_period_months} months</div>
             </div>
-            <div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Distributions</div>
-              <div className="font-semibold text-sm">{bundle.distribution_frequency}</div>
+
+            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                Risk Level
+              </div>
+              <div className={`font-semibold text-sm capitalize px-2 py-1 rounded-lg border ${getRiskColor(bundle.risk_level)}`}>
+                {bundle.risk_level}
+              </div>
             </div>
-            <div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Deals Included</div>
-              <div className="font-semibold text-sm">{bundle.included_deals.length} deals</div>
+
+            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+                <Target className="w-3 h-3" />
+                Diversification
+              </div>
+              <div className="font-semibold text-white">{bundle.diversification_score}/100</div>
             </div>
           </div>
 
-          {/* Composition */}
-          <div className="mb-6">
-            <div className="text-sm font-semibold mb-3">Asset Allocation</div>
-            <div className="space-y-2">
-              {Object.entries(bundle.composition).map(([asset, percentage]) => (
-                <div key={asset}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-600 dark:text-gray-400">{asset}</span>
-                    <span className="font-semibold">{percentage}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                    <div
-                      className="bg-primary-600 h-1.5 rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+          {/* Funding Progress */}
+          {parseFloat(bundle.raised_amount) > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="text-purple-300 flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  Funding Progress
+                </span>
+                <span className="font-semibold text-white">{fundingProgress.toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
+                <div
+                  className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} h-full transition-all duration-500`}
+                  style={{ width: `${Math.min(fundingProgress, 100)}%` }}
+                ></div>
+              </div>
+              <div className="text-xs text-purple-300 mt-2">
+                {formatCurrency(parseFloat(bundle.raised_amount))} of {formatCurrency(parseFloat(bundle.target_amount))}
+              </div>
             </div>
+          )}
+
+          {/* Description */}
+          <div className="mb-4">
+            <p className="text-sm text-purple-200 line-clamp-3">
+              {bundle.description}
+            </p>
           </div>
 
-          {/* Highlights */}
+          {/* Features/Highlights */}
           <div className="mt-auto">
-            <div className="text-sm font-semibold mb-2">Key Highlights</div>
-            <ul className="space-y-1">
-              {bundle.highlights.slice(0, 2).map((highlight, idx) => (
-                <li key={idx} className="text-xs text-gray-600 dark:text-gray-400 flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span>{highlight}</span>
+            <div className="text-sm font-semibold text-white mb-3">Key Features</div>
+            <ul className="space-y-2">
+              {bundle.features.slice(0, 3).map((feature, idx) => (
+                <li key={idx} className="text-xs text-purple-200 flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>{feature}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* CTA */}
-          <button className="mt-6 w-full btn-primary">
+          <button className="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105">
             View Bundle Details
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

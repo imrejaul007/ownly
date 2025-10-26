@@ -324,4 +324,28 @@ export const referralAPI = {
   getActivity: () => api.get('/referrals/activity'),
 };
 
+// Bundle APIs
+export const bundleAPI = {
+  list: (params?: any) => api.get('/bundles', { params }),
+  get: (id: string) => api.get(`/bundles/${id}`),
+  create: (data: any) => api.post('/bundles', data),
+  update: (id: string, data: any) => api.patch(`/bundles/${id}`, data),
+  publish: (id: string) => api.post(`/bundles/${id}/publish`),
+  close: (id: string) => api.post(`/bundles/${id}/close`),
+  invest: (id: string, data: any) => api.post(`/bundles/${id}/invest`, data),
+};
+
+// SIP Plan APIs
+export const sipAPI = {
+  list: (params?: any) => api.get('/sip-plans', { params }),
+  get: (id: string) => api.get(`/sip-plans/${id}`),
+  create: (data: any) => api.post('/sip-plans', data),
+  subscribe: (data: any) => api.post('/sip-subscriptions', data),
+  getMySubscriptions: () => api.get('/sip-subscriptions/my-subscriptions'),
+  updateSubscription: (id: string, data: any) => api.patch(`/sip-subscriptions/${id}`, data),
+  pauseSubscription: (id: string) => api.post(`/sip-subscriptions/${id}/pause`),
+  resumeSubscription: (id: string) => api.post(`/sip-subscriptions/${id}/resume`),
+  cancelSubscription: (id: string) => api.post(`/sip-subscriptions/${id}/cancel`),
+};
+
 export default api;

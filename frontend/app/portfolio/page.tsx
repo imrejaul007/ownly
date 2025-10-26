@@ -215,7 +215,7 @@ export default function PortfolioPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-bold">
-                        <span className={parseFloat(investment.earnings?.actualRoi || 0) >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        <span className={parseFloat(investment.earnings?.actualRoi?.toString() || '0') >= 0 ? 'text-green-600' : 'text-red-600'}>
                           {formatPercentage(investment.earnings?.actualRoi || 0)}
                         </span>
                       </div>

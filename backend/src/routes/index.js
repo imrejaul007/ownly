@@ -26,6 +26,9 @@ import workflowRoutes from './workflows.js';
 import walletRoutes from './wallet.js';
 import propertyManagementRoutes from './propertyManagement.js';
 import referralRoutes from './referrals.js';
+import exchangeRoutes from './exchange.js';
+import bundleRoutes from './bundles.js';
+import sipRoutes from './sip.js';
 
 const router = express.Router();
 
@@ -68,5 +71,8 @@ router.use('/workflows', workflowRoutes);
 router.use('/wallet', walletRoutes);
 router.use('/property-management', propertyManagementRoutes);
 router.use('/referrals', referralRoutes);
+router.use('/exchange', exchangeRoutes);
+router.use('/bundles', bundleRoutes);
+router.use('/sip', sipRoutes);
 
 export default router;

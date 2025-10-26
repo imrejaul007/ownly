@@ -24,6 +24,15 @@ import EmailTemplate from './EmailTemplate.js';
 import EmailLog from './EmailLog.js';
 import Workflow from './Workflow.js';
 import WorkflowExecution from './WorkflowExecution.js';
+import ExchangeAsset from './ExchangeAsset.js';
+import Order from './Order.js';
+import Trade from './Trade.js';
+import Portfolio from './Portfolio.js';
+import MarketData from './MarketData.js';
+import Bundle from './Bundle.js';
+import BundleDeal from './BundleDeal.js';
+import SIPPlan from './SIPPlan.js';
+import SIPSubscription from './SIPSubscription.js';
 
 // Define relationships
 
@@ -143,6 +152,77 @@ WorkflowExecution.belongsTo(Workflow, { foreignKey: 'workflow_id', as: 'workflow
 User.hasMany(WorkflowExecution, { foreignKey: 'trigger_user_id', as: 'triggeredWorkflows' });
 WorkflowExecution.belongsTo(User, { foreignKey: 'trigger_user_id', as: 'triggerUser' });
 
+// Exchange relationships
+Deal.hasOne(ExchangeAsset, { foreignKey: 'deal_id', as: 'exchangeAsset' });
+ExchangeAsset.belongsTo(Deal, { foreignKey: 'deal_id', as: 'deal' });
+
+User.hasMany(Order, { foreignKey: 'user_id', as: 'orders' });
+Order.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+ExchangeAsset.hasMany(Order, { foreignKey: 'asset_id', as: 'orders' });
+Order.belongsTo(ExchangeAsset, { foreignKey: 'asset_id', as: 'asset' });
+
+ExchangeAsset.hasMany(Trade, { foreignKey: 'asset_id', as: 'trades' });
+Trade.belongsTo(ExchangeAsset, { foreignKey: 'asset_id', as: 'asset' });
+
+User.hasMany(Trade, { foreignKey: 'buyer_id', as: 'buyTrades' });
+Trade.belongsTo(User, { foreignKey: 'buyer_id', as: 'buyer' });
+
+User.hasMany(Trade, { foreignKey: 'seller_id', as: 'sellTrades' });
+Trade.belongsTo(User, { foreignKey: 'seller_id', as: 'seller' });
+
+User.hasMany(Portfolio, { foreignKey: 'user_id', as: 'portfolioHoldings' });
+Portfolio.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+ExchangeAsset.hasMany(Portfolio, { foreignKey: 'asset_id', as: 'portfolioHoldings' });
+Portfolio.belongsTo(ExchangeAsset, { foreignKey: 'asset_id', as: 'asset' });
+
+ExchangeAsset.hasMany(MarketData, { foreignKey: 'asset_id', as: 'marketData' });
+MarketData.belongsTo(ExchangeAsset, { foreignKey: 'asset_id', as: 'asset' });
+
+// Bundle relationships
+User.hasMany(Bundle, { foreignKey: 'created_by', as: 'createdBundles' });
+Bundle.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+
+Bundle.belongsToMany(Deal, {
+  through: BundleDeal,
+  foreignKey: 'bundle_id',
+  otherKey: 'deal_id',
+  as: 'deals',
+});
+
+Deal.belongsToMany(Bundle, {
+  through: BundleDeal,
+  foreignKey: 'deal_id',
+  otherKey: 'bundle_id',
+  as: 'bundles',
+});
+
+Bundle.hasMany(BundleDeal, { foreignKey: 'bundle_id', as: 'bundleDeals' });
+BundleDeal.belongsTo(Bundle, { foreignKey: 'bundle_id', as: 'bundle' });
+
+Deal.hasMany(BundleDeal, { foreignKey: 'deal_id', as: 'bundleDeals' });
+BundleDeal.belongsTo(Deal, { foreignKey: 'deal_id', as: 'deal' });
+
+Bundle.hasMany(Investment, { foreignKey: 'bundle_id', as: 'investments' });
+Investment.belongsTo(Bundle, { foreignKey: 'bundle_id', as: 'bundle' });
+
+// SIP Plan relationships
+Bundle.hasMany(SIPPlan, { foreignKey: 'bundle_id', as: 'sipPlans' });
+SIPPlan.belongsTo(Bundle, { foreignKey: 'bundle_id', as: 'bundle' });
+
+User.hasMany(SIPSubscription, { foreignKey: 'user_id', as: 'sipSubscriptions' });
+SIPSubscription.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+SIPPlan.hasMany(SIPSubscription, { foreignKey: 'plan_id', as: 'subscriptions' });
+SIPSubscription.belongsTo(SIPPlan, { foreignKey: 'plan_id', as: 'plan' });
+
+PaymentMethod.hasMany(SIPSubscription, { foreignKey: 'payment_method_id', as: 'sipSubscriptions' });
+SIPSubscription.belongsTo(PaymentMethod, { foreignKey: 'payment_method_id', as: 'paymentMethod' });
+
+SIPSubscription.hasMany(Investment, { foreignKey: 'sip_subscription_id', as: 'investments' });
+Investment.belongsTo(SIPSubscription, { foreignKey: 'sip_subscription_id', as: 'sipSubscription' });
+
 // Export all models
 export {
   User,
@@ -171,6 +251,15 @@ export {
   EmailLog,
   Workflow,
   WorkflowExecution,
+  ExchangeAsset,
+  Order,
+  Trade,
+  Portfolio,
+  MarketData,
+  Bundle,
+  BundleDeal,
+  SIPPlan,
+  SIPSubscription,
 };
 
 export default {
@@ -200,4 +289,13 @@ export default {
   EmailLog,
   Workflow,
   WorkflowExecution,
+  ExchangeAsset,
+  Order,
+  Trade,
+  Portfolio,
+  MarketData,
+  Bundle,
+  BundleDeal,
+  SIPPlan,
+  SIPSubscription,
 };

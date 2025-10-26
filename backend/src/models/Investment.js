@@ -73,11 +73,31 @@ const Investment = sequelize.define('Investment', {
     allowNull: true,
     comment: 'Agent referral code used during investment',
   },
+  bundle_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'bundles',
+      key: 'id',
+    },
+    comment: 'If investment was made through a bundle',
+  },
+  sip_subscription_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'sip_subscriptions',
+      key: 'id',
+    },
+    comment: 'If investment was made through a SIP subscription',
+  },
 }, {
   tableName: 'investments',
   indexes: [
     { fields: ['user_id'] },
     { fields: ['spv_id'] },
+    { fields: ['bundle_id'] },
+    { fields: ['sip_subscription_id'] },
     { fields: ['deal_id'] },
     { fields: ['status'] },
   ],

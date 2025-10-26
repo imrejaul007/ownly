@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Deal } from '@/types';
-import { dealAPI, bundleAPI, secondaryMarketAPI } from '@/lib/api';
+import { dealAPI, secondaryMarketAPI } from '@/lib/api';
 import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
 
 // Universal item type for comparison

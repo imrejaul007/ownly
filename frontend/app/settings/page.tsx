@@ -198,7 +198,7 @@ export default function SettingsPage() {
             {activeTab === 'notifications' && preferences && (
               <NotificationSettings
                 preferences={preferences.notifications}
-                onUpdate={(updates) => updatePreferences('notifications', updates)}
+                onUpdate={(updates: any) => updatePreferences('notifications', updates)}
                 saving={saving}
               />
             )}
@@ -206,7 +206,7 @@ export default function SettingsPage() {
             {activeTab === 'display' && preferences && (
               <DisplaySettings
                 preferences={preferences.display}
-                onUpdate={(updates) => updatePreferences('display', updates)}
+                onUpdate={(updates: any) => updatePreferences('display', updates)}
                 saving={saving}
               />
             )}
@@ -214,7 +214,7 @@ export default function SettingsPage() {
             {activeTab === 'privacy' && preferences && (
               <PrivacySettings
                 preferences={preferences.privacy}
-                onUpdate={(updates) => updatePreferences('privacy', updates)}
+                onUpdate={(updates: any) => updatePreferences('privacy', updates)}
                 saving={saving}
               />
             )}
@@ -222,7 +222,7 @@ export default function SettingsPage() {
             {activeTab === 'security' && preferences && (
               <SecuritySettings
                 preferences={preferences.security}
-                onUpdate={(updates) => updatePreferences('security', updates)}
+                onUpdate={(updates: any) => updatePreferences('security', updates)}
                 saving={saving}
               />
             )}
@@ -230,7 +230,7 @@ export default function SettingsPage() {
             {activeTab === 'dashboard' && preferences && (
               <DashboardSettings
                 preferences={preferences.dashboard}
-                onUpdate={(updates) => updatePreferences('dashboard', updates)}
+                onUpdate={(updates: any) => updatePreferences('dashboard', updates)}
                 saving={saving}
               />
             )}
