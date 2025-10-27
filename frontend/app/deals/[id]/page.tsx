@@ -36,6 +36,12 @@ export default function DealDetailPage() {
   useEffect(() => {
     if (params.id) {
       fetchDeal(params.id as string);
+      // Load watchlist state from localStorage
+      const watchlist = localStorage.getItem('ownly_deal_watchlist');
+      if (watchlist) {
+        const watchlistArray = JSON.parse(watchlist);
+        setIsWatchlisted(watchlistArray.includes(params.id));
+      }
     }
     fetchWalletBalance();
   }, [params.id]);
@@ -100,8 +106,25 @@ export default function DealDetailPage() {
   };
 
   const toggleWatchlist = () => {
-    setIsWatchlisted(!isWatchlisted);
-    // TODO: Persist to backend/localStorage
+    const newState = !isWatchlisted;
+    setIsWatchlisted(newState);
+
+    // Persist to localStorage
+    const dealId = params.id as string;
+    const watchlist = localStorage.getItem('ownly_deal_watchlist');
+    let watchlistArray: string[] = watchlist ? JSON.parse(watchlist) : [];
+
+    if (newState) {
+      // Add to watchlist
+      if (!watchlistArray.includes(dealId)) {
+        watchlistArray.push(dealId);
+      }
+    } else {
+      // Remove from watchlist
+      watchlistArray = watchlistArray.filter(id => id !== dealId);
+    }
+
+    localStorage.setItem('ownly_deal_watchlist', JSON.stringify(watchlistArray));
   };
 
   const handleShare = (platform: string) => {

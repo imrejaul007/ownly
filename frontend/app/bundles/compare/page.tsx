@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, TrendingUp, Shield, PieChart, Clock, DollarSign, Users, X, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -37,7 +37,7 @@ interface Bundle {
   deals?: Deal[];
 }
 
-export default function BundleComparePage() {
+function BundleCompareContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
@@ -441,5 +441,20 @@ export default function BundleComparePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BundleComparePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-purple-300">Loading comparison...</p>
+        </div>
+      </div>
+    }>
+      <BundleCompareContent />
+    </Suspense>
   );
 }

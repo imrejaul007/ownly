@@ -8,7 +8,8 @@ import {
   TrendingUp, DollarSign, Users, ArrowRight, Filter, X, ShoppingCart,
   Briefcase, Home, Building, Rocket, Gem, Calendar, MapPin, Award,
   CheckCircle, Clock, AlertCircle, Flame, Target, BarChart3, Package,
-  Eye, Tag, Zap, Shield, ArrowUpRight, ArrowDownRight, Share2, Plus
+  Eye, Tag, Zap, Shield, ArrowUpRight, ArrowDownRight, Share2, Plus,
+  Heart, Download, SlidersHorizontal, ArrowUpDown, Check
 } from 'lucide-react';
 
 export default function SecondaryMarketPage() {
@@ -26,11 +27,186 @@ export default function SecondaryMarketPage() {
     minPrice: '',
     maxPrice: '',
     search: '',
+    minROI: '',
+    maxROI: '',
+    location: '',
   });
+
+  // Advanced features
+  const [sortBy, setSortBy] = useState('newest');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [favoriteListingIds, setFavoriteListingIds] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [itemsToShow, setItemsToShow] = useState(12);
+  const [itemsPerPage] = useState(12);
+  const [showCopiedNotification, setShowCopiedNotification] = useState(false);
+  const [filteredListings, setFilteredListings] = useState<any[]>([]);
+
+  // Saved searches
+  const [savedSearches, setSavedSearches] = useState<any[]>([]);
+  const [searchName, setSearchName] = useState('');
+  const [showSaveSearchModal, setShowSaveSearchModal] = useState(false);
+  const [showSavedSearchDropdown, setShowSavedSearchDropdown] = useState(false);
+
+  // Load favorites and saved searches from localStorage
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem('ownly_favorite_secondary_listings');
+    if (storedFavorites) {
+      setFavoriteListingIds(JSON.parse(storedFavorites));
+    }
+
+    const storedSearches = localStorage.getItem('ownly_saved_secondary_searches');
+    if (storedSearches) {
+      setSavedSearches(JSON.parse(storedSearches));
+    }
+  }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setItemsToShow(itemsPerPage);
+  }, [filters, sortBy, showFavoritesOnly, itemsPerPage]);
 
   useEffect(() => {
     fetchListings();
   }, [activeTab, filters]);
+
+  // Apply favorites filter, sorting, and set filtered listings
+  useEffect(() => {
+    let result = [...listings];
+
+    // Apply favorites filter
+    if (showFavoritesOnly) {
+      result = result.filter(listing => favoriteListingIds.includes(listing.id));
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'newest':
+        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        break;
+      case 'oldest':
+        result.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        break;
+      case 'price-low':
+        result.sort((a, b) => parseFloat(a.total_price || 0) - parseFloat(b.total_price || 0));
+        break;
+      case 'price-high':
+        result.sort((a, b) => parseFloat(b.total_price || 0) - parseFloat(a.total_price || 0));
+        break;
+      case 'roi-high':
+        result.sort((a, b) => {
+          const roiA = a.investment?.deal?.expected_roi || 0;
+          const roiB = b.investment?.deal?.expected_roi || 0;
+          return roiB - roiA;
+        });
+        break;
+    }
+
+    setFilteredListings(result);
+  }, [listings, showFavoritesOnly, sortBy, favoriteListingIds]);
+
+  // Saved search functions
+  const saveCurrentSearch = () => {
+    if (!searchName.trim()) {
+      alert('Please enter a name for this search');
+      return;
+    }
+
+    const newSearch = {
+      id: Date.now().toString(),
+      name: searchName,
+      filters,
+      sortBy,
+      showFavoritesOnly,
+      createdAt: new Date().toISOString()
+    };
+
+    const updated = [...savedSearches, newSearch];
+    setSavedSearches(updated);
+    localStorage.setItem('ownly_saved_secondary_searches', JSON.stringify(updated));
+    setSearchName('');
+    setShowSaveSearchModal(false);
+    alert(`Search "${searchName}" saved successfully!`);
+  };
+
+  const loadSavedSearch = (search: any) => {
+    setFilters(search.filters);
+    setSortBy(search.sortBy);
+    setShowFavoritesOnly(search.showFavoritesOnly);
+    setShowSavedSearchDropdown(false);
+  };
+
+  const deleteSavedSearch = (searchId: string) => {
+    const updated = savedSearches.filter(s => s.id !== searchId);
+    setSavedSearches(updated);
+    localStorage.setItem('ownly_saved_secondary_searches', JSON.stringify(updated));
+  };
+
+  // Favorite functions
+  const toggleFavorite = (listingId: string) => {
+    const updated = favoriteListingIds.includes(listingId)
+      ? favoriteListingIds.filter(id => id !== listingId)
+      : [...favoriteListingIds, listingId];
+    setFavoriteListingIds(updated);
+    localStorage.setItem('ownly_favorite_secondary_listings', JSON.stringify(updated));
+  };
+
+  // Pagination functions
+  const loadMoreListings = () => {
+    setItemsToShow(prev => prev + itemsPerPage);
+  };
+
+  const showAllListings = () => {
+    setItemsToShow(filteredListings.length);
+  };
+
+  // Export to CSV
+  const exportToCSV = () => {
+    const headers = ['Deal Title', 'Type', 'Seller', 'Shares', 'Price Per Share', 'Total Price', 'Expected ROI', 'Created Date'];
+    const csvRows = [headers.join(',')];
+
+    filteredListings.slice(0, itemsToShow).forEach(listing => {
+      const deal = listing.investment?.deal;
+      const row = [
+        `"${deal?.title || 'N/A'}"`,
+        `"${deal ? getDealTypeLabel(deal.type) : 'N/A'}"`,
+        `"${listing.seller?.name || 'N/A'}"`,
+        listing.shares_for_sale || 0,
+        parseFloat(listing.price_per_share || 0).toFixed(2),
+        parseFloat(listing.total_price || 0).toFixed(2),
+        `"${deal?.expected_roi || 0}%"`,
+        `"${formatDate(listing.created_at)}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `secondary-market-listings-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // Share filters
+  const shareFilters = () => {
+    const params = new URLSearchParams();
+    if (filters.dealType) params.set('dealType', filters.dealType);
+    if (filters.minPrice) params.set('minPrice', filters.minPrice);
+    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+    if (filters.search) params.set('search', filters.search);
+    if (sortBy) params.set('sortBy', sortBy);
+    if (showFavoritesOnly) params.set('favorites', 'true');
+
+    const shareUrl = `${window.location.origin}/secondary-market?${params.toString()}`;
+    navigator.clipboard.writeText(shareUrl);
+    setShowCopiedNotification(true);
+    setTimeout(() => setShowCopiedNotification(false), 3000);
+  };
 
   const fetchListings = async () => {
     try {
@@ -69,6 +245,9 @@ export default function SecondaryMarketPage() {
       minPrice: '',
       maxPrice: '',
       search: '',
+      minROI: '',
+      maxROI: '',
+      location: '',
     });
   };
 
@@ -306,6 +485,154 @@ export default function SecondaryMarketPage() {
         {/* Browse Tab */}
         {activeTab === 'browse' && (
           <div className="space-y-6">
+            {/* Advanced Controls Toolbar */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-2xl">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Sort Dropdown */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer hover:bg-white/10 transition-all"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="roi-high">ROI: High to Low</option>
+                  </select>
+                  <ArrowUpDown className="w-4 h-4 text-purple-300 absolute left-3 top-3 pointer-events-none" />
+                </div>
+
+                {/* Save Search Button */}
+                <button
+                  onClick={() => setShowSaveSearchModal(true)}
+                  className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-purple-200 hover:bg-white/10 transition-all flex items-center gap-2 text-sm font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Save Search</span>
+                  <span className="sm:hidden">Save</span>
+                </button>
+
+                {/* Saved Searches Dropdown */}
+                {savedSearches.length > 0 && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowSavedSearchDropdown(!showSavedSearchDropdown)}
+                      className="px-4 py-2.5 bg-blue-600/20 border border-blue-500/30 rounded-xl text-blue-300 hover:bg-blue-600/30 transition-all flex items-center gap-2 text-sm font-medium"
+                    >
+                      <SlidersHorizontal className="w-4 h-4" />
+                      <span className="hidden sm:inline">Saved</span>
+                      <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        {savedSearches.length}
+                      </span>
+                    </button>
+
+                    {showSavedSearchDropdown && (
+                      <div className="absolute top-full mt-2 left-0 w-72 bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                        <div className="p-3 border-b border-white/10">
+                          <h3 className="text-sm font-semibold text-white">Saved Searches</h3>
+                        </div>
+                        {savedSearches.map((search) => (
+                          <div
+                            key={search.id}
+                            className="p-3 border-b border-white/10 hover:bg-white/5 transition-all"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <button
+                                onClick={() => loadSavedSearch(search)}
+                                className="flex-1 text-left"
+                              >
+                                <div className="font-medium text-white text-sm mb-1">{search.name}</div>
+                                <div className="text-xs text-purple-300">
+                                  {new Date(search.createdAt).toLocaleDateString()}
+                                </div>
+                              </button>
+                              <button
+                                onClick={() => deleteSavedSearch(search.id)}
+                                className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Favorites Filter Toggle */}
+                <button
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm font-medium ${
+                    showFavoritesOnly
+                      ? 'bg-pink-600/30 border border-pink-500/50 text-pink-300'
+                      : 'bg-white/5 border border-white/10 text-purple-200 hover:bg-white/10'
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                  <span className="hidden sm:inline">Favorites</span>
+                  {favoriteListingIds.length > 0 && (
+                    <span className="bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {favoriteListingIds.length}
+                    </span>
+                  )}
+                </button>
+
+                <div className="flex-1"></div>
+
+                {/* Export CSV */}
+                <button
+                  onClick={exportToCSV}
+                  className="px-4 py-2.5 bg-green-600/20 border border-green-500/30 rounded-xl text-green-300 hover:bg-green-600/30 transition-all flex items-center gap-2 text-sm font-medium"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Export CSV</span>
+                  <span className="sm:hidden">Export</span>
+                </button>
+
+                {/* Share Filters */}
+                <button
+                  onClick={shareFilters}
+                  className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-purple-200 hover:bg-white/10 transition-all flex items-center gap-2 text-sm font-medium"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
+              </div>
+
+              {/* Active Filters Summary */}
+              {(filters.dealType || filters.minPrice || filters.maxPrice || filters.search || showFavoritesOnly) && (
+                <div className="mt-3 pt-3 border-t border-white/10">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-purple-300">Active filters:</span>
+                    {filters.dealType && (
+                      <span className="px-2 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg text-xs">
+                        Type: {filters.dealType}
+                      </span>
+                    )}
+                    {filters.search && (
+                      <span className="px-2 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg text-xs">
+                        Search: "{filters.search}"
+                      </span>
+                    )}
+                    {(filters.minPrice || filters.maxPrice) && (
+                      <span className="px-2 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg text-xs">
+                        Price: {filters.minPrice && `AED ${filters.minPrice}`}{filters.minPrice && filters.maxPrice && ' - '}{filters.maxPrice && `AED ${filters.maxPrice}`}
+                      </span>
+                    )}
+                    {showFavoritesOnly && (
+                      <span className="px-2 py-1 bg-pink-500/20 border border-pink-500/30 text-pink-300 rounded-lg text-xs flex items-center gap-1">
+                        <Heart className="w-3 h-3 fill-current" />
+                        Favorites Only
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Filters */}
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl">
               <div className="flex items-center gap-2 mb-4">
@@ -378,15 +705,36 @@ export default function SecondaryMarketPage() {
               </div>
             </div>
 
+            {/* Results count */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="text-purple-200">
+                  Showing <span className="font-bold text-white">{Math.min(itemsToShow, filteredListings.length)}</span> of{' '}
+                  <span className="font-bold text-white">{filteredListings.length}</span> listing{filteredListings.length !== 1 ? 's' : ''}
+                  {showFavoritesOnly && <span className="text-pink-300"> (favorites only)</span>}
+                </div>
+              </div>
+            </div>
+
             {/* Listings */}
-            {listings.length === 0 ? (
+            {filteredListings.length === 0 ? (
               <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
                 <Package className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
-                <p className="text-purple-200 text-lg">No active listings available</p>
+                <p className="text-purple-200 text-lg">
+                  {showFavoritesOnly ? 'No favorite listings found' : 'No active listings available'}
+                </p>
+                {showFavoritesOnly && (
+                  <button
+                    onClick={() => setShowFavoritesOnly(false)}
+                    className="mt-4 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-purple-200 hover:bg-white/10 transition-all"
+                  >
+                    Show All Listings
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-6">
-                {listings.map((listing) => {
+                {filteredListings.slice(0, itemsToShow).map((listing) => {
                   // Calculate potential and earnings metrics
                   const deal = listing.investment?.deal;
                   const expectedAnnualROI = deal?.expected_roi || 12;
@@ -436,9 +784,23 @@ export default function SecondaryMarketPage() {
                           </div>
 
                           <div className="flex-1">
-                            <h3 className="text-2xl font-bold text-white mb-2">
-                              {listing.investment?.deal?.title}
-                            </h3>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <h3 className="text-2xl font-bold text-white">
+                                {listing.investment?.deal?.title}
+                              </h3>
+                              <button
+                                onClick={() => toggleFavorite(listing.id)}
+                                className={`p-2 rounded-xl transition-all ${
+                                  favoriteListingIds.includes(listing.id)
+                                    ? 'bg-pink-600/30 text-pink-300 hover:bg-pink-600/40'
+                                    : 'bg-white/5 text-purple-300 hover:bg-white/10'
+                                }`}
+                              >
+                                <Heart
+                                  className={`w-5 h-5 ${favoriteListingIds.includes(listing.id) ? 'fill-current' : ''}`}
+                                />
+                              </button>
+                            </div>
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <span className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 text-blue-300 rounded-full text-xs font-semibold">
                                 {listing.investment?.deal ? getDealTypeLabel(listing.investment.deal.type) : 'N/A'}
@@ -627,6 +989,25 @@ export default function SecondaryMarketPage() {
                     </div>
                   );
                 })}
+
+                {/* Pagination Controls */}
+                {filteredListings.length > itemsToShow && (
+                  <div className="mt-8 flex justify-center gap-4">
+                    <button
+                      onClick={loadMoreListings}
+                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center gap-2"
+                    >
+                      Load More
+                      <ArrowDownRight className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={showAllListings}
+                      className="px-6 py-3 bg-white/5 border border-white/10 text-purple-200 rounded-xl hover:bg-white/10 transition-all font-semibold"
+                    >
+                      Show All ({filteredListings.length})
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -793,6 +1174,92 @@ export default function SecondaryMarketPage() {
                 Browse Listings
                 <ArrowRight className="w-5 h-5" />
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Save Search Modal */}
+        {showSaveSearchModal && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Save Search</h2>
+                <button
+                  onClick={() => {
+                    setShowSaveSearchModal(false);
+                    setSearchName('');
+                  }}
+                  className="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all"
+                >
+                  <X className="w-5 h-5 text-purple-300" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-purple-300 mb-2">
+                  Search Name
+                </label>
+                <input
+                  type="text"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  placeholder="e.g., High ROI Listings"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  onKeyPress={(e) => e.key === 'Enter' && saveCurrentSearch()}
+                />
+              </div>
+
+              <div className="bg-white/5 rounded-xl p-4 border border-white/10 mb-6">
+                <p className="text-sm text-purple-300 mb-2">Current filters:</p>
+                <ul className="text-xs text-purple-200 space-y-1">
+                  {filters.dealType && <li>• Type: {filters.dealType}</li>}
+                  {filters.search && <li>• Search: "{filters.search}"</li>}
+                  {(filters.minPrice || filters.maxPrice) && (
+                    <li>
+                      • Price: {filters.minPrice && `AED ${filters.minPrice}`}
+                      {filters.minPrice && filters.maxPrice && ' - '}
+                      {filters.maxPrice && `AED ${filters.maxPrice}`}
+                    </li>
+                  )}
+                  {sortBy !== 'newest' && <li>• Sort: {sortBy}</li>}
+                  {showFavoritesOnly && <li>• Favorites only</li>}
+                  {!filters.dealType && !filters.search && !filters.minPrice && !filters.maxPrice && !showFavoritesOnly && sortBy === 'newest' && (
+                    <li className="text-purple-400">No filters applied</li>
+                  )}
+                </ul>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={saveCurrentSearch}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2"
+                >
+                  <Check className="w-5 h-5" />
+                  Save Search
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSaveSearchModal(false);
+                    setSearchName('');
+                  }}
+                  className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-purple-200 rounded-xl hover:bg-white/10 transition-all font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Notification Toast */}
+        {showCopiedNotification && (
+          <div className="fixed bottom-8 right-8 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-slide-up">
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <Check className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-semibold">Link Copied!</div>
+              <div className="text-sm text-green-100">Share this filter configuration with others</div>
             </div>
           </div>
         )}

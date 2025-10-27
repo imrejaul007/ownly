@@ -6,6 +6,10 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Deal } from '@/types';
 import { dealAPI, secondaryMarketAPI } from '@/lib/api';
 import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import {
+  TrendingUp, Clock, DollarSign, MapPin, Users, Target, Award,
+  BarChart3, X, Plus, CheckCircle, ArrowLeft, Crown
+} from 'lucide-react';
 
 // Universal item type for comparison
 interface ComparisonItem {
@@ -131,94 +135,131 @@ function DealCompareContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-purple-200 text-lg">Loading comparison...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero Header */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-700 rounded-2xl shadow-2xl p-8 mb-8 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative z-10">
-          <Link href="/deals" className="text-white hover:text-primary-100 mb-4 inline-block">
-            ← Back to Deals
-          </Link>
-          <h1 className="text-4xl font-bold mb-2">
-            Compare Investment Opportunities
-          </h1>
-          <p className="text-primary-100 text-lg">
-            Compare up to 4 investment opportunities side by side to make informed decisions
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Animated Gradient Orbs */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="fixed top-1/2 left-1/2 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
 
-      {/* Item Selector */}
-      {items.length < 4 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-lg font-bold mb-4">Add Items to Compare</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {allDeals
-              .filter(deal => !selectedItems.includes(`deal:${deal.id}`))
-              .slice(0, 6)
-              .map(deal => (
-                <button
-                  key={deal.id}
-                  onClick={() => handleAddItem(deal.id)}
-                  className="text-left p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition"
-                >
-                  <div className="text-xs text-primary-600 font-semibold mb-1">📋 DEAL</div>
-                  <div className="font-semibold text-sm mb-1">{deal.title}</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {getDealTypeLabel(deal.type)} • {formatPercentage(deal.expected_roi || 0)} ROI
-                  </div>
-                </button>
-              ))}
+      {/* Background Pattern */}
+      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5"></div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Header */}
+        <div className="relative overflow-hidden rounded-2xl mb-8">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}></div>
+
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 p-8">
+            <Link href="/deals" className="flex items-center gap-2 text-purple-200 hover:text-white mb-4 inline-flex transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Deals
+            </Link>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                  Compare Investments
+                </h1>
+                <p className="text-purple-200 text-lg">
+                  Side-by-side comparison • Make informed decisions
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Comparison Table */}
-      {items.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center">
-          <div className="text-gray-400 mb-4">
-            <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            Select Items to Compare
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Choose at least 2 items from deals, bundles, or secondary market to start comparing
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900">
-                  Feature
-                </th>
-                {items.map(item => (
-                  <th key={item.id} className="p-4 text-center min-w-[200px] bg-gray-50 dark:bg-gray-900">
-                    <div className="text-xs text-primary-600 font-semibold mb-1">
-                      {item.type.toUpperCase()}
+        {/* Item Selector */}
+        {items.length < 4 && (
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Plus className="w-5 h-5 text-purple-400" />
+              <h2 className="text-lg font-bold text-white">Add Deals to Compare</h2>
+              <span className="text-purple-300 text-sm">({4 - items.length} slots remaining)</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allDeals
+                .filter(deal => !selectedItems.includes(`deal:${deal.id}`))
+                .slice(0, 6)
+                .map(deal => (
+                  <button
+                    key={deal.id}
+                    onClick={() => handleAddItem(deal.id)}
+                    className="text-left p-4 bg-white/5 border border-white/10 rounded-xl hover:border-purple-500/50 hover:bg-white/10 transition-all group"
+                  >
+                    <div className="flex items-center gap-2 text-xs text-purple-400 font-semibold mb-2">
+                      <BarChart3 className="w-3 h-3" />
+                      DEAL
                     </div>
-                    <div className="font-bold text-sm mb-2">{item.title}</div>
-                    <button
-                      onClick={() => handleRemoveItem(`${item.type}:${item.id}`)}
-                      className="text-xs text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
-                  </th>
+                    <div className="font-semibold text-sm mb-2 text-white group-hover:text-purple-200 transition-colors line-clamp-2">{deal.title}</div>
+                    <div className="text-xs text-purple-300">
+                      {getDealTypeLabel(deal.type)} • {formatPercentage(deal.expected_roi || 0)} ROI
+                    </div>
+                  </button>
                 ))}
-              </tr>
-            </thead>
+            </div>
+          </div>
+        )}
+
+        {/* Comparison Table */}
+        {items.length === 0 ? (
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-12 text-center">
+            <div className="text-purple-400/50 mb-4">
+              <BarChart3 className="w-20 h-20 mx-auto" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">
+              Select Deals to Compare
+            </h3>
+            <p className="text-purple-300 max-w-md mx-auto">
+              Choose at least 2 investment opportunities above to start comparing them side by side
+            </p>
+          </div>
+        ) : (
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+            {/* Mobile: Add horizontal scroll wrapper */}
+            <div className="overflow-x-auto scrollbar-hide">
+              <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="p-4 text-left text-sm font-semibold text-purple-200 bg-white/5">
+                    <div className="flex items-center gap-2">
+                      <Award className="w-4 h-4" />
+                      Feature
+                    </div>
+                  </th>
+                  {items.map((item, index) => (
+                    <th key={item.id} className="p-4 text-center min-w-[220px] bg-white/5 relative">
+                      <div className="text-xs text-purple-400 font-semibold mb-1 flex items-center justify-center gap-1">
+                        <BarChart3 className="w-3 h-3" />
+                        {item.type.toUpperCase()}
+                      </div>
+                      <div className="font-bold text-sm mb-3 text-white px-2">{item.title}</div>
+                      <button
+                        onClick={() => handleRemoveItem(`${item.type}:${item.id}`)}
+                        className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1.5 rounded-lg transition-all"
+                      >
+                        <X className="w-3 h-3" />
+                        Remove
+                      </button>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
             <tbody>
               {/* Type */}
               <ComparisonRow
@@ -322,12 +363,17 @@ function DealCompareContent() {
               )}
 
               {/* Actions */}
-              <tr className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <td className="p-4 font-semibold">Actions</td>
+              <tr className="border-t border-white/10 bg-white/5">
+                <td className="p-4 font-semibold text-purple-200">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Actions
+                  </div>
+                </td>
                 {items.map(item => (
                   <td key={item.id} className="p-4 text-center">
                     <Link href={item.type === 'deal' ? `/deals/${item.id}` : item.type === 'bundle' ? `/bundles/${item.id}` : `/secondary-market/${item.id}`}>
-                      <button className="btn-primary w-full mb-2">
+                      <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all">
                         View Details
                       </button>
                     </Link>
@@ -335,9 +381,11 @@ function DealCompareContent() {
                 ))}
               </tr>
             </tbody>
-          </table>
-        </div>
-      )}
+            </table>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -371,18 +419,23 @@ function ComparisonRow({
   }
 
   return (
-    <tr className="border-t border-gray-200 dark:border-gray-700">
-      <td className="p-4 font-semibold text-gray-700 dark:text-gray-300">{label}</td>
+    <tr className="border-t border-white/10 hover:bg-white/5 transition-colors">
+      <td className="p-4 font-semibold text-purple-200">{label}</td>
       {values.map((value, index) => (
         <td
           key={index}
-          className={`p-4 text-center ${
+          className={`p-4 text-center text-white transition-all ${
             bestIndex === index
-              ? 'bg-green-50 dark:bg-green-900/20 font-bold text-green-700 dark:text-green-400'
+              ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 font-bold text-green-300 border-l border-r border-green-500/30 relative'
               : ''
           }`}
         >
-          {value}
+          {bestIndex === index && (
+            <div className="absolute top-2 right-2">
+              <Crown className="w-4 h-4 text-yellow-400 fill-current" />
+            </div>
+          )}
+          <div className="relative z-10">{value}</div>
         </td>
       ))}
     </tr>

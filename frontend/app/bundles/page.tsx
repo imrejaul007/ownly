@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/utils';
 import {
   Package, TrendingUp, Shield, Clock, Users, Target,
-  Zap, CheckCircle, ArrowRight, Filter, Sparkles, GitCompare
+  Zap, CheckCircle, ArrowRight, Filter, Sparkles, GitCompare,
+  Heart, Download, Share2, Check, ChevronDown, SlidersHorizontal,
+  BarChart3, DollarSign, X, ArrowUpDown, Save, Bookmark
 } from 'lucide-react';
 
 interface Bundle {
@@ -38,11 +40,37 @@ interface Bundle {
 export default function BundlesPage() {
   const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
+  const [filteredBundles, setFilteredBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedBundles, setSelectedBundles] = useState<string[]>([]);
+
+  // Advanced filtering & sorting
+  const [sortBy, setSortBy] = useState('newest');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [favoriteBundleIds, setFavoriteBundleIds] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [itemsToShow, setItemsToShow] = useState(9);
+  const [itemsPerPage] = useState(9);
+  const [showCopiedNotification, setShowCopiedNotification] = useState(false);
+
+  const [filters, setFilters] = useState({
+    search: '',
+    minROI: '',
+    maxROI: '',
+    minInvestment: '',
+    maxInvestment: '',
+    riskLevel: '',
+    minDiversification: '',
+  });
+
+  // Saved searches
+  const [savedSearches, setSavedSearches] = useState<any[]>([]);
+  const [searchName, setSearchName] = useState('');
+  const [showSaveSearchModal, setShowSaveSearchModal] = useState(false);
+  const [showSavedSearchDropdown, setShowSavedSearchDropdown] = useState(false);
 
   useEffect(() => {
     const fetchBundles = async () => {
@@ -66,9 +94,246 @@ export default function BundlesPage() {
     fetchBundles();
   }, []);
 
-  const filteredBundles = filter
-    ? bundles.filter(b => b.bundle_type === filter)
-    : bundles;
+  // Load favorites from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('ownly_favorite_bundles');
+    if (saved) {
+      setFavoriteBundleIds(JSON.parse(saved));
+    }
+  }, []);
+
+  // Load saved searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('ownly_saved_bundle_searches');
+    if (saved) {
+      setSavedSearches(JSON.parse(saved));
+    }
+  }, []);
+
+  // Apply filters and sorting
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [bundles, filter, filters, sortBy, showFavoritesOnly, favoriteBundleIds]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setItemsToShow(itemsPerPage);
+  }, [filter, filters, sortBy, showFavoritesOnly]);
+
+  const applyFiltersAndSort = () => {
+    let filtered = [...bundles];
+
+    // Apply favorites filter
+    if (showFavoritesOnly) {
+      filtered = filtered.filter(bundle => favoriteBundleIds.includes(bundle.id));
+    }
+
+    // Apply bundle type filter
+    if (filter) {
+      filtered = filtered.filter(b => b.bundle_type === filter);
+    }
+
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(bundle =>
+        bundle.name?.toLowerCase().includes(searchLower) ||
+        bundle.description?.toLowerCase().includes(searchLower) ||
+        bundle.category?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply ROI filters
+    if (filters.minROI) {
+      filtered = filtered.filter(bundle => {
+        const avgROI = (parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2;
+        return avgROI >= parseFloat(filters.minROI);
+      });
+    }
+    if (filters.maxROI) {
+      filtered = filtered.filter(bundle => {
+        const avgROI = (parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2;
+        return avgROI <= parseFloat(filters.maxROI);
+      });
+    }
+
+    // Apply investment amount filters
+    if (filters.minInvestment) {
+      filtered = filtered.filter(bundle => parseFloat(bundle.min_investment) >= parseFloat(filters.minInvestment));
+    }
+    if (filters.maxInvestment) {
+      filtered = filtered.filter(bundle => parseFloat(bundle.min_investment) <= parseFloat(filters.maxInvestment));
+    }
+
+    // Apply risk level filter
+    if (filters.riskLevel) {
+      filtered = filtered.filter(bundle => bundle.risk_level === filters.riskLevel);
+    }
+
+    // Apply diversification filter
+    if (filters.minDiversification) {
+      filtered = filtered.filter(bundle => bundle.diversification_score >= parseFloat(filters.minDiversification));
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'roi-high':
+        filtered.sort((a, b) => {
+          const avgA = (parseFloat(a.expected_roi_min) + parseFloat(a.expected_roi_max)) / 2;
+          const avgB = (parseFloat(b.expected_roi_min) + parseFloat(b.expected_roi_max)) / 2;
+          return avgB - avgA;
+        });
+        break;
+      case 'roi-low':
+        filtered.sort((a, b) => {
+          const avgA = (parseFloat(a.expected_roi_min) + parseFloat(a.expected_roi_max)) / 2;
+          const avgB = (parseFloat(b.expected_roi_min) + parseFloat(b.expected_roi_max)) / 2;
+          return avgA - avgB;
+        });
+        break;
+      case 'investment-low':
+        filtered.sort((a, b) => parseFloat(a.min_investment) - parseFloat(b.min_investment));
+        break;
+      case 'investment-high':
+        filtered.sort((a, b) => parseFloat(b.min_investment) - parseFloat(a.min_investment));
+        break;
+      case 'diversification':
+        filtered.sort((a, b) => b.diversification_score - a.diversification_score);
+        break;
+      case 'newest':
+      default:
+        // Keep original order (assumed newest first from API)
+        break;
+    }
+
+    setFilteredBundles(filtered);
+  };
+
+  const toggleFavorite = (bundleId: string) => {
+    const updated = favoriteBundleIds.includes(bundleId)
+      ? favoriteBundleIds.filter(id => id !== bundleId)
+      : [...favoriteBundleIds, bundleId];
+    setFavoriteBundleIds(updated);
+    localStorage.setItem('ownly_favorite_bundles', JSON.stringify(updated));
+  };
+
+  const loadMoreBundles = () => {
+    setItemsToShow(prev => prev + itemsPerPage);
+  };
+
+  const showAllBundles = () => {
+    setItemsToShow(filteredBundles.length);
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Name', 'Type', 'Avg ROI', 'Min Investment', 'Duration (Months)', 'Risk Level', 'Diversification Score', 'Status'];
+    const csvRows = [headers.join(',')];
+
+    filteredBundles.forEach(bundle => {
+      const avgROI = ((parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2).toFixed(1);
+      const row = [
+        `"${bundle.name || ''}"`,
+        `"${bundle.bundle_type.replace('_', ' ')}"`,
+        `${avgROI}%`,
+        bundle.min_investment,
+        bundle.holding_period_months,
+        `"${bundle.risk_level}"`,
+        bundle.diversification_score,
+        `"${bundle.status}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ownly-bundles-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const shareFilters = () => {
+    const params = new URLSearchParams();
+    if (filter) params.set('type', filter);
+    if (filters.search) params.set('search', filters.search);
+    if (filters.minROI) params.set('minROI', filters.minROI);
+    if (filters.maxROI) params.set('maxROI', filters.maxROI);
+    if (filters.minInvestment) params.set('minInvestment', filters.minInvestment);
+    if (filters.maxInvestment) params.set('maxInvestment', filters.maxInvestment);
+    if (filters.riskLevel) params.set('riskLevel', filters.riskLevel);
+    if (filters.minDiversification) params.set('minDiversification', filters.minDiversification);
+    if (sortBy !== 'newest') params.set('sort', sortBy);
+
+    const shareUrl = `${window.location.origin}/bundles?${params.toString()}`;
+    navigator.clipboard.writeText(shareUrl);
+    setShowCopiedNotification(true);
+    setTimeout(() => setShowCopiedNotification(false), 3000);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      search: '',
+      minROI: '',
+      maxROI: '',
+      minInvestment: '',
+      maxInvestment: '',
+      riskLevel: '',
+      minDiversification: '',
+    });
+    setFilter('');
+    setSortBy('newest');
+    setShowFavoritesOnly(false);
+  };
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (filter) count++;
+    if (filters.search) count++;
+    if (filters.minROI || filters.maxROI) count++;
+    if (filters.minInvestment || filters.maxInvestment) count++;
+    if (filters.riskLevel) count++;
+    if (filters.minDiversification) count++;
+    if (showFavoritesOnly) count++;
+    return count;
+  };
+
+  const saveCurrentSearch = () => {
+    if (!searchName.trim()) return;
+
+    const newSearch = {
+      id: Date.now().toString(),
+      name: searchName,
+      filter,
+      filters,
+      sortBy,
+      showFavoritesOnly,
+      createdAt: new Date().toISOString()
+    };
+
+    const updated = [...savedSearches, newSearch];
+    setSavedSearches(updated);
+    localStorage.setItem('ownly_saved_bundle_searches', JSON.stringify(updated));
+    setSearchName('');
+    setShowSaveSearchModal(false);
+  };
+
+  const loadSavedSearch = (search: any) => {
+    setFilter(search.filter);
+    setFilters(search.filters);
+    setSortBy(search.sortBy);
+    setShowFavoritesOnly(search.showFavoritesOnly);
+    setShowSavedSearchDropdown(false);
+  };
+
+  const deleteSavedSearch = (searchId: string) => {
+    const updated = savedSearches.filter(s => s.id !== searchId);
+    setSavedSearches(updated);
+    localStorage.setItem('ownly_saved_bundle_searches', JSON.stringify(updated));
+  };
 
   const bundleTypes = ['category_based', 'roi_based', 'thematic', 'community', 'custom'];
 
@@ -202,24 +467,268 @@ export default function BundlesPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        {/* Filters */}
+        {/* Enhanced Filters Bar */}
         <div className="mb-8">
+          {/* Top Controls */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+            {/* Left Side - Action Buttons */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+              {/* Save Search Button */}
+              <button
+                onClick={() => setShowSaveSearchModal(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10 transition-all"
+              >
+                <Save className="w-4 h-4" />
+                <span className="hidden sm:inline">Save Search</span>
+                <span className="sm:hidden">Save</span>
+              </button>
+
+              {/* Saved Searches Dropdown */}
+              {savedSearches.length > 0 && (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSavedSearchDropdown(!showSavedSearchDropdown)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10 transition-all"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    <span className="hidden sm:inline">Saved</span>
+                    <ChevronDown className="w-4 h-4" />
+                    <span className="ml-1 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                      {savedSearches.length}
+                    </span>
+                  </button>
+
+                  {showSavedSearchDropdown && (
+                    <div className="absolute top-full mt-2 left-0 w-72 max-w-[calc(100vw-2rem)] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                      <div className="p-4">
+                        <div className="text-sm font-semibold text-white mb-3">Saved Searches</div>
+                        <div className="space-y-2">
+                          {savedSearches.map((search) => (
+                            <div key={search.id} className="group flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all">
+                              <button
+                                onClick={() => loadSavedSearch(search)}
+                                className="flex-1 text-left"
+                              >
+                                <div className="text-sm font-medium text-white">{search.name}</div>
+                                <div className="text-xs text-purple-300 mt-1">
+                                  {new Date(search.createdAt).toLocaleDateString()}
+                                </div>
+                              </button>
+                              <button
+                                onClick={() => deleteSavedSearch(search.id)}
+                                className="ml-2 p-1.5 rounded-lg hover:bg-red-500/20 text-purple-300 hover:text-red-400 transition-all"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all ${
+                  showAdvancedFilters
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+                }`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                <span className="hidden sm:inline">Advanced Filters</span>
+                <span className="sm:hidden">Filters</span>
+                {getActiveFiltersCount() > 0 && (
+                  <span className="ml-1 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                    {getActiveFiltersCount()}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all ${
+                  showFavoritesOnly
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                <span className="hidden sm:inline">Favorites</span>
+                <span className="sm:hidden">Fav</span>
+                {favoriteBundleIds.length > 0 && (
+                  <span className="ml-1 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                    {favoriteBundleIds.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={exportToCSV}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 rounded-xl text-sm font-medium hover:bg-white/10 transition-all whitespace-nowrap flex-shrink-0"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Export CSV</span>
+                <span className="sm:hidden">Export</span>
+              </button>
+
+              <button
+                onClick={shareFilters}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 rounded-xl text-sm font-medium hover:bg-white/10 transition-all whitespace-nowrap flex-shrink-0"
+              >
+                <Share2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+
+              {getActiveFiltersCount() > 0 && (
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium hover:bg-red-500/20 transition-all whitespace-nowrap flex-shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="hidden sm:inline">Clear All</span>
+                  <span className="sm:hidden">Clear</span>
+                </button>
+              )}
+            </div>
+
+            {/* Right Side - Sort & Compare */}
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <ArrowUpDown className="w-4 h-4 text-purple-300 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="pl-9 pr-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 rounded-xl text-sm font-medium hover:bg-white/10 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="roi-high">Highest ROI</option>
+                  <option value="roi-low">Lowest ROI</option>
+                  <option value="investment-low">Min Investment: Low to High</option>
+                  <option value="investment-high">Min Investment: High to Low</option>
+                  <option value="diversification">Best Diversification</option>
+                </select>
+              </div>
+
+              <button
+                onClick={toggleCompareMode}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
+                  compareMode
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10'
+                }`}
+              >
+                <GitCompare className="w-4 h-4" />
+                <span className="hidden sm:inline">{compareMode ? 'Exit Compare' : 'Compare'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Advanced Filters Panel */}
+          {showAdvancedFilters && (
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Search</label>
+                  <input
+                    type="text"
+                    placeholder="Search bundles..."
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* Min ROI */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Min ROI (%)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 20"
+                    value={filters.minROI}
+                    onChange={(e) => setFilters({ ...filters, minROI: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* Max ROI */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Max ROI (%)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 60"
+                    value={filters.maxROI}
+                    onChange={(e) => setFilters({ ...filters, maxROI: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* Min Investment */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Min Investment (AED)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 5000"
+                    value={filters.minInvestment}
+                    onChange={(e) => setFilters({ ...filters, minInvestment: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* Max Investment */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Max Investment (AED)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 50000"
+                    value={filters.maxInvestment}
+                    onChange={(e) => setFilters({ ...filters, maxInvestment: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* Risk Level */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Risk Level</label>
+                  <select
+                    value={filters.riskLevel}
+                    onChange={(e) => setFilters({ ...filters, riskLevel: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-colors"
+                  >
+                    <option value="">All Risk Levels</option>
+                    <option value="low">Low Risk</option>
+                    <option value="medium">Medium Risk</option>
+                    <option value="high">High Risk</option>
+                  </select>
+                </div>
+
+                {/* Min Diversification */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200 mb-2">Min Diversification Score</label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 70"
+                    value={filters.minDiversification}
+                    onChange={(e) => setFilters({ ...filters, minDiversification: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Bundle Type Filter Tabs */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Filter className="w-5 h-5 text-purple-300" />
               <h3 className="text-lg font-semibold text-white">Filter by Type</h3>
             </div>
-            <button
-              onClick={toggleCompareMode}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-                compareMode
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                  : 'bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10'
-              }`}
-            >
-              <GitCompare className="w-5 h-5" />
-              {compareMode ? 'Exit Compare Mode' : 'Compare Bundles'}
-            </button>
+            <div className="text-sm text-purple-300">
+              Showing <span className="font-bold text-white">{filteredBundles.length}</span> of <span className="font-bold text-white">{bundles.length}</span> bundles
+            </div>
           </div>
 
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -255,37 +764,143 @@ export default function BundlesPage() {
             <Package className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
             <p className="text-purple-200 text-lg">No bundles found.</p>
             <button
-              onClick={() => setFilter('')}
+              onClick={clearFilters}
               className="mt-4 text-purple-400 hover:text-purple-300 transition-colors"
             >
               Clear filters
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredBundles.map(bundle => (
-              <BundleCard
-                key={bundle.id}
-                bundle={bundle}
-                compareMode={compareMode}
-                isSelected={selectedBundles.includes(bundle.id)}
-                onToggleSelect={() => toggleBundleSelection(bundle.id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredBundles.slice(0, itemsToShow).map(bundle => (
+                <BundleCard
+                  key={bundle.id}
+                  bundle={bundle}
+                  compareMode={compareMode}
+                  isSelected={selectedBundles.includes(bundle.id)}
+                  onToggleSelect={() => toggleBundleSelection(bundle.id)}
+                  isFavorite={favoriteBundleIds.includes(bundle.id)}
+                  onToggleFavorite={() => toggleFavorite(bundle.id)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {itemsToShow < filteredBundles.length && (
+              <div className="mt-12 flex flex-col items-center gap-4">
+                <p className="text-purple-300 text-sm">
+                  Showing {itemsToShow} of {filteredBundles.length} bundles
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={loadMoreBundles}
+                    className="px-8 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 rounded-xl font-medium hover:bg-white/10 transition-all"
+                  >
+                    Load More ({Math.min(itemsPerPage, filteredBundles.length - itemsToShow)} more)
+                  </button>
+                  <button
+                    onClick={showAllBundles}
+                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all"
+                  >
+                    Show All ({filteredBundles.length - itemsToShow} remaining)
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {itemsToShow >= filteredBundles.length && filteredBundles.length > itemsPerPage && (
+              <div className="mt-12 text-center">
+                <p className="text-purple-300 text-sm">
+                  Showing all {filteredBundles.length} bundles
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Floating Compare Button */}
         {compareMode && selectedBundles.length >= 2 && (
-          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="fixed bottom-4 right-4 left-4 sm:left-1/2 sm:right-auto sm:bottom-8 sm:transform sm:-translate-x-1/2 z-50">
             <button
               onClick={handleCompare}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-bold shadow-2xl shadow-purple-500/50 transition-all flex items-center gap-3 hover:scale-105"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-bold shadow-2xl shadow-purple-500/50 transition-all flex items-center justify-center gap-3 hover:scale-105"
             >
               <GitCompare className="w-6 h-6" />
               Compare {selectedBundles.length} Bundles
               <ArrowRight className="w-5 h-5" />
             </button>
+          </div>
+        )}
+
+        {/* Notification Toast */}
+        {showCopiedNotification && (
+          <div className="fixed bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-8 z-50 animate-fade-in">
+            <div className="bg-green-500/90 backdrop-blur-xl text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-green-400/20 max-w-md mx-auto">
+              <Check className="w-6 h-6 flex-shrink-0" />
+              <span className="font-medium">Filter link copied to clipboard!</span>
+            </div>
+          </div>
+        )}
+
+        {/* Save Search Modal */}
+        {showSaveSearchModal && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Save Current Search</h2>
+                <button
+                  onClick={() => setShowSaveSearchModal(false)}
+                  className="w-8 h-8 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all"
+                >
+                  <X className="w-5 h-5 text-purple-300" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-purple-300 mb-2">Search Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g., High ROI Bundles"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && saveCurrentSearch()}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  autoFocus
+                />
+              </div>
+
+              <div className="mb-6 bg-white/5 rounded-xl p-4 border border-white/10">
+                <p className="text-sm text-purple-300 mb-2">Current Filters:</p>
+                <div className="space-y-1 text-sm text-white">
+                  {filter && <p>• Type: {filter.replace('_', ' ')}</p>}
+                  {filters.search && <p>• Search: {filters.search}</p>}
+                  {(filters.minROI || filters.maxROI) && <p>• ROI Range: {filters.minROI || '0'}% - {filters.maxROI || '∞'}%</p>}
+                  {filters.riskLevel && <p>• Risk: {filters.riskLevel}</p>}
+                  {sortBy !== 'newest' && <p>• Sort: {sortBy.replace('-', ' ')}</p>}
+                  {!filter && !filters.search && !filters.minROI && !filters.maxROI && !filters.riskLevel && sortBy === 'newest' && (
+                    <p className="text-purple-400 italic">No filters applied</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={saveCurrentSearch}
+                  disabled={!searchName.trim()}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Save className="w-5 h-5" />
+                  Save Search
+                </button>
+                <button
+                  onClick={() => setShowSaveSearchModal(false)}
+                  className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-purple-200 rounded-xl hover:bg-white/10 transition-all font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -308,13 +923,30 @@ interface BundleCardProps {
   compareMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
-function BundleCard({ bundle, compareMode = false, isSelected = false, onToggleSelect }: BundleCardProps) {
+function BundleCard({
+  bundle,
+  compareMode = false,
+  isSelected = false,
+  onToggleSelect,
+  isFavorite = false,
+  onToggleFavorite
+}: BundleCardProps) {
   const handleClick = (e: React.MouseEvent) => {
     if (compareMode && onToggleSelect) {
       e.preventDefault();
       onToggleSelect();
+    }
+  };
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite();
     }
   };
 
@@ -352,9 +984,24 @@ function BundleCard({ bundle, compareMode = false, isSelected = false, onToggleS
       }`}
       onClick={handleClick}
     >
-      {/* Checkbox Overlay in Compare Mode */}
-      {compareMode && (
-        <div className="absolute top-4 right-4 z-10">
+      {/* Favorite & Checkbox Overlay */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        {/* Favorite Button */}
+        {!compareMode && onToggleFavorite && (
+          <button
+            onClick={handleFavoriteClick}
+            className={`w-10 h-10 rounded-xl backdrop-blur-sm border-2 flex items-center justify-center transition-all ${
+              isFavorite
+                ? 'bg-red-500 border-red-500 hover:bg-red-600'
+                : 'bg-white/10 border-white/30 hover:border-red-400 hover:bg-red-500/20'
+            }`}
+          >
+            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current text-white' : 'text-white'}`} />
+          </button>
+        )}
+
+        {/* Checkbox in Compare Mode */}
+        {compareMode && (
           <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all ${
             isSelected
               ? 'bg-purple-500 border-purple-500'
@@ -364,8 +1011,8 @@ function BundleCard({ bundle, compareMode = false, isSelected = false, onToggleS
               <CheckCircle className="w-6 h-6 text-white" />
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
         {/* Header with Gradient */}
         <div className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} p-6 text-white relative overflow-hidden`}>
           <div className="absolute inset-0 bg-black/10"></div>
