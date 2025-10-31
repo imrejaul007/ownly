@@ -180,24 +180,11 @@ export default function DealDetailPage() {
         amount,
       });
 
-      // Success message
-      alert(`Investment successful!\n\nYou invested ${formatCurrency(amount)} in ${deal.title}.\n\nYour wallet balance has been updated.`);
-
-      setShowInvestModal(false);
-      setInvestAmount('');
-
-      // Refresh data
-      fetchDeal(params.id as string);
-      fetchWalletBalance();
-
-      // Redirect to investments after 2 seconds
-      setTimeout(() => {
-        router.push('/investments');
-      }, 2000);
+      // Redirect to success page with investment details
+      router.push(`/investment-success?amount=${amount}&dealId=${deal.id}`);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Investment failed. Please try again.';
       alert(`${errorMessage}`);
-    } finally {
       setInvesting(false);
     }
   };

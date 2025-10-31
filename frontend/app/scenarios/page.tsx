@@ -5,6 +5,100 @@ import Link from 'next/link';
 import { scenarioAPI, dealAPI } from '@/lib/api';
 import { formatCurrency, formatPercentage } from '@/lib/utils';
 
+// Fallback templates in case backend API is unavailable
+const FALLBACK_TEMPLATES = [
+  {
+    type: 'perfect_flip',
+    name: 'Perfect Flip (10% in 60 days)',
+    description: 'Property sells quickly at 10% above target price',
+    parameters: {
+      holdingPeriodDays: 60,
+      exitMultiplier: 1.10,
+      expenseShock: 0,
+      marketCondition: 'bull',
+    },
+    events: [
+      { day: 1, type: 'acquisition', description: 'Property acquired' },
+      { day: 30, type: 'marketing', description: 'Marketing campaign launched' },
+      { day: 45, type: 'offer', description: 'Buyer offer received' },
+      { day: 60, type: 'exit', description: 'Property sold, funds distributed' },
+    ],
+  },
+  {
+    type: 'market_crash',
+    name: 'Market Downturn (-15% valuation)',
+    description: 'Market crashes, property value drops 15%',
+    parameters: {
+      holdingPeriodDays: 365,
+      exitMultiplier: 0.85,
+      expenseShock: 0.05,
+      marketCondition: 'bear',
+    },
+    events: [
+      { day: 1, type: 'acquisition', description: 'Property acquired' },
+      { day: 90, type: 'market_shift', description: 'Market conditions deteriorate' },
+      { day: 180, type: 'valuation_drop', description: 'Property revalued at -15%' },
+      { day: 270, type: 'expense_increase', description: 'Maintenance costs increase' },
+      { day: 365, type: 'exit', description: 'Property sold at loss' },
+    ],
+  },
+  {
+    type: 'franchise_blowout',
+    name: 'Franchise Blowout (150% revenue)',
+    description: 'Franchise exceeds revenue targets by 50%',
+    parameters: {
+      holdingPeriodDays: 730,
+      exitMultiplier: 1.50,
+      revenueMultiplier: 1.50,
+      marketCondition: 'bull',
+    },
+    events: [
+      { day: 1, type: 'opening', description: 'Store opens' },
+      { day: 90, type: 'milestone', description: 'First profitable quarter' },
+      { day: 180, type: 'expansion', description: 'Added delivery service' },
+      { day: 365, type: 'milestone', description: 'Revenue exceeds target by 50%' },
+      { day: 730, type: 'exit', description: 'Franchise sold at premium' },
+    ],
+  },
+  {
+    type: 'delay_expense',
+    name: 'Delayed Exit with Extra Expenses',
+    description: 'Exit delayed by 6 months with 10% extra costs',
+    parameters: {
+      holdingPeriodDays: 540,
+      exitMultiplier: 1.05,
+      expenseShock: 0.10,
+      delayMonths: 6,
+      marketCondition: 'neutral',
+    },
+    events: [
+      { day: 1, type: 'acquisition', description: 'Asset acquired' },
+      { day: 180, type: 'delay', description: 'Exit delayed due to market conditions' },
+      { day: 270, type: 'expense', description: 'Unexpected maintenance required' },
+      { day: 360, type: 'expense', description: 'Additional holding costs' },
+      { day: 540, type: 'exit', description: 'Asset sold with modest profit' },
+    ],
+  },
+  {
+    type: 'default',
+    name: 'Investment Default',
+    description: 'Investment fails, partial recovery (30%)',
+    parameters: {
+      holdingPeriodDays: 180,
+      exitMultiplier: 0.30,
+      expenseShock: 0.20,
+      marketCondition: 'crisis',
+    },
+    events: [
+      { day: 1, type: 'acquisition', description: 'Asset acquired' },
+      { day: 60, type: 'warning', description: 'Financial difficulties emerge' },
+      { day: 90, type: 'crisis', description: 'Unable to meet obligations' },
+      { day: 120, type: 'restructuring', description: 'Asset liquidation begins' },
+      { day: 180, type: 'exit', description: 'Partial recovery at 30%' },
+    ],
+  },
+];
+
 export default function ScenariosPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
@@ -22,21 +116,38 @@ export default function ScenariosPage() {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
+
+    // Fetch each API independently to avoid one failure breaking everything
     try {
-      setLoading(true);
-      const [templatesRes, scenariosRes, dealsRes] = await Promise.all([
-        scenarioAPI.getTemplates(),
-        scenarioAPI.list(),
-        dealAPI.list({ status: 'funded' }),
-      ]);
-      setTemplates(templatesRes.data.data.templates);
-      setScenarios(scenariosRes.data.data.scenarios);
-      setDeals(dealsRes.data.data);
+      const templatesRes = await scenarioAPI.getTemplates();
+      const fetchedTemplates = templatesRes.data.data.templates || [];
+      setTemplates(fetchedTemplates.length > 0 ? fetchedTemplates : FALLBACK_TEMPLATES);
     } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+      console.error('❌ Error fetching templates:', error);
+      setTemplates(FALLBACK_TEMPLATES);
     }
+
+    try {
+      const scenariosRes = await scenarioAPI.list();
+      setScenarios(scenariosRes.data.data.scenarios);
+    } catch (error) {
+      console.error('❌ Error fetching scenarios:', error);
+      setScenarios([]);
+    }
+
+    try {
+      const dealsRes = await dealAPI.list();
+      const dealsWithSpv = (dealsRes.data.data || []).filter((deal: any) => deal.spv);
+      console.log('📊 Deals fetched:', dealsRes.data.data?.length || 0);
+      console.log('✅ Deals with SPV:', dealsWithSpv.length);
+      setDeals(dealsWithSpv);
+    } catch (error) {
+      console.error('❌ Error fetching deals:', error);
+      setDeals([]);
+    }
+
+    setLoading(false);
   };
 
   const handleCreateScenario = async () => {
@@ -84,6 +195,12 @@ export default function ScenariosPage() {
 
   const getTemplateIcon = (type: string) => {
     const icons: Record<string, string> = {
+      'perfect_flip': '🚀',
+      'market_crash': '📉',
+      'franchise_blowout': '💥',
+      'delay_expense': '⏳',
+      'default': '⚠️',
+      // Legacy support
       'best_case': '🚀',
       'expected_case': '📊',
       'worst_case': '⚠️',
@@ -96,6 +213,12 @@ export default function ScenariosPage() {
 
   const getTemplateColor = (type: string) => {
     const colors: Record<string, string> = {
+      'perfect_flip': 'from-green-500 to-emerald-600',
+      'market_crash': 'from-red-500 to-orange-600',
+      'franchise_blowout': 'from-purple-500 to-pink-600',
+      'delay_expense': 'from-yellow-500 to-amber-600',
+      'default': 'from-gray-600 to-gray-700',
+      // Legacy support
       'best_case': 'from-green-500 to-emerald-600',
       'expected_case': 'from-blue-500 to-indigo-600',
       'worst_case': 'from-red-500 to-orange-600',
@@ -452,7 +575,7 @@ export default function ScenariosPage() {
                 {/* Deal Selection */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Select Deal/SPV to Simulate
+                    Select Deal/SPV to Simulate {deals.length > 0 && <span className="text-xs opacity-75">({deals.length} available)</span>}
                   </label>
                   <select
                     value={selectedDeal}
@@ -460,12 +583,15 @@ export default function ScenariosPage() {
                     className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700"
                   >
                     <option value="">-- Select Deal --</option>
-                    {deals.filter(d => d.spv).map((deal) => (
+                    {deals.map((deal) => (
                       <option key={deal.id} value={deal.id}>
                         {deal.title} ({deal.spv?.spv_name})
                       </option>
                     ))}
                   </select>
+                  {deals.length === 0 && (
+                    <p className="text-sm text-gray-500 mt-2">No deals with SPVs available. Please create deals first.</p>
+                  )}
                 </div>
               </div>
 
