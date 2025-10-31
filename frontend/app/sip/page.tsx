@@ -256,8 +256,247 @@ export default function SIPDashboard Page() {
             </Link>
           </div>
         ) : (
-          <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
-            <p className="text-purple-200">Feature under development. Check back soon!</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredSubscriptions.map((subscription) => {
+              const progress = subscription.total_installments > 0
+                ? (subscription.completed_installments / subscription.total_installments) * 100
+                : 0;
+              const invested = parseFloat(subscription.total_invested || 0);
+              const currentValue = parseFloat(subscription.current_value || 0);
+              const returns = currentValue - invested;
+              const returnsPercent = invested > 0 ? (returns / invested) * 100 : 0;
+              const isLoading = actionLoading[subscription.id];
+
+              return (
+                <div
+                  key={subscription.id}
+                  className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-green-500/30 transition-all hover:shadow-lg hover:shadow-green-500/10"
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Package className="w-5 h-5 text-green-400" />
+                        <h3 className="text-xl font-bold text-white">
+                          {subscription.bundle?.name || subscription.plan?.name || 'SIP Subscription'}
+                        </h3>
+                      </div>
+                      <p className="text-purple-300 text-sm">
+                        {subscription.bundle?.description || subscription.plan?.description || 'Monthly investment plan'}
+                      </p>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      subscription.status === 'active'
+                        ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                        : subscription.status === 'paused'
+                        ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                        : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                    }`}>
+                      {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                    </div>
+                  </div>
+
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+                      <div className="flex items-center gap-2 mb-1">
+                        <DollarSign className="w-4 h-4 text-green-400" />
+                        <div className="text-xs text-purple-300">Monthly Amount</div>
+                      </div>
+                      <div className="text-2xl font-bold text-white">
+                        {formatCurrency(subscription.monthly_amount)}
+                      </div>
+                    </div>
+
+                    <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Calendar className="w-4 h-4 text-blue-400" />
+                        <div className="text-xs text-purple-300">Next Payment</div>
+                      </div>
+                      <div className="text-sm font-bold text-white">
+                        {subscription.next_execution_date
+                          ? formatDate(subscription.next_execution_date)
+                          : 'N/A'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-purple-300" />
+                        <span className="text-sm text-purple-300">Progress</span>
+                      </div>
+                      <span className="text-sm font-medium text-white">
+                        {subscription.completed_installments} / {subscription.total_installments} installments
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 h-2.5 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-purple-300 mt-1 text-right">
+                      {progress.toFixed(1)}% complete
+                    </div>
+                  </div>
+
+                  {/* Financial Summary */}
+                  <div className="grid grid-cols-3 gap-3 mb-6">
+                    <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 rounded-xl p-3 border border-purple-500/20">
+                      <div className="text-xs text-purple-300 mb-1">Invested</div>
+                      <div className="text-lg font-bold text-white">
+                        {formatCurrency(invested)}
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl p-3 border border-blue-500/20">
+                      <div className="text-xs text-blue-300 mb-1">Current</div>
+                      <div className="text-lg font-bold text-white">
+                        {formatCurrency(currentValue)}
+                      </div>
+                    </div>
+
+                    <div className={`bg-gradient-to-br ${returns >= 0 ? 'from-green-500/10 to-green-600/10' : 'from-red-500/10 to-red-600/10'} rounded-xl p-3 border ${returns >= 0 ? 'border-green-500/20' : 'border-red-500/20'}`}>
+                      <div className={`text-xs ${returns >= 0 ? 'text-green-300' : 'text-red-300'} mb-1`}>Returns</div>
+                      <div className={`text-lg font-bold ${returns >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                        {returns >= 0 ? '+' : ''}{formatCurrency(Math.abs(returns))}
+                      </div>
+                      <div className={`text-xs ${returns >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {returnsPercent >= 0 ? '+' : ''}{returnsPercent.toFixed(2)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    {subscription.status === 'active' && (
+                      <button
+                        onClick={() => handlePauseSubscription(subscription.id)}
+                        disabled={isLoading}
+                        className="flex-1 px-4 py-2.5 bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border border-yellow-600/30 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-yellow-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-yellow-300"></div>
+                        ) : (
+                          <>
+                            <Pause className="w-4 h-4" />
+                            Pause
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {subscription.status === 'paused' && (
+                      <button
+                        onClick={() => handleResumeSubscription(subscription.id)}
+                        disabled={isLoading}
+                        className="flex-1 px-4 py-2.5 bg-green-600/20 hover:bg-green-600/30 text-green-300 border border-green-600/30 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isLoading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-300"></div>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4" />
+                            Resume
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {(subscription.status === 'active' || subscription.status === 'paused') && (
+                      <button
+                        onClick={() => {
+                          setSelectedSubscription(subscription);
+                          setShowCancelModal(true);
+                        }}
+                        disabled={isLoading}
+                        className="flex-1 px-4 py-2.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-600/30 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <X className="w-4 h-4" />
+                        Cancel
+                      </button>
+                    )}
+
+                    <Link href={`/sip/${subscription.id}`} className="flex-1">
+                      <button className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 text-purple-200 border border-white/10 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg">
+                        <Eye className="w-4 h-4" />
+                        View Details
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Cancel Modal */}
+        {showCancelModal && selectedSubscription && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Cancel SIP Subscription</h3>
+                  <p className="text-purple-300 text-sm">This action cannot be undone</p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 rounded-xl p-4 mb-4 border border-white/10">
+                <div className="text-sm text-purple-300 mb-1">Subscription</div>
+                <div className="text-white font-medium">
+                  {selectedSubscription.bundle?.name || selectedSubscription.plan?.name}
+                </div>
+                <div className="text-sm text-purple-400 mt-2">
+                  Monthly: {formatCurrency(selectedSubscription.monthly_amount)}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="text-sm text-purple-300 mb-2 block">
+                  Reason for cancellation (optional)
+                </label>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Tell us why you're cancelling..."
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false);
+                    setSelectedSubscription(null);
+                    setCancelReason('');
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-purple-200 border border-white/10 rounded-xl font-medium transition-all"
+                >
+                  Keep Subscription
+                </button>
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={actionLoading[selectedSubscription.id]}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {actionLoading[selectedSubscription.id] ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                  ) : (
+                    <>
+                      <X className="w-4 h-4" />
+                      Cancel SIP
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
