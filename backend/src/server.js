@@ -10,6 +10,7 @@ import sequelize, { testConnection, syncDatabase } from './config/database.js';
 import routes from './routes/index.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import { startPayoutScheduler } from './cron/payoutScheduler.js';
+import { startSIPScheduler } from './cron/sipScheduler.js';
 
 // Load environment variables
 dotenv.config();
@@ -126,6 +127,7 @@ const startServer = async () => {
 
       // Start cron jobs
       startPayoutScheduler();
+      startSIPScheduler();
     });
 
   } catch (error) {

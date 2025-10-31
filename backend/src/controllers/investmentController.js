@@ -364,3 +364,39 @@ export const getUserTransactions = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateInvestmentSettings = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { auto_reinvest_enabled } = req.body;
+
+    // Find investment
+    const investment = await Investment.findByPk(id);
+
+    if (!investment) {
+      return error(res, 'Investment not found', 404);
+    }
+
+    // Check authorization - only investor can update their investment
+    if (investment.user_id !== req.user.id) {
+      return error(res, 'Not authorized to update this investment', 403);
+    }
+
+    // Check if investment is active
+    if (investment.status !== 'active' && investment.status !== 'confirmed') {
+      return error(res, 'Only active investments can have settings updated', 400);
+    }
+
+    // Update auto_reinvest_enabled setting
+    if (typeof auto_reinvest_enabled !== 'undefined') {
+      await investment.update({
+        auto_reinvest_enabled: Boolean(auto_reinvest_enabled),
+      });
+    }
+
+    return success(res, { investment }, 'Investment settings updated successfully');
+
+  } catch (err) {
+    next(err);
+  }
+};

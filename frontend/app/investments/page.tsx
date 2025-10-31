@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { investmentAPI } from '@/lib/api';
 import { formatCurrency, getDealTypeLabel } from '@/lib/utils';
 import Link from 'next/link';
+import axios from 'axios';
 import {
   Briefcase, TrendingUp, TrendingDown, DollarSign, PieChart,
   Building, Rocket, Home, Gem, Calendar, MapPin, Share2,
@@ -16,6 +17,7 @@ export default function InvestmentsPage() {
   const [investments, setInvestments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [togglingReinvest, setTogglingReinvest] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchInvestments();
@@ -30,6 +32,35 @@ export default function InvestmentsPage() {
       console.error('Error fetching investments:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleAutoReinvest = async (investmentId: string, currentValue: boolean) => {
+    try {
+      setTogglingReinvest(prev => ({ ...prev, [investmentId]: true }));
+
+      const token = localStorage.getItem('token');
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+
+      await axios.patch(
+        `${API_URL}/investments/${investmentId}/settings`,
+        { auto_reinvest_enabled: !currentValue },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update local state
+      setInvestments(prev =>
+        prev.map(inv =>
+          inv.id === investmentId
+            ? { ...inv, auto_reinvest_enabled: !currentValue }
+            : inv
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling auto-reinvest:', error);
+      alert('Failed to update auto-reinvest setting');
+    } finally {
+      setTogglingReinvest(prev => ({ ...prev, [investmentId]: false }));
     }
   };
 
@@ -467,6 +498,30 @@ export default function InvestmentsPage() {
                               Analytics
                             </button>
                           </Link>
+
+                          {/* Auto-Reinvest Toggle */}
+                          <div className="flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl">
+                            <div className="flex items-center gap-2 flex-1">
+                              <RefreshCw className="w-4 h-4 text-green-400" />
+                              <div>
+                                <div className="text-sm font-semibold text-white">Auto-Reinvest</div>
+                                <div className="text-xs text-green-300">Compound returns automatically</div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => toggleAutoReinvest(investment.id, investment.auto_reinvest_enabled)}
+                              disabled={togglingReinvest[investment.id]}
+                              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                                investment.auto_reinvest_enabled ? 'bg-green-500' : 'bg-gray-600'
+                              } ${togglingReinvest[investment.id] ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            >
+                              <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                                  investment.auto_reinvest_enabled ? 'translate-x-6' : 'translate-x-1'
+                                }`}
+                              />
+                            </button>
+                          </div>
                         </>
                       )}
                     </div>

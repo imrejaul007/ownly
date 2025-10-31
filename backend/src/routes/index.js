@@ -29,6 +29,7 @@ import referralRoutes from './referrals.js';
 import exchangeRoutes from './exchange.js';
 import bundleRoutes from './bundles.js';
 import sipRoutes from './sip.js';
+import adminRoutes from './admin.js';
 
 const router = express.Router();
 
@@ -74,5 +75,6 @@ router.use('/referrals', referralRoutes);
 router.use('/exchange', exchangeRoutes);
 router.use('/bundles', bundleRoutes);
 router.use('/sip', sipRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

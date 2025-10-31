@@ -9,6 +9,7 @@ import {
   Transaction
 } from '../models/index.js';
 import { successResponse, errorResponse } from "../utils/response.js";
+import { canTrade, isInLockInPeriod, getDaysRemainingInLockIn } from '../utils/lockInValidator.js';
 
 /**
  * List all active secondary market listings
@@ -126,6 +127,12 @@ export const createListing = async (req, res, next) => {
 
     if (!investment) {
       return errorResponse(res, 'Investment not found or not owned by you', 404);
+    }
+
+    // LOCK-IN PERIOD ENFORCEMENT: Check if trading is allowed
+    const tradingCheck = canTrade(investment.deal);
+    if (!tradingCheck.allowed) {
+      return errorResponse(res, tradingCheck.reason, 403);
     }
 
     // Check if shares available
@@ -352,19 +359,25 @@ export const respondToOffer = async (req, res, next) => {
 
       const transactionAmount = parseFloat(listing.offer_price || listing.total_price);
 
+      // Calculate platform fee (2%)
+      const PLATFORM_FEE_PERCENT = 2;
+      const platformFee = (transactionAmount * PLATFORM_FEE_PERCENT) / 100;
+      const sellerProceeds = transactionAmount - platformFee;
+
       // Check buyer has funds
       if (parseFloat(buyerWallet.balance) < transactionAmount) {
         return errorResponse(res, 'Buyer has insufficient funds', 400);
       }
 
-      // Transfer funds
+      // Transfer funds from buyer
       await buyerWallet.update(
         { balance: parseFloat(buyerWallet.balance) - transactionAmount },
         { transaction: t }
       );
 
+      // Transfer proceeds to seller (after deducting platform fee)
       await sellerWallet.update(
-        { balance: parseFloat(sellerWallet.balance) + transactionAmount },
+        { balance: parseFloat(sellerWallet.balance) + sellerProceeds },
         { transaction: t }
       );
 
@@ -428,11 +441,34 @@ export const respondToOffer = async (req, res, next) => {
         {
           user_id: seller.id,
           type: 'secondary_market_sale',
-          amount: transactionAmount,
+          amount: sellerProceeds,
           description: `Sold ${sharesBeingSold} shares via secondary market`,
           reference_type: 'secondary_market_listing',
           reference_id: listing.id,
-          metadata: { original_investment_id: originalInvestment.id },
+          metadata: {
+            original_investment_id: originalInvestment.id,
+            gross_amount: transactionAmount,
+            platform_fee: platformFee,
+            net_amount: sellerProceeds,
+            fee_percent: PLATFORM_FEE_PERCENT,
+          },
+        },
+        { transaction: t }
+      );
+
+      // Record platform fee transaction
+      await Transaction.create(
+        {
+          user_id: seller.id,
+          type: 'platform_fee',
+          amount: -platformFee,
+          description: `Platform fee (${PLATFORM_FEE_PERCENT}%) for secondary market sale`,
+          reference_type: 'secondary_market_listing',
+          reference_id: listing.id,
+          metadata: {
+            fee_percent: PLATFORM_FEE_PERCENT,
+            transaction_amount: transactionAmount,
+          },
         },
         { transaction: t }
       );
@@ -446,6 +482,10 @@ export const respondToOffer = async (req, res, next) => {
             ...listing.metadata,
             transaction_completed_at: new Date(),
             new_investment_id: newInvestment.id,
+            transaction_gross: transactionAmount,
+            platform_fee: platformFee,
+            seller_net_proceeds: sellerProceeds,
+            fee_percent: PLATFORM_FEE_PERCENT,
           },
         },
         { transaction: t }

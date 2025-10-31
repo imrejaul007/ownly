@@ -902,7 +902,7 @@ export default function SecondaryMarketPage() {
                             </div>
                           </div>
 
-                          {/* Total Investment */}
+                          {/* Total Investment with Platform Fee */}
                           <div className="bg-amber-600/10 rounded-xl p-4 border border-amber-500/20">
                             <div className="flex items-center gap-2 mb-2">
                               <Target className="w-4 h-4 text-amber-400" />
@@ -910,6 +910,12 @@ export default function SecondaryMarketPage() {
                             </div>
                             <div className="text-2xl font-bold text-amber-300">
                               {formatCurrency(totalPrice)}
+                            </div>
+                            <div className="text-xs text-amber-400/60 mt-1">
+                              Seller receives: {formatCurrency(totalPrice * 0.98)}
+                            </div>
+                            <div className="text-xs text-amber-400/60">
+                              (2% platform fee)
                             </div>
                           </div>
                         </div>
@@ -1074,6 +1080,10 @@ export default function SecondaryMarketPage() {
                     <div className="bg-white/5 rounded-xl p-3 border border-white/10">
                       <p className="text-xs text-purple-300 mb-1">Asking Price</p>
                       <p className="font-semibold text-white">{formatCurrency(listing.total_price)}</p>
+                      <div className="mt-1 pt-1 border-t border-white/10">
+                        <p className="text-xs text-green-400">You receive: {formatCurrency(parseFloat(listing.total_price) * 0.98)}</p>
+                        <p className="text-xs text-purple-400">Platform fee (2%): {formatCurrency(parseFloat(listing.total_price) * 0.02)}</p>
+                      </div>
                     </div>
                     {listing.offer_price && (
                       <div className="bg-green-600/10 rounded-xl p-3 border border-green-500/20">

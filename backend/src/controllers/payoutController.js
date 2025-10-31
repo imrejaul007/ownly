@@ -126,47 +126,115 @@ export const distributePayout = async (req, res, next) => {
     const distributionResults = [];
 
     for (const item of payout.payout_items) {
-      // Get investor wallet
-      const wallet = await Wallet.findOne({
-        where: { user_id: item.investor_id },
+      // Get the original investment to check auto_reinvest setting
+      const originalInvestment = await Investment.findByPk(item.investment_id, {
         transaction: t,
       });
 
-      if (!wallet) {
-        console.error(`Wallet not found for investor ${item.investor_id}`);
+      if (!originalInvestment) {
+        console.error(`Investment not found: ${item.investment_id}`);
         continue;
       }
 
-      // Add to wallet balance
-      const oldBalance = parseFloat(wallet.balance_dummy);
-      const newBalance = oldBalance + parseFloat(item.amount);
+      // Check if auto-reinvest is enabled
+      if (originalInvestment.auto_reinvest_enabled) {
+        // AUTO-REINVEST: Create new investment instead of crediting wallet
+        const payoutAmount = parseFloat(item.amount);
+        const sharePrice = parseFloat(originalInvestment.share_price);
+        const reinvestShares = Math.floor(payoutAmount / sharePrice);
 
-      await wallet.update(
-        {
-          balance_dummy: newBalance,
-        },
-        { transaction: t }
-      );
+        if (reinvestShares > 0) {
+          // Create new investment (compounding)
+          await Investment.create(
+            {
+              user_id: item.investor_id,
+              deal_id: originalInvestment.deal_id,
+              spv_id: originalInvestment.spv_id,
+              bundle_id: originalInvestment.bundle_id,
+              amount: payoutAmount,
+              shares_issued: reinvestShares,
+              share_price: sharePrice,
+              status: 'active',
+              invested_at: new Date(),
+              auto_reinvest_enabled: true, // Inherit the setting
+            },
+            { transaction: t }
+          );
 
-      // Create transaction record
-      await Transaction.create(
-        {
-          user_id: item.investor_id,
-          type: 'payout',
+          // Create transaction record for reinvestment
+          await Transaction.create(
+            {
+              user_id: item.investor_id,
+              type: 'payout_reinvested',
+              amount: payoutAmount,
+              currency: 'USD',
+              status: 'completed',
+              reference_type: 'payout',
+              reference_id: payout.id,
+              description: `Auto-reinvested ${payout.payout_type} payout (${reinvestShares} shares)`,
+              completed_at: new Date(),
+            },
+            { transaction: t }
+          );
+
+          distributionResults.push({
+            investor_id: item.investor_id,
+            amount: item.amount,
+            status: 'success',
+            reinvested: true,
+            shares_acquired: reinvestShares,
+          });
+        }
+      } else {
+        // NORMAL FLOW: Credit to wallet
+        const wallet = await Wallet.findOne({
+          where: { user_id: item.investor_id },
+          transaction: t,
+        });
+
+        if (!wallet) {
+          console.error(`Wallet not found for investor ${item.investor_id}`);
+          continue;
+        }
+
+        // Add to wallet balance
+        const oldBalance = parseFloat(wallet.balance_dummy);
+        const newBalance = oldBalance + parseFloat(item.amount);
+
+        await wallet.update(
+          {
+            balance_dummy: newBalance,
+          },
+          { transaction: t }
+        );
+
+        // Create transaction record
+        await Transaction.create(
+          {
+            user_id: item.investor_id,
+            type: 'payout',
+            amount: item.amount,
+            currency: 'USD',
+            status: 'completed',
+            reference_type: 'payout',
+            reference_id: payout.id,
+            description: `${payout.payout_type} payout from SPV`,
+            balance_before: oldBalance,
+            balance_after: newBalance,
+            completed_at: new Date(),
+          },
+          { transaction: t }
+        );
+
+        distributionResults.push({
+          investor_id: item.investor_id,
           amount: item.amount,
-          currency: 'USD',
-          status: 'completed',
-          reference_type: 'payout',
-          reference_id: payout.id,
-          description: `${payout.payout_type} payout from SPV`,
-          balance_before: oldBalance,
-          balance_after: newBalance,
-          completed_at: new Date(),
-        },
-        { transaction: t }
-      );
+          status: 'success',
+          reinvested: false,
+        });
+      }
 
-      // Update investment record
+      // Update investment record (for both cases)
       await Investment.update(
         {
           total_payouts_received: sequelize.literal(`total_payouts_received + ${item.amount}`),
@@ -176,12 +244,6 @@ export const distributePayout = async (req, res, next) => {
           transaction: t,
         }
       );
-
-      distributionResults.push({
-        investor_id: item.investor_id,
-        amount: item.amount,
-        status: 'success',
-      });
     }
 
     // Mark payout as distributed

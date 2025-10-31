@@ -17,7 +17,7 @@ const Deal = sequelize.define('Deal', {
     unique: true,
   },
   type: {
-    type: DataTypes.ENUM('real_estate', 'franchise', 'startup', 'asset'),
+    type: DataTypes.ENUM('real_estate', 'franchise', 'startup', 'asset', 'equity', 'basket', 'trade'),
     allowNull: false,
   },
   jurisdiction: {
@@ -56,6 +56,11 @@ const Deal = sequelize.define('Deal', {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  lock_in_period_months: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Minimum hold period before trading allowed (part of holding period)',
+  },
   expected_roi: {
     type: DataTypes.DECIMAL(5, 2),
     allowNull: true,
@@ -72,7 +77,7 @@ const Deal = sequelize.define('Deal', {
     comment: 'Platform fee, management fee, carry, etc.',
   },
   status: {
-    type: DataTypes.ENUM('draft', 'open', 'funding', 'funded', 'closed', 'failed', 'exited'),
+    type: DataTypes.ENUM('draft', 'active', 'funding', 'funded', 'lock-in', 'operational', 'secondary', 'exchange', 'exited', 'failed', 'closed'),
     defaultValue: 'draft',
   },
   open_date: {
@@ -86,6 +91,16 @@ const Deal = sequelize.define('Deal', {
   exit_date: {
     type: DataTypes.DATE,
     allowNull: true,
+  },
+  lock_in_start_date: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Date when lock-in period started',
+  },
+  lock_in_end_date: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Date when lock-in period ends and trading is allowed',
   },
   images: {
     type: DataTypes.ARRAY(DataTypes.STRING),

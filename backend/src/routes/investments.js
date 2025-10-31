@@ -5,6 +5,7 @@ import {
   getInvestmentDetails,
   requestExit,
   getUserTransactions,
+  updateInvestmentSettings,
 } from '../controllers/investmentController.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -15,6 +16,7 @@ router.post('/', authenticate, invest);
 router.get('/my-investments', authenticate, getUserInvestments);
 router.get('/my-transactions', authenticate, getUserTransactions);
 router.get('/:id', authenticate, getInvestmentDetails);
+router.patch('/:id/settings', authenticate, updateInvestmentSettings);
 router.post('/:id/exit', authenticate, requestExit);
 
 // Admin route to view any user's investments

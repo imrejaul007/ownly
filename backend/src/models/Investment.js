@@ -68,6 +68,11 @@ const Investment = sequelize.define('Investment', {
     allowNull: true,
     comment: 'Calculated current value based on SPV valuation',
   },
+  auto_reinvest_enabled: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Whether to automatically reinvest payouts instead of crediting to wallet',
+  },
   referral_code: {
     type: DataTypes.STRING,
     allowNull: true,

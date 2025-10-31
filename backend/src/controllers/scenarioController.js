@@ -106,11 +106,6 @@ export const listScenarios = async (req, res, next) => {
           as: 'spv',
           include: ['deal'],
         },
-        {
-          model: User,
-          as: 'creator',
-          attributes: ['id', 'name', 'email'],
-        },
       ],
       order: [['created_at', 'DESC']],
     });
