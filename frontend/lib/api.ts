@@ -337,15 +337,16 @@ export const bundleAPI = {
 
 // SIP Plan APIs
 export const sipAPI = {
-  list: (params?: any) => api.get('/sip-plans', { params }),
-  get: (id: string) => api.get(`/sip-plans/${id}`),
-  create: (data: any) => api.post('/sip-plans', data),
-  subscribe: (data: any) => api.post('/sip-subscriptions', data),
-  getMySubscriptions: () => api.get('/sip-subscriptions/my-subscriptions'),
-  updateSubscription: (id: string, data: any) => api.patch(`/sip-subscriptions/${id}`, data),
-  pauseSubscription: (id: string) => api.post(`/sip-subscriptions/${id}/pause`),
-  resumeSubscription: (id: string) => api.post(`/sip-subscriptions/${id}/resume`),
-  cancelSubscription: (id: string) => api.post(`/sip-subscriptions/${id}/cancel`),
+  list: (params?: any) => api.get('/sip/plans', { params }),
+  get: (id: string) => api.get(`/sip/plans/${id}`),
+  create: (data: any) => api.post('/sip/plans', data),
+  subscribe: (planId: string, data: any) => api.post(`/sip/plans/${planId}/subscribe`, data),
+  getMySubscriptions: () => api.get('/sip/subscriptions'),
+  getSubscription: (id: string) => api.get(`/sip/subscriptions/${id}`),
+  updateSubscription: (id: string, data: any) => api.patch(`/sip/subscriptions/${id}`, data),
+  pauseSubscription: (id: string) => api.post(`/sip/subscriptions/${id}/pause`),
+  resumeSubscription: (id: string) => api.post(`/sip/subscriptions/${id}/resume`),
+  cancelSubscription: (id: string, data?: any) => api.post(`/sip/subscriptions/${id}/cancel`, data),
 };
 
 export default api;
