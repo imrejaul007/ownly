@@ -52,6 +52,48 @@ const Deal = sequelize.define('Deal', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  // Allocation Configuration (% split across channels)
+  allocation_direct_sale_pct: {
+    type: DataTypes.DECIMAL(5, 2),
+    defaultValue: 60.00,
+    comment: 'Percentage allocated for direct sale (primary market)',
+  },
+  allocation_bundles_pct: {
+    type: DataTypes.DECIMAL(5, 2),
+    defaultValue: 20.00,
+    comment: 'Percentage allocated for bundles',
+  },
+  allocation_auto_invest_pct: {
+    type: DataTypes.DECIMAL(5, 2),
+    defaultValue: 10.00,
+    comment: 'Percentage allocated for auto-invest reserve',
+  },
+  allocation_reserve_pct: {
+    type: DataTypes.DECIMAL(5, 2),
+    defaultValue: 10.00,
+    comment: 'Percentage allocated for platform reserve',
+  },
+  // Allocation Tracking (actual raised amounts per channel)
+  direct_sale_raised: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0.00,
+    comment: 'Amount raised through direct sale',
+  },
+  bundles_raised: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0.00,
+    comment: 'Amount raised through bundles',
+  },
+  auto_invest_raised: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0.00,
+    comment: 'Amount raised through auto-invest plans',
+  },
+  reserve_raised: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0.00,
+    comment: 'Amount allocated to platform reserve',
+  },
   holding_period_months: {
     type: DataTypes.INTEGER,
     allowNull: true,

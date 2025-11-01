@@ -10,6 +10,7 @@ import {
   pauseSubscription,
   resumeSubscription,
   cancelSubscription,
+  getDashboard,
 } from '../controllers/sipController.js';
 import { authenticate, authorize, optionalAuth } from '../middleware/auth.js';
 import authConfig from '../config/auth.js';
@@ -41,6 +42,13 @@ router.post(
   authenticate,
   authorize(authConfig.roles.INVESTOR_HNI, authConfig.roles.INVESTOR_RETAIL),
   subscribeToPlan
+);
+
+router.get(
+  '/dashboard',
+  authenticate,
+  authorize(authConfig.roles.INVESTOR_HNI, authConfig.roles.INVESTOR_RETAIL),
+  getDashboard
 );
 
 router.get(

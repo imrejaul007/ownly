@@ -382,3 +382,56 @@ export const cancelSubscription = async (req, res, next) => {
     next(err);
   }
 };
+
+// Get SIP Dashboard Summary
+export const getDashboard = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // Get all user subscriptions
+    const subscriptions = await SIPSubscription.findAll({
+      where: { user_id: userId },
+      include: [
+        {
+          model: SIPPlan,
+          as: 'plan',
+          include: [
+            {
+              model: Bundle,
+              as: 'bundle',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Calculate dashboard metrics
+    const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active').length;
+    const totalMonthlyCommitment = subscriptions
+      .filter(sub => sub.status === 'active')
+      .reduce((sum, sub) => sum + parseFloat(sub.monthly_amount || 0), 0);
+
+    const totalInvested = subscriptions.reduce((sum, sub) => sum + parseFloat(sub.total_invested || 0), 0);
+
+    // Calculate estimated returns (simplified - using average 30% annual return on invested amount)
+    // In production, this should be calculated from actual investment performance
+    const totalReturns = totalInvested * 0.30;
+
+    const dashboard = {
+      active_subscriptions: activeSubscriptions,
+      total_monthly_commitment: parseFloat(totalMonthlyCommitment.toFixed(2)),
+      total_invested: parseFloat(totalInvested.toFixed(2)),
+      total_returns: parseFloat(totalReturns.toFixed(2)),
+      subscriptions_summary: {
+        active: subscriptions.filter(sub => sub.status === 'active').length,
+        paused: subscriptions.filter(sub => sub.status === 'paused').length,
+        cancelled: subscriptions.filter(sub => sub.status === 'cancelled').length,
+        total: subscriptions.length,
+      },
+    };
+
+    return success(res, dashboard, 'SIP dashboard retrieved successfully');
+  } catch (err) {
+    next(err);
+  }
+};

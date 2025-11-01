@@ -13,7 +13,7 @@ import {
   ShoppingBag, Sparkles, Package, Repeat, Building2, ChevronDown, Menu, X,
   Calculator, Target, Shield, Lightbulb, BarChart3, User, Settings, LogOut,
   Home, CreditCard, FileCheck, BadgeCheck, HelpCircle, Award, Users, Zap,
-  TrendingDown, Search, Star, BookOpen
+  TrendingDown, Search, Star, BookOpen, Trophy, MapPin, FolderOpen
 } from 'lucide-react';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -161,6 +161,11 @@ function Header() {
                     <BarChart3 className="w-4 h-4" />
                     Compare Deals
                   </Link>
+                  <Link href="/property-map" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-teal-500/20 hover:to-blue-500/20 border-l-2 border-transparent hover:border-teal-500 transition-all">
+                    <MapPin className="w-4 h-4 text-teal-400" />
+                    <span>Property Map</span>
+                    <span className="ml-auto text-xs bg-teal-500/20 text-teal-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
+                  </Link>
                   <Link href="/analytics" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <BarChart3 className="w-4 h-4" />
                     Analytics
@@ -183,6 +188,10 @@ function Header() {
                     <span>Getting Started</span>
                     <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
                   </Link>
+                  <Link href="/how-to-invest" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+                    <TrendingUp className="w-4 h-4" />
+                    How to Invest
+                  </Link>
                   <Link href="/help" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <HelpCircle className="w-4 h-4" />
                     Help Center
@@ -191,6 +200,10 @@ function Header() {
                   <Link href="/how-it-works" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <HelpCircle className="w-4 h-4" />
                     How It Works
+                  </Link>
+                  <Link href="/statistics" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+                    <BarChart3 className="w-4 h-4" />
+                    Platform Statistics
                   </Link>
                   <Link href="/about" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Building2 className="w-4 h-4" />
@@ -203,6 +216,10 @@ function Header() {
                   <Link href="/security" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Shield className="w-4 h-4" />
                     Security
+                  </Link>
+                  <Link href="/shariah-compliance" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+                    <FileCheck className="w-4 h-4" />
+                    Shariah Compliance
                   </Link>
                   <Link href="/academy" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <GraduationCap className="w-4 h-4" />
@@ -224,6 +241,12 @@ function Header() {
               </button>
               <div className="absolute right-0 mt-2 w-56 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 max-h-[80vh] overflow-y-auto">
                 <div className="py-2">
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">For Businesses</div>
+                  <Link href="/list-your-deal" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-green-500/20 hover:to-emerald-500/20 border-l-2 border-transparent hover:border-green-500 transition-all">
+                    <Building2 className="w-4 h-4 text-green-400" />
+                    List Your Deal
+                  </Link>
+                  <div className="border-t border-white/10 my-2"></div>
                   <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Community</div>
                   <Link href="/community" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Users className="w-4 h-4" />
@@ -295,6 +318,11 @@ function Header() {
                       <Wallet className="w-4 h-4" />
                       Portfolio
                     </Link>
+                    <Link href="/progress" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 border-l-2 border-transparent hover:border-purple-500 transition-all">
+                      <Trophy className="w-4 h-4 text-purple-400" />
+                      <span>Investment Progress</span>
+                      <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
+                    </Link>
                     <Link href="/wallet" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                       <CreditCard className="w-4 h-4" />
                       Wallet
@@ -302,6 +330,11 @@ function Header() {
                     <Link href="/kyc" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                       <BadgeCheck className="w-4 h-4" />
                       KYC Status
+                    </Link>
+                    <Link href="/documents" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-cyan-500/20 border-l-2 border-transparent hover:border-blue-500 transition-all">
+                      <FolderOpen className="w-4 h-4 text-blue-400" />
+                      <span>Documents</span>
+                      <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
                     </Link>
                     <div className="border-t border-white/10 my-2"></div>
                     <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
@@ -466,8 +499,9 @@ export default function RootLayout({
                   <ul className="space-y-2">
                     <li><Link href="/about" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">About Us</Link></li>
                     <li><Link href="/how-it-works" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">How It Works</Link></li>
+                    <li><Link href="/statistics" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Platform Statistics</Link></li>
                     <li><Link href="/fees" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Fees</Link></li>
-                    <li><Link href="/platform-stats" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Platform Stats</Link></li>
+                    <li><Link href="/list-your-deal" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">List Your Deal</Link></li>
                   </ul>
                 </div>
                 <div>
@@ -478,15 +512,18 @@ export default function RootLayout({
                     <li><Link href="/bundles" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Bundles</Link></li>
                     <li><Link href="/copy-trading" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Copy Trading</Link></li>
                     <li><Link href="/exchange" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Exchange</Link></li>
+                    <li><Link href="/progress" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Investment Progress</Link></li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-4">Learn</h3>
                   <ul className="space-y-2">
+                    <li><Link href="/how-to-invest" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">How to Invest</Link></li>
                     <li><Link href="/academy" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Academy</Link></li>
                     <li><Link href="/faq" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">FAQ</Link></li>
                     <li><Link href="/calculator" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">ROI Calculator</Link></li>
                     <li><Link href="/risk-assessment" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Risk Assessment</Link></li>
+                    <li><Link href="/property-map" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Property Map</Link></li>
                   </ul>
                 </div>
                 <div>
@@ -494,8 +531,9 @@ export default function RootLayout({
                   <ul className="space-y-2">
                     <li><Link href="/getting-started" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Getting Started</Link></li>
                     <li><Link href="/help" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Help Center</Link></li>
-                    <li><Link href="/faq" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">FAQ</Link></li>
                     <li><Link href="/security" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Security</Link></li>
+                    <li><Link href="/shariah-compliance" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Shariah Compliance</Link></li>
+                    <li><Link href="/documents" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Documents</Link></li>
                     <li><a href="mailto:support@ownly.ae" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Contact Us</a></li>
                     <li><a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Terms of Service</a></li>
                     <li><a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">Privacy Policy</a></li>

@@ -7,6 +7,11 @@ import {
   publishDeal,
   closeDeal,
 } from '../controllers/dealController.js';
+import {
+  processDealExit,
+  getExitEligibility,
+  getExitHistory,
+} from '../controllers/exitController.js';
 import { authenticate, authorize, optionalAuth } from '../middleware/auth.js';
 import authConfig from '../config/auth.js';
 
@@ -43,6 +48,26 @@ router.post(
   authenticate,
   authorize(authConfig.roles.ADMIN, authConfig.roles.SPV_ADMIN),
   closeDeal
+);
+
+// Exit/Redemption routes
+router.post(
+  '/:dealId/exit',
+  authenticate,
+  authorize(authConfig.roles.ADMIN),
+  processDealExit
+);
+
+router.get(
+  '/:dealId/exit/eligibility',
+  authenticate,
+  getExitEligibility
+);
+
+router.get(
+  '/:dealId/exit/history',
+  authenticate,
+  getExitHistory
 );
 
 export default router;

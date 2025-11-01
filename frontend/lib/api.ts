@@ -340,6 +340,8 @@ export const sipAPI = {
   list: (params?: any) => api.get('/sip/plans', { params }),
   get: (id: string) => api.get(`/sip/plans/${id}`),
   create: (data: any) => api.post('/sip/plans', data),
+  update: (id: string, data: any) => api.patch(`/sip/plans/${id}`, data),
+  delete: (id: string) => api.delete(`/sip/plans/${id}`),
   subscribe: (planId: string, data: any) => api.post(`/sip/plans/${planId}/subscribe`, data),
   getMySubscriptions: () => api.get('/sip/subscriptions'),
   getSubscription: (id: string) => api.get(`/sip/subscriptions/${id}`),
@@ -347,6 +349,67 @@ export const sipAPI = {
   pauseSubscription: (id: string) => api.post(`/sip/subscriptions/${id}/pause`),
   resumeSubscription: (id: string) => api.post(`/sip/subscriptions/${id}/resume`),
   cancelSubscription: (id: string, data?: any) => api.post(`/sip/subscriptions/${id}/cancel`, data),
+};
+
+// Exchange APIs
+export const exchangeAPI = {
+  getAssets: (params?: any) => api.get('/exchange/assets', { params }),
+  getAsset: (symbol: string) => api.get(`/exchange/assets/${symbol}`),
+  createOrder: (data: any) => api.post('/exchange/orders', data),
+  getOrders: (params?: any) => api.get('/exchange/orders', { params }),
+  getMyOrders: (params?: any) => api.get('/exchange/orders/my-orders', { params }),
+  cancelOrder: (orderId: string) => api.post(`/exchange/orders/${orderId}/cancel`),
+  getOrderBook: (symbol: string) => api.get(`/exchange/orderbook/${symbol}`),
+  getTradeHistory: (symbol: string, params?: any) => api.get(`/exchange/trades/${symbol}`, { params }),
+  getMyTrades: (params?: any) => api.get('/exchange/my-trades', { params }),
+  // Admin functions
+  updateAssetPrice: (assetId: string, data: any) => api.post(`/exchange/assets/${assetId}/price-update`, data),
+  adminCancelOrder: (orderId: string) => api.post(`/exchange/orders/${orderId}/cancel`, {}),
+};
+
+// Admin-specific APIs
+export const adminAPI = {
+  // Deal transitions
+  transitionToLockIn: (dealId: string) => api.post(`/admin/deals/${dealId}/transition-to-lock-in`),
+  transitionToOperational: (dealId: string) => api.post(`/admin/deals/${dealId}/transition-to-operational`),
+  updateLockInDates: (dealId: string, data: any) => api.put(`/admin/deals/${dealId}/lock-in-dates`, data),
+  getDealsInLockIn: () => api.get('/admin/deals/lock-in'),
+  deployAsset: (dealId: string, data: any) => api.post(`/admin/deals/${dealId}/deploy-asset`, data),
+
+  // User management
+  getAllUsers: (params?: any) => api.get('/auth/users', { params }),
+  getUser: (userId: string) => api.get(`/auth/users/${userId}`),
+  updateUser: (userId: string, data: any) => api.patch(`/auth/users/${userId}`, data),
+  updateUserRole: (userId: string, data: any) => api.patch(`/auth/users/${userId}/role`, data),
+  blockUser: (userId: string) => api.post(`/auth/users/${userId}/block`),
+  unblockUser: (userId: string) => api.post(`/auth/users/${userId}/unblock`),
+  deleteUser: (userId: string) => api.delete(`/auth/users/${userId}`),
+
+  // KYC management
+  getPendingKYC: (params?: any) => api.get('/kyc/pending', { params }),
+  approveKYC: (kycId: string, data?: any) => api.post(`/kyc/${kycId}/approve`, data),
+  rejectKYC: (kycId: string, data: any) => api.post(`/kyc/${kycId}/reject`, data),
+
+  // Payout management
+  getPendingPayouts: (params?: any) => api.get('/payouts', { params: { ...params, status: 'pending' } }),
+  approvePayout: (payoutId: string) => api.post(`/payouts/${payoutId}/approve`),
+  rejectPayout: (payoutId: string, data: any) => api.post(`/payouts/${payoutId}/reject`, data),
+  processPayout: (payoutId: string) => api.post(`/payouts/${payoutId}/process`),
+
+  // Exit/Redemption
+  processExit: (dealId: string, data: any) => api.post(`/deals/${dealId}/exit`, data),
+  getExitEligibility: (dealId: string) => api.get(`/deals/${dealId}/exit/eligibility`),
+  getExitHistory: (dealId: string) => api.get(`/deals/${dealId}/exit/history`),
+};
+
+// Scenarios APIs
+export const scenariosAPI = {
+  getScenarios: (params?: any) => api.get('/scenarios', { params }),
+  getScenario: (id: string) => api.get(`/scenarios/${id}`),
+  createScenario: (data: any) => api.post('/scenarios', data),
+  updateScenario: (id: string, data: any) => api.patch(`/scenarios/${id}`, data),
+  deleteScenario: (id: string) => api.delete(`/scenarios/${id}`),
+  runScenario: (id: string, data?: any) => api.post(`/scenarios/${id}/run`, data),
 };
 
 export default api;

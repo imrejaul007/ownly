@@ -11,6 +11,9 @@ import routes from './routes/index.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import { startPayoutScheduler } from './cron/payoutScheduler.js';
 import { startSIPScheduler } from './cron/sipScheduler.js';
+import { startLockInScheduler } from './cron/lockInScheduler.js';
+import { startSIPMonthlyScheduler } from './cron/sipMonthlyScheduler.js';
+import { startExitScheduler } from './cron/exitScheduler.js';
 
 // Load environment variables
 dotenv.config();
@@ -128,6 +131,9 @@ const startServer = async () => {
       // Start cron jobs
       startPayoutScheduler();
       startSIPScheduler();
+      startLockInScheduler();
+      startSIPMonthlyScheduler();
+      startExitScheduler();
     });
 
   } catch (error) {

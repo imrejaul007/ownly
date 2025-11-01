@@ -53,6 +53,22 @@ export const invest = async (req, res, next) => {
       return error(res, 'Investment would exceed deal target', 400);
     }
 
+    // Check allocation limits for direct sale channel
+    // Direct sale investments should respect the allocation_direct_sale_pct
+    const directSaleAllocation = parseFloat(deal.target_amount) * (parseFloat(deal.allocation_direct_sale_pct) / 100);
+    const currentDirectSaleRaised = parseFloat(deal.direct_sale_raised || 0);
+    const newDirectSaleRaised = currentDirectSaleRaised + parseFloat(amount);
+
+    if (newDirectSaleRaised > directSaleAllocation) {
+      await t.rollback();
+      const remaining = directSaleAllocation - currentDirectSaleRaised;
+      return error(
+        res,
+        `Direct sale allocation limit reached. Available: ${remaining.toFixed(2)} (${deal.allocation_direct_sale_pct}% of target)`,
+        400
+      );
+    }
+
     // Check user wallet balance
     const wallet = await Wallet.findOne({
       where: { user_id: userId },
@@ -117,6 +133,7 @@ export const invest = async (req, res, next) => {
 
     await deal.update({
       raised_amount: parseFloat(deal.raised_amount) + parseFloat(amount),
+      direct_sale_raised: parseFloat(deal.direct_sale_raised || 0) + parseFloat(amount),
       investor_count: currentInvestorCount,
       status: newTotal >= parseFloat(deal.target_amount) ? 'funded' : 'funding',
     }, { transaction: t });

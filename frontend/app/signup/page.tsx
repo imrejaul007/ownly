@@ -118,81 +118,90 @@ function SignupContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Animated Gradient Orbs */}
+      <div className="absolute top-20 left-10 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+      <div className="max-w-md w-full relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary-600 mb-2">OWNLY</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Multi-Asset Fractional Investment Ecosystem
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-2">
+            OWNLY
+          </h1>
+          <p className="text-purple-200 text-lg">
+            Own the world, one deal at a time
           </p>
         </div>
 
         {/* Referral Bonus Banner */}
         {referralBonus && (
-          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-4 mb-6 text-center">
-            <div className="text-2xl mb-1">🎉</div>
-            <div className="font-bold">You've been referred!</div>
-            <div className="text-sm">Get AED 50 welcome bonus after signup</div>
+          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-xl border border-green-400/30 text-white rounded-2xl p-4 mb-6 text-center shadow-lg shadow-green-500/20">
+            <div className="text-3xl mb-2">🎉</div>
+            <div className="font-bold text-green-300 text-lg">You've been referred!</div>
+            <div className="text-sm text-green-200">Get AED 50 welcome bonus after signup</div>
           </div>
         )}
 
         {/* Signup Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
-          <h2 className="text-2xl font-bold mb-6 text-center">Create Your Account</h2>
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+          <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Create Your Account
+          </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium mb-2">Full Name *</label>
+              <label className="block text-sm font-semibold mb-2 text-purple-200">Full Name *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Ahmed Al Mansouri"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                className={`w-full px-4 py-3 rounded-xl border ${
+                  errors.name ? 'border-red-500/50 bg-red-500/5' : 'border-white/10 bg-white/5'
+                } backdrop-blur-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all`}
               />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-red-400 text-sm mt-1 flex items-center gap-1">⚠️ {errors.name}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-2">Email Address *</label>
+              <label className="block text-sm font-semibold mb-2 text-purple-200">Email Address *</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="ahmed@example.ae"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                className={`w-full px-4 py-3 rounded-xl border ${
+                  errors.email ? 'border-red-500/50 bg-red-500/5' : 'border-white/10 bg-white/5'
+                } backdrop-blur-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all`}
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-400 text-sm mt-1 flex items-center gap-1">⚠️ {errors.email}</p>}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium mb-2">Phone Number *</label>
+              <label className="block text-sm font-semibold mb-2 text-purple-200">Phone Number *</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+971 50 123 4567"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                className={`w-full px-4 py-3 rounded-xl border ${
+                  errors.phone ? 'border-red-500/50 bg-red-500/5' : 'border-white/10 bg-white/5'
+                } backdrop-blur-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all`}
               />
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-400 text-sm mt-1 flex items-center gap-1">⚠️ {errors.phone}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium mb-2">Password *</label>
+              <label className="block text-sm font-semibold mb-2 text-purple-200">Password *</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -200,24 +209,24 @@ function SignupContent() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Minimum 6 characters"
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.password ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  } dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                  className={`w-full px-4 py-3 pr-12 rounded-xl border ${
+                    errors.password ? 'border-red-500/50 bg-red-500/5' : 'border-white/10 bg-white/5'
+                  } backdrop-blur-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-3 text-gray-400 hover:text-purple-300 transition-colors"
                 >
                   {showPassword ? '👁️' : '👁️‍🗨️'}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-400 text-sm mt-1 flex items-center gap-1">⚠️ {errors.password}</p>}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium mb-2">Confirm Password *</label>
+              <label className="block text-sm font-semibold mb-2 text-purple-200">Confirm Password *</label>
               <div className="relative">
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -225,39 +234,46 @@ function SignupContent() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Re-enter your password"
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.confirmPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  } dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                  className={`w-full px-4 py-3 pr-12 rounded-xl border ${
+                    errors.confirmPassword ? 'border-red-500/50 bg-red-500/5' : 'border-white/10 bg-white/5'
+                  } backdrop-blur-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-3 text-gray-400 hover:text-purple-300 transition-colors"
                 >
                   {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
                 </button>
               </div>
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-red-400 text-sm mt-1 flex items-center gap-1">⚠️ {errors.confirmPassword}</p>}
             </div>
 
             {/* Account Type */}
             <div>
-              <label className="block text-sm font-medium mb-2">Account Type *</label>
+              <label className="block text-sm font-semibold mb-2 text-purple-200">Account Type *</label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all appearance-none cursor-pointer"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23a78bfa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
+                  backgroundPosition: 'right 0.5rem center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '1.5em 1.5em',
+                  paddingRight: '2.5rem'
+                }}
               >
-                <option value="investor">Investor - Retail (Min: AED 1,000)</option>
-                <option value="investor_hni">Investor - HNI (Min: AED 50,000)</option>
-                <option value="agent">Agent - Earn Commissions</option>
+                <option value="investor" className="bg-slate-900">Investor - Retail (Min: AED 1,000)</option>
+                <option value="investor_hni" className="bg-slate-900">Investor - HNI (Min: AED 50,000)</option>
+                <option value="agent" className="bg-slate-900">Agent - Earn Commissions</option>
               </select>
             </div>
 
             {/* Referral Code */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-semibold mb-2 text-purple-200">
                 Referral Code (Optional) 🎁
               </label>
               <input
@@ -266,30 +282,30 @@ function SignupContent() {
                 value={formData.referralCode}
                 onChange={handleChange}
                 placeholder="Enter referral code"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 uppercase"
+                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all uppercase"
               />
               {formData.referralCode && (
-                <p className="text-green-600 text-sm mt-1">
+                <p className="text-green-400 text-sm mt-1 flex items-center gap-1">
                   ✓ Get AED 50 welcome bonus!
                 </p>
               )}
             </div>
 
             {/* Terms */}
-            <div className="flex items-start space-x-2">
+            <div className="flex items-start space-x-3">
               <input
                 type="checkbox"
                 id="terms"
                 required
-                className="mt-1"
+                className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-purple-500 focus:ring-purple-500/50 focus:ring-offset-slate-950"
               />
-              <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
+              <label htmlFor="terms" className="text-sm text-purple-200">
                 I agree to OWNLY's{' '}
-                <a href="#" className="text-primary-600 hover:underline">
+                <a href="#" className="text-purple-400 hover:text-purple-300 underline">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-primary-600 hover:underline">
+                <a href="#" className="text-purple-400 hover:text-purple-300 underline">
                   Privacy Policy
                 </a>
               </label>
@@ -299,7 +315,7 @@ function SignupContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary py-3 flex items-center justify-center space-x-2"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <>
@@ -314,28 +330,60 @@ function SignupContent() {
 
           {/* Login Link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-purple-200">
               Already have an account?{' '}
-              <Link href="/login" className="text-primary-600 font-semibold hover:underline">
-                Sign In
+              <Link href="/login" className="text-purple-400 font-semibold hover:text-purple-300 transition-colors">
+                Sign In →
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Features */}
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center text-xs text-gray-600 dark:text-gray-400">
-          <div>
+        {/* Features Grid - 8 Investment Categories */}
+        <div className="mt-8 grid grid-cols-4 gap-3 text-center text-xs">
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">🚗</div>
+            <div className="text-purple-200 font-semibold">Mobility</div>
+          </div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
             <div className="text-2xl mb-1">🏢</div>
-            <div>Multi-Asset Portfolio</div>
+            <div className="text-purple-200 font-semibold">Workspace</div>
           </div>
-          <div>
-            <div className="text-2xl mb-1">🔒</div>
-            <div>Secure & Licensed</div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">💆‍♀️</div>
+            <div className="text-purple-200 font-semibold">Lifestyle</div>
           </div>
-          <div>
-            <div className="text-2xl mb-1">💰</div>
-            <div>High ROI Potential</div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">🛍️</div>
+            <div className="text-purple-200 font-semibold">Retail</div>
+          </div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">☕</div>
+            <div className="text-purple-200 font-semibold">Hospitality</div>
+          </div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">🏠</div>
+            <div className="text-purple-200 font-semibold">Real Estate</div>
+          </div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">🏕️</div>
+            <div className="text-purple-200 font-semibold">Experience</div>
+          </div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="text-2xl mb-1">💎</div>
+            <div className="text-purple-200 font-semibold">Luxury</div>
+          </div>
+        </div>
+
+        {/* Trust Indicators */}
+        <div className="mt-6 flex justify-center gap-6 text-xs text-purple-300">
+          <div className="flex items-center gap-1">
+            <span>🔒</span>
+            <span>Bank-Grade Security</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>✓</span>
+            <span>5,000+ Investors</span>
           </div>
         </div>
       </div>

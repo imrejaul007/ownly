@@ -1,397 +1,545 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { documentAPI } from '@/lib/api';
+import { useState } from 'react';
+import {
+  FolderOpen,
+  Search,
+  Download,
+  Eye,
+  FileText,
+  FileCheck,
+  Receipt,
+  FileSpreadsheet,
+  Upload,
+  FileQuestion,
+  Printer,
+  Archive,
+  Calendar,
+  HardDrive,
+  ArrowUpDown,
+  Filter
+} from 'lucide-react';
 
-export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filterCategory, setFilterCategory] = useState('all');
+interface Document {
+  id: string;
+  name: string;
+  type: 'deed' | 'agreement' | 'tax' | 'receipt';
+  category: string;
+  property: string;
+  date: string;
+  size: string;
+  sizeBytes: number;
+}
+
+const allDocuments: Document[] = [
+  // Property Deeds (3)
+  { id: '1', name: 'Marina Heights - Title Deed.pdf', type: 'deed', category: 'Property Deeds', property: 'Dubai Marina', date: '15 Jan 2024', size: '2.4 MB', sizeBytes: 2400000 },
+  { id: '2', name: 'Business Bay Tower - Title Deed.pdf', type: 'deed', category: 'Property Deeds', property: 'Business Bay', date: '20 Dec 2023', size: '2.1 MB', sizeBytes: 2100000 },
+  { id: '3', name: 'Reem Island - Title Deed.pdf', type: 'deed', category: 'Property Deeds', property: 'Abu Dhabi', date: '10 Nov 2023', size: '2.3 MB', sizeBytes: 2300000 },
+
+  // SPV Agreements (8)
+  { id: '4', name: 'SPV Agreement - Marina Heights.pdf', type: 'agreement', category: 'Agreements', property: 'Dubai Marina', date: '15 Jan 2024', size: '850 KB', sizeBytes: 850000 },
+  { id: '5', name: 'Shareholder Certificate - MH001.pdf', type: 'agreement', category: 'Agreements', property: 'Dubai Marina', date: '15 Jan 2024', size: '420 KB', sizeBytes: 420000 },
+  { id: '6', name: 'SPV Agreement - Business Bay.pdf', type: 'agreement', category: 'Agreements', property: 'Business Bay', date: '20 Dec 2023', size: '780 KB', sizeBytes: 780000 },
+  { id: '7', name: 'Shareholder Certificate - BB002.pdf', type: 'agreement', category: 'Agreements', property: 'Business Bay', date: '20 Dec 2023', size: '390 KB', sizeBytes: 390000 },
+  { id: '8', name: 'SPV Agreement - Reem Island.pdf', type: 'agreement', category: 'Agreements', property: 'Abu Dhabi', date: '10 Nov 2023', size: '820 KB', sizeBytes: 820000 },
+  { id: '9', name: 'Shareholder Certificate - RI003.pdf', type: 'agreement', category: 'Agreements', property: 'Abu Dhabi', date: '10 Nov 2023', size: '410 KB', sizeBytes: 410000 },
+  { id: '10', name: 'Investment Terms - Marina Heights.pdf', type: 'agreement', category: 'Agreements', property: 'Dubai Marina', date: '15 Jan 2024', size: '650 KB', sizeBytes: 650000 },
+  { id: '11', name: 'Investment Terms - Business Bay.pdf', type: 'agreement', category: 'Agreements', property: 'Business Bay', date: '20 Dec 2023', size: '620 KB', sizeBytes: 620000 },
+
+  // Tax Documents (6)
+  { id: '12', name: 'Tax Certificate 2024 - Q1.pdf', type: 'tax', category: 'Tax Documents', property: 'All Investments', date: '01 Apr 2024', size: '320 KB', sizeBytes: 320000 },
+  { id: '13', name: 'Tax Certificate 2023 - Q4.pdf', type: 'tax', category: 'Tax Documents', property: 'All Investments', date: '01 Jan 2024', size: '310 KB', sizeBytes: 310000 },
+  { id: '14', name: 'Tax Certificate 2023 - Q3.pdf', type: 'tax', category: 'Tax Documents', property: 'All Investments', date: '01 Oct 2023', size: '305 KB', sizeBytes: 305000 },
+  { id: '15', name: 'Annual Tax Summary 2023.pdf', type: 'tax', category: 'Tax Documents', property: 'All Investments', date: '31 Dec 2023', size: '540 KB', sizeBytes: 540000 },
+  { id: '16', name: 'Investment Income Statement 2023.pdf', type: 'tax', category: 'Tax Documents', property: 'All Investments', date: '31 Dec 2023', size: '450 KB', sizeBytes: 450000 },
+  { id: '17', name: 'TDS Certificate 2023.pdf', type: 'tax', category: 'Tax Documents', property: 'All Investments', date: '31 Dec 2023', size: '280 KB', sizeBytes: 280000 },
+
+  // Payout Receipts (7)
+  { id: '18', name: 'Payout Receipt - March 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Marina Heights', date: '05 Mar 2024', size: '180 KB', sizeBytes: 180000 },
+  { id: '19', name: 'Payout Receipt - February 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Marina Heights', date: '05 Feb 2024', size: '175 KB', sizeBytes: 175000 },
+  { id: '20', name: 'Payout Receipt - January 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Marina Heights', date: '05 Jan 2024', size: '170 KB', sizeBytes: 170000 },
+  { id: '21', name: 'Payout Receipt - March 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Business Bay', date: '08 Mar 2024', size: '185 KB', sizeBytes: 185000 },
+  { id: '22', name: 'Payout Receipt - February 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Business Bay', date: '08 Feb 2024', size: '180 KB', sizeBytes: 180000 },
+  { id: '23', name: 'Payout Receipt - March 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Reem Island', date: '10 Mar 2024', size: '190 KB', sizeBytes: 190000 },
+  { id: '24', name: 'Payout Receipt - February 2024.pdf', type: 'receipt', category: 'Payout Receipts', property: 'Reem Island', date: '10 Feb 2024', size: '185 KB', sizeBytes: 185000 },
+];
+
+export default function DocumentVaultPage() {
+  const [selectedTab, setSelectedTab] = useState<'all' | 'deed' | 'agreement' | 'tax' | 'receipt'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadData, setUploadData] = useState({
-    name: '',
-    category: 'legal',
-    description: '',
+  const [sortField, setSortField] = useState<'name' | 'date' | 'size'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+
+  // Filter documents based on tab and search
+  const filteredDocuments = allDocuments.filter(doc => {
+    const matchesTab = selectedTab === 'all' || doc.type === selectedTab;
+    const matchesSearch = !searchQuery ||
+      doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.property.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
   });
 
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
-
-  const fetchDocuments = async () => {
-    try {
-      setLoading(true);
-      const params: any = {};
-      if (filterCategory !== 'all') params.category = filterCategory;
-      if (searchQuery) params.search = searchQuery;
-
-      const response = await documentAPI.getDocuments(params);
-      setDocuments(response.data.data.documents || []);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    } finally {
-      setLoading(false);
+  // Sort documents
+  const sortedDocuments = [...filteredDocuments].sort((a, b) => {
+    let comparison = 0;
+    if (sortField === 'name') {
+      comparison = a.name.localeCompare(b.name);
+    } else if (sortField === 'date') {
+      comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+    } else if (sortField === 'size') {
+      comparison = a.sizeBytes - b.sizeBytes;
     }
-  };
-
-  const getCategoryIcon = (category: string) => {
-    const icons: any = {
-      legal: '⚖️',
-      financial: '💰',
-      property: '🏢',
-      identity: '🆔',
-      contract: '📝',
-      report: '📊',
-      other: '📄',
-    };
-    return icons[category] || '📄';
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors: any = {
-      legal: 'bg-purple-100 text-purple-800',
-      financial: 'bg-green-100 text-green-800',
-      property: 'bg-blue-100 text-blue-800',
-      identity: 'bg-orange-100 text-orange-800',
-      contract: 'bg-yellow-100 text-yellow-800',
-      report: 'bg-pink-100 text-pink-800',
-      other: 'bg-gray-100 text-gray-800',
-    };
-    return colors[category] || 'bg-gray-100 text-gray-800';
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      if (!uploadData.name) {
-        setUploadData((prev) => ({ ...prev, name: e.target.files![0].name }));
-      }
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert('Please select a file');
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append('document', selectedFile);
-      formData.append('name', uploadData.name);
-      formData.append('category', uploadData.category);
-      formData.append('description', uploadData.description);
-
-      await documentAPI.uploadDocument(formData);
-      alert('✅ Document uploaded successfully!');
-
-      // Reset and refresh
-      setUploadModalOpen(false);
-      setSelectedFile(null);
-      setUploadData({ name: '', category: 'legal', description: '' });
-      fetchDocuments();
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      alert(error.response?.data?.message || 'Upload failed');
-    }
-  };
-
-  const handleDownload = async (documentId: string) => {
-    try {
-      window.open(`${process.env.NEXT_PUBLIC_API_URL}/documents/${documentId}/download`, '_blank');
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('Download failed');
-    }
-  };
-
-  const handleDelete = async (documentId: string) => {
-    if (!confirm('Are you sure you want to delete this document?')) {
-      return;
-    }
-
-    try {
-      await documentAPI.deleteDocument(documentId);
-      alert('✅ Document deleted successfully');
-      fetchDocuments();
-    } catch (error: any) {
-      console.error('Delete error:', error);
-      alert(error.response?.data?.message || 'Delete failed');
-    }
-  };
-
-  const filteredDocuments = documents.filter((doc) => {
-    const matchesCategory = filterCategory === 'all' || doc.category === filterCategory;
-    const matchesSearch = !searchQuery || doc.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return sortDirection === 'asc' ? comparison : -comparison;
   });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
+  // Toggle sort
+  const toggleSort = (field: 'name' | 'date' | 'size') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  // Get document counts
+  const counts = {
+    all: allDocuments.length,
+    deed: allDocuments.filter(d => d.type === 'deed').length,
+    agreement: allDocuments.filter(d => d.type === 'agreement').length,
+    tax: allDocuments.filter(d => d.type === 'tax').length,
+    receipt: allDocuments.filter(d => d.type === 'receipt').length,
+  };
+
+  // Get file type icon
+  const getFileIcon = (type: Document['type']) => {
+    switch (type) {
+      case 'deed':
+        return FileCheck;
+      case 'agreement':
+        return FileText;
+      case 'tax':
+        return FileSpreadsheet;
+      case 'receipt':
+        return Receipt;
+      default:
+        return FileText;
+    }
+  };
+
+  // Handle select/deselect document
+  const toggleSelectDoc = (id: string) => {
+    const newSelected = new Set(selectedDocs);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedDocs(newSelected);
+  };
+
+  // Handle select all
+  const toggleSelectAll = () => {
+    if (selectedDocs.size === sortedDocuments.length) {
+      setSelectedDocs(new Set());
+    } else {
+      setSelectedDocs(new Set(sortedDocuments.map(d => d.id)));
+    }
+  };
+
+  const handleView = (doc: Document) => {
+    console.log('View document:', doc.name);
+    // In real app, open document viewer
+  };
+
+  const handleDownload = (doc: Document) => {
+    console.log('Download document:', doc.name);
+    // In real app, trigger download
+  };
+
+  const handleDownloadAll = () => {
+    console.log('Download all documents as ZIP');
+    // In real app, trigger ZIP download
+  };
+
+  const handlePrintSelected = () => {
+    console.log('Print selected documents:', Array.from(selectedDocs));
+    // In real app, trigger print
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-              Document Library
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Manage and access all your investment documents
-            </p>
-          </div>
-          <button
-            onClick={() => setUploadModalOpen(true)}
-            className="btn-primary flex items-center space-x-2"
-          >
-            <span>📤</span>
-            <span>Upload Document</span>
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-      {/* Search and Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+        {/* Hero Section */}
+        <div className="mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl">
+                  <FolderOpen className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                  Document Vault
+                </h1>
+              </div>
+              <p className="text-gray-400 text-lg ml-1">
+                Access all your investment documents in one secure place
+              </p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-3">
+              <button className="px-4 py-2.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-purple-300 font-medium transition-all flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                <span>Upload</span>
+              </button>
+              <button className="px-4 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-300 font-medium transition-all flex items-center gap-2">
+                <FileQuestion className="w-4 h-4" />
+                <span>Request</span>
+              </button>
+              <button
+                onClick={handleDownloadAll}
+                className="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-lg text-white font-medium transition-all flex items-center gap-2"
+              >
+                <Archive className="w-4 h-4" />
+                <span>Download All</span>
+              </button>
+              {selectedDocs.size > 0 && (
+                <button
+                  onClick={handlePrintSelected}
+                  className="px-4 py-2.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-white font-medium transition-all flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Print ({selectedDocs.size})</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="mt-8 relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search documents..."
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+              placeholder="Search documents by name or property..."
+              className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all backdrop-blur-sm"
             />
           </div>
-          <div>
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
-            >
-              <option value="all">All Categories</option>
-              <option value="legal">⚖️ Legal</option>
-              <option value="financial">💰 Financial</option>
-              <option value="property">🏢 Property</option>
-              <option value="identity">🆔 Identity</option>
-              <option value="contract">📝 Contract</option>
-              <option value="report">📊 Report</option>
-              <option value="other">📄 Other</option>
-            </select>
+        </div>
+
+        {/* Document Category Tabs */}
+        <div className="mb-8 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl p-2">
+          <div className="flex flex-wrap gap-2">
+            <TabButton
+              active={selectedTab === 'all'}
+              onClick={() => setSelectedTab('all')}
+              count={counts.all}
+              label="All Documents"
+            />
+            <TabButton
+              active={selectedTab === 'deed'}
+              onClick={() => setSelectedTab('deed')}
+              count={counts.deed}
+              label="Property Deeds"
+            />
+            <TabButton
+              active={selectedTab === 'agreement'}
+              onClick={() => setSelectedTab('agreement')}
+              count={counts.agreement}
+              label="Agreements"
+            />
+            <TabButton
+              active={selectedTab === 'tax'}
+              onClick={() => setSelectedTab('tax')}
+              count={counts.tax}
+              label="Tax Documents"
+            />
+            <TabButton
+              active={selectedTab === 'receipt'}
+              onClick={() => setSelectedTab('receipt')}
+              count={counts.receipt}
+              label="Payout Receipts"
+            />
           </div>
         </div>
-      </div>
 
-      {/* Category Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
-        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">⚖️</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Legal</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'legal').length}</div>
-        </div>
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">💰</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Financial</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'financial').length}</div>
-        </div>
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">🏢</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Property</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'property').length}</div>
-        </div>
-        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">🆔</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Identity</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'identity').length}</div>
-        </div>
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">📝</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Contract</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'contract').length}</div>
-        </div>
-        <div className="bg-pink-50 dark:bg-pink-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">📊</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Report</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'report').length}</div>
-        </div>
-        <div className="bg-gray-50 dark:bg-gray-900/20 rounded-lg p-4 text-center">
-          <div className="text-2xl mb-1">📄</div>
-          <div className="text-xs font-semibold text-gray-600 dark:text-gray-400">Other</div>
-          <div className="text-lg font-bold">{documents.filter((d) => d.category === 'other').length}</div>
-        </div>
-      </div>
+        {/* Document List */}
+        <div className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-xl overflow-hidden">
+          {/* Desktop Table View */}
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-700/50">
+                  <th className="px-4 py-4 text-left">
+                    <input
+                      type="checkbox"
+                      checked={selectedDocs.size === sortedDocuments.length && sortedDocuments.length > 0}
+                      onChange={toggleSelectAll}
+                      className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-purple-500 focus:ring-purple-500"
+                    />
+                  </th>
+                  <th className="px-6 py-4 text-left">
+                    <button
+                      onClick={() => toggleSort('name')}
+                      className="flex items-center gap-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider"
+                    >
+                      Document Name
+                      {sortField === 'name' && <ArrowUpDown className="w-4 h-4" />}
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
+                    Deal/Property
+                  </th>
+                  <th className="px-6 py-4 text-left">
+                    <button
+                      onClick={() => toggleSort('date')}
+                      className="flex items-center gap-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider"
+                    >
+                      Date
+                      {sortField === 'date' && <ArrowUpDown className="w-4 h-4" />}
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-left">
+                    <button
+                      onClick={() => toggleSort('size')}
+                      className="flex items-center gap-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors uppercase tracking-wider"
+                    >
+                      Size
+                      {sortField === 'size' && <ArrowUpDown className="w-4 h-4" />}
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700/50">
+                {sortedDocuments.map((doc) => {
+                  const Icon = getFileIcon(doc.type);
+                  return (
+                    <tr
+                      key={doc.id}
+                      className="hover:bg-slate-700/30 transition-colors group"
+                    >
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedDocs.has(doc.id)}
+                          onChange={() => toggleSelectDoc(doc.id)}
+                          className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-purple-500 focus:ring-purple-500"
+                        />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg">
+                            <Icon className="w-5 h-5 text-purple-400" />
+                          </div>
+                          <span className="font-medium text-white">{doc.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1 bg-slate-700/50 border border-slate-600 rounded-full text-xs font-medium text-gray-300">
+                          {doc.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {doc.property}
+                      </td>
+                      <td className="px-6 py-4 text-gray-400">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          {doc.date}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-gray-400">
+                        <div className="flex items-center gap-2">
+                          <HardDrive className="w-4 h-4" />
+                          {doc.size}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleView(doc)}
+                            className="p-2 hover:bg-blue-500/20 rounded-lg transition-colors group/btn"
+                            title="View"
+                          >
+                            <Eye className="w-5 h-5 text-gray-400 group-hover/btn:text-blue-400" />
+                          </button>
+                          <button
+                            onClick={() => handleDownload(doc)}
+                            className="p-2 hover:bg-purple-500/20 rounded-lg transition-colors group/btn"
+                            title="Download"
+                          >
+                            <Download className="w-5 h-5 text-gray-400 group-hover/btn:text-purple-400" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-      {/* Documents Grid */}
-      {filteredDocuments.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center">
-          <div className="text-6xl mb-4">📂</div>
-          <h3 className="text-xl font-bold mb-2">No documents found</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {searchQuery || filterCategory !== 'all'
-              ? 'Try adjusting your filters'
-              : 'Upload your first document to get started'}
-          </p>
-          <button onClick={() => setUploadModalOpen(true)} className="btn-primary">
-            Upload Document
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDocuments.map((doc) => (
-            <div
-              key={doc.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition p-6"
-            >
-              {/* Icon and Category */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-4xl">{getCategoryIcon(doc.category)}</div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(doc.category)}`}>
-                  {doc.category}
-                </span>
-              </div>
+          {/* Mobile Card View */}
+          <div className="lg:hidden divide-y divide-slate-700/50">
+            {sortedDocuments.map((doc) => {
+              const Icon = getFileIcon(doc.type);
+              return (
+                <div key={doc.id} className="p-4 hover:bg-slate-700/30 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedDocs.has(doc.id)}
+                      onChange={() => toggleSelectDoc(doc.id)}
+                      className="mt-1 w-4 h-4 rounded bg-slate-700 border-slate-600 text-purple-500 focus:ring-purple-500"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="p-2 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-lg">
+                          <Icon className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-white mb-1 break-words">{doc.name}</h3>
+                          <span className="inline-block px-2 py-1 bg-slate-700/50 border border-slate-600 rounded-full text-xs font-medium text-gray-300">
+                            {doc.category}
+                          </span>
+                        </div>
+                      </div>
 
-              {/* Document Name */}
-              <h3 className="text-lg font-bold mb-2 line-clamp-2">{doc.name}</h3>
+                      <div className="space-y-2 mb-3 text-sm">
+                        <div className="flex items-center justify-between text-gray-400">
+                          <span>Property:</span>
+                          <span className="text-gray-300">{doc.property}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-gray-400">
+                          <span>Date:</span>
+                          <span className="text-gray-300">{doc.date}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-gray-400">
+                          <span>Size:</span>
+                          <span className="text-gray-300">{doc.size}</span>
+                        </div>
+                      </div>
 
-              {/* Description */}
-              {doc.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                  {doc.description}
-                </p>
-              )}
-
-              {/* Metadata */}
-              <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center justify-between">
-                  <span>Size:</span>
-                  <span className="font-semibold">{formatFileSize(doc.file_size || 0)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Uploaded:</span>
-                  <span className="font-semibold">{new Date(doc.created_at).toLocaleDateString()}</span>
-                </div>
-                {doc.related_entity && (
-                  <div className="flex items-center justify-between">
-                    <span>Related to:</span>
-                    <span className="font-semibold">{doc.related_entity}</span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleView(doc)}
+                          className="flex-1 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-300 font-medium transition-all flex items-center justify-center gap-2"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>View</span>
+                        </button>
+                        <button
+                          onClick={() => handleDownload(doc)}
+                          className="flex-1 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-purple-300 font-medium transition-all flex items-center justify-center gap-2"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Download</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              );
+            })}
+          </div>
 
-              {/* Actions */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleDownload(doc.id)}
-                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm"
-                >
-                  Download
-                </button>
-                <button
-                  onClick={() => handleDelete(doc.id)}
-                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm"
-                >
-                  Delete
-                </button>
+          {/* Empty State */}
+          {sortedDocuments.length === 0 && (
+            <div className="py-16 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-700/50 rounded-full mb-4">
+                <FolderOpen className="w-8 h-8 text-gray-400" />
               </div>
+              <h3 className="text-xl font-semibold text-white mb-2">No documents found</h3>
+              <p className="text-gray-400">
+                {searchQuery ? 'Try adjusting your search query' : 'No documents in this category'}
+              </p>
             </div>
-          ))}
+          )}
         </div>
-      )}
 
-      {/* Upload Modal */}
-      {uploadModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold mb-4">Upload Document</h2>
-
-            <div className="space-y-4">
-              {/* File Upload */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Select File *</label>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
-                />
-                {selectedFile && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                    {selectedFile.name} ({formatFileSize(selectedFile.size)})
-                  </p>
-                )}
-              </div>
-
-              {/* Document Name */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Document Name *</label>
-                <input
-                  type="text"
-                  value={uploadData.name}
-                  onChange={(e) => setUploadData({ ...uploadData, name: e.target.value })}
-                  placeholder="e.g., Investment Agreement - Deal 01"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Category *</label>
-                <select
-                  value={uploadData.category}
-                  onChange={(e) => setUploadData({ ...uploadData, category: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
-                >
-                  <option value="legal">⚖️ Legal</option>
-                  <option value="financial">💰 Financial</option>
-                  <option value="property">🏢 Property</option>
-                  <option value="identity">🆔 Identity</option>
-                  <option value="contract">📝 Contract</option>
-                  <option value="report">📊 Report</option>
-                  <option value="other">📄 Other</option>
-                </select>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Description (Optional)</label>
-                <textarea
-                  value={uploadData.description}
-                  onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
-                  placeholder="Brief description of the document..."
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700"
-                />
-              </div>
-
-              {/* Actions */}
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setUploadModalOpen(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-                <button onClick={handleUpload} className="flex-1 btn-primary">
-                  Upload
-                </button>
-              </div>
+        {/* Storage Stats */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-xl p-6 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-400 text-sm font-medium">Documents Stored</span>
+              <FileText className="w-5 h-5 text-purple-400" />
             </div>
+            <p className="text-2xl font-bold text-white">{allDocuments.length} files</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-xl p-6 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-400 text-sm font-medium">Total Size</span>
+              <HardDrive className="w-5 h-5 text-blue-400" />
+            </div>
+            <p className="text-2xl font-bold text-white">15.2 MB</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/20 rounded-xl p-6 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-400 text-sm font-medium">Last Updated</span>
+              <Calendar className="w-5 h-5 text-pink-400" />
+            </div>
+            <p className="text-2xl font-bold text-white">5 Mar 2024</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20 rounded-xl p-6 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-400 text-sm font-medium">Storage</span>
+              <Archive className="w-5 h-5 text-green-400" />
+            </div>
+            <p className="text-lg font-bold text-white">Unlimited</p>
+            <p className="text-xs text-gray-400 mt-1">For all investors</p>
           </div>
         </div>
-      )}
+      </div>
     </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  count,
+  label
+}: {
+  active: boolean;
+  onClick: () => void;
+  count: number;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        px-4 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2
+        ${active
+          ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25'
+          : 'text-gray-400 hover:text-white hover:bg-slate-700/50'
+        }
+      `}
+    >
+      <span>{label}</span>
+      <span className={`
+        px-2 py-0.5 rounded-full text-xs font-bold
+        ${active
+          ? 'bg-white/20 text-white'
+          : 'bg-slate-700 text-gray-300'
+        }
+      `}>
+        {count}
+      </span>
+    </button>
   );
 }
