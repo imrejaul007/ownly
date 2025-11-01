@@ -261,18 +261,18 @@ export default function Marketplace() {
 
                 {/* Quick Access Features */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <Link href="/sip">
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-all cursor-pointer group">
+                      <RefreshCw className="w-5 h-5 mb-1 text-green-300 group-hover:scale-110 transition-transform" />
+                      <div className="text-xs font-semibold text-white">SIP Plans</div>
+                      <div className="text-xs text-green-200">Recurring</div>
+                    </div>
+                  </Link>
                   <Link href="/copy-trading">
                     <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-all cursor-pointer group">
                       <Users className="w-5 h-5 mb-1 text-blue-300 group-hover:scale-110 transition-transform" />
                       <div className="text-xs font-semibold text-white">Copy Trading</div>
                       <div className="text-xs text-blue-200">Follow experts</div>
-                    </div>
-                  </Link>
-                  <Link href="/rewards">
-                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-all cursor-pointer group">
-                      <Award className="w-5 h-5 mb-1 text-yellow-300 group-hover:scale-110 transition-transform" />
-                      <div className="text-xs font-semibold text-white">Rewards</div>
-                      <div className="text-xs text-yellow-200">Earn bonuses</div>
                     </div>
                   </Link>
                   <Link href="/bundles">
@@ -284,9 +284,9 @@ export default function Marketplace() {
                   </Link>
                   <Link href="/secondary-market">
                     <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-all cursor-pointer group">
-                      <RefreshCw className="w-5 h-5 mb-1 text-green-300 group-hover:scale-110 transition-transform" />
+                      <RefreshCw className="w-5 h-5 mb-1 text-orange-300 group-hover:scale-110 transition-transform" />
                       <div className="text-xs font-semibold text-white">Trade</div>
-                      <div className="text-xs text-green-200">Exit early</div>
+                      <div className="text-xs text-orange-200">Exit early</div>
                     </div>
                   </Link>
                 </div>
