@@ -8,32 +8,28 @@ import {
   cancelListing,
   getListingDetails,
 } from '../controllers/secondaryMarketController.js';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// All routes require authentication
-router.use(authenticate);
+// Public routes (browsing) - use optionalAuth
+router.get('/listings', optionalAuth, getActiveListings);
+router.get('/listings/:listingId', optionalAuth, getListingDetails);
 
-// Get all active listings (public to authenticated users)
-router.get('/listings', getActiveListings);
-
+// Private routes (require authentication)
 // Get my listings (as seller)
-router.get('/my-listings', getMyListings);
+router.get('/my-listings', authenticate, getMyListings);
 
 // Create a new listing
-router.post('/listings', createListing);
-
-// Get listing details
-router.get('/listings/:listingId', getListingDetails);
+router.post('/listings', authenticate, createListing);
 
 // Make an offer on a listing
-router.post('/listings/:listingId/offer', makeOffer);
+router.post('/listings/:listingId/offer', authenticate, makeOffer);
 
 // Accept or reject an offer (seller only)
-router.post('/listings/:listingId/respond', respondToOffer);
+router.post('/listings/:listingId/respond', authenticate, respondToOffer);
 
 // Cancel a listing (seller only)
-router.post('/listings/:listingId/cancel', cancelListing);
+router.post('/listings/:listingId/cancel', authenticate, cancelListing);
 
 export default router;
