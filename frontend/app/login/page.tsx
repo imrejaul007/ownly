@@ -37,7 +37,12 @@ export default function LoginPage() {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      router.push('/');
+      // Redirect based on user role
+      if (user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Authentication failed');
     } finally {
@@ -56,7 +61,12 @@ export default function LoginPage() {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      router.push('/');
+      // Redirect based on user role
+      if (user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
