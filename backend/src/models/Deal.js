@@ -20,6 +20,39 @@ const Deal = sequelize.define('Deal', {
     type: DataTypes.ENUM('real_estate', 'franchise', 'startup', 'asset', 'equity', 'basket', 'trade'),
     allowNull: false,
   },
+  // Main Category (20 master categories)
+  category: {
+    type: DataTypes.ENUM(
+      'real_estate',
+      'mobility_transport',
+      'hospitality_tourism',
+      'food_beverage',
+      'health_wellness',
+      'retail_franchises',
+      'education_training',
+      'media_entertainment',
+      'technology_innovation',
+      'home_services',
+      'events_experiences',
+      'agriculture_sustainable',
+      'ecommerce_digital',
+      'logistics_supply_chain',
+      'manufacturing_production',
+      'micro_investment_baskets',
+      'secondary_market',
+      'bundles_thematic',
+      'community_impact',
+      'ownly_exchange'
+    ),
+    allowNull: true,
+    comment: 'Main Shariah-compliant category',
+  },
+  // Subcategory (specific business type within category)
+  subcategory: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Specific subcategory within main category',
+  },
   jurisdiction: {
     type: DataTypes.STRING,
     allowNull: true,

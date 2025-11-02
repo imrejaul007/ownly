@@ -37,6 +37,8 @@ export interface Deal {
   metadata?: any;
   spv?: SPV;
   created_at: string;
+  category?: string;
+  subcategory?: string;
 }
 
 export interface SPV {

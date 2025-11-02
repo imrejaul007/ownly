@@ -30,6 +30,7 @@ import exchangeRoutes from './exchange.js';
 import bundleRoutes from './bundles.js';
 import sipRoutes from './sip.js';
 import adminRoutes from './admin.js';
+import categoriesRoutes from './categories.js';
 
 const router = express.Router();
 
@@ -76,5 +77,6 @@ router.use('/exchange', exchangeRoutes);
 router.use('/bundles', bundleRoutes);
 router.use('/sip', sipRoutes);
 router.use('/admin', adminRoutes);
+router.use('/categories', categoriesRoutes);
 
 export default router;

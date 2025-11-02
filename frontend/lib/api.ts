@@ -227,6 +227,17 @@ export const searchAPI = {
   getSuggestions: (query: string) => api.get('/search/suggestions', { params: { q: query } }),
 };
 
+// Category APIs
+export const categoriesAPI = {
+  getAll: () => api.get('/categories'),
+  getTree: () => api.get('/categories/tree'),
+  getCategory: (categoryKey: string) => api.get(`/categories/${categoryKey}`),
+  getSubcategories: (categoryKey: string) => api.get(`/categories/${categoryKey}/subcategories`),
+  search: (query: string) => api.get('/categories/search', { params: { q: query } }),
+  validate: (categoryKey: string) => api.get(`/categories/${categoryKey}/validate`),
+  getProhibited: () => api.get('/categories/prohibited'),
+};
+
 // Report APIs
 export const reportAPI = {
   getReports: (params?: any) => api.get('/reports', { params }),

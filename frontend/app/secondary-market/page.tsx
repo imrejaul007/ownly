@@ -423,25 +423,24 @@ export default function SecondaryMarketPage() {
 
       <div className="relative max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Header with Live Ticker */}
-        <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 rounded-2xl shadow-2xl overflow-hidden mb-8">
-          <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden mb-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-indigo-600/10"></div>
           <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)',
             backgroundSize: '30px 30px'
           }}></div>
 
           <div className="relative z-10 p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center border border-purple-500/30 shadow-lg shadow-purple-500/30">
                   <Share2 className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold text-white flex items-center gap-3">
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent flex items-center gap-3">
                     Secondary Market
-                    <span className="text-2xl">💎</span>
                   </h1>
-                  <p className="text-purple-100 mt-1">
+                  <p className="text-purple-200 mt-1">
                     Buy and sell investment shares • Access immediate liquidity
                   </p>
                 </div>
@@ -451,46 +450,46 @@ export default function SecondaryMarketPage() {
             {/* Market Statistics */}
             {activeTab === 'browse' && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group">
+                <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 hover:bg-white/10 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2 mb-2">
-                    <Package className="w-4 h-4 text-purple-200 group-hover:scale-110 transition-transform" />
-                    <div className="text-purple-100 text-xs">Active Listings</div>
+                    <Package className="w-4 h-4 text-purple-300 group-hover:scale-110 transition-transform" />
+                    <div className="text-purple-200 text-xs">Active Listings</div>
                   </div>
                   <div className="text-3xl font-bold text-white">{listings.length}</div>
-                  <div className="text-xs text-purple-200 mt-1">Available now</div>
+                  <div className="text-xs text-purple-300 mt-1">Available now</div>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group">
+                <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 hover:bg-white/10 hover:shadow-lg hover:shadow-blue-500/20 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4 text-purple-200 group-hover:scale-110 transition-transform" />
-                    <div className="text-purple-100 text-xs">Total Market Value</div>
+                    <DollarSign className="w-4 h-4 text-purple-300 group-hover:scale-110 transition-transform" />
+                    <div className="text-purple-200 text-xs">Total Market Value</div>
                   </div>
                   <div className="text-3xl font-bold text-white">
                     {formatCurrency(listings.reduce((sum, l) => sum + parseFloat(l.total_price || 0), 0))}
                   </div>
-                  <div className="text-xs text-purple-200 mt-1">In listings</div>
+                  <div className="text-xs text-purple-300 mt-1">In listings</div>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group">
+                <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 hover:bg-white/10 hover:shadow-lg hover:shadow-pink-500/20 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2 mb-2">
-                    <BarChart3 className="w-4 h-4 text-purple-200 group-hover:scale-110 transition-transform" />
-                    <div className="text-purple-100 text-xs">Avg Investment</div>
+                    <BarChart3 className="w-4 h-4 text-purple-300 group-hover:scale-110 transition-transform" />
+                    <div className="text-purple-200 text-xs">Avg Investment</div>
                   </div>
                   <div className="text-3xl font-bold text-white">
                     {formatCurrency(listings.length > 0 ? listings.reduce((sum, l) => sum + parseFloat(l.total_price || 0), 0) / listings.length : 0)}
                   </div>
-                  <div className="text-xs text-purple-200 mt-1">Per listing</div>
+                  <div className="text-xs text-purple-300 mt-1">Per listing</div>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group">
+                <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 hover:bg-white/10 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-4 h-4 text-purple-200 group-hover:scale-110 transition-transform" />
-                    <div className="text-purple-100 text-xs">Total Shares</div>
+                    <Target className="w-4 h-4 text-purple-300 group-hover:scale-110 transition-transform" />
+                    <div className="text-purple-200 text-xs">Total Shares</div>
                   </div>
                   <div className="text-3xl font-bold text-white">
                     {listings.reduce((sum, l) => sum + parseInt(l.shares_for_sale || 0), 0).toLocaleString()}
                   </div>
-                  <div className="text-xs text-purple-200 mt-1">For sale</div>
+                  <div className="text-xs text-purple-300 mt-1">For sale</div>
                 </div>
               </div>
             )}
@@ -498,8 +497,8 @@ export default function SecondaryMarketPage() {
 
           {/* Live Activity Ticker */}
           {activeTab === 'browse' && liveActivity.length > 0 && (
-            <div className="relative bg-black/30 border-t border-white/10 overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 border-b border-white/20">
+            <div className="relative bg-white/5 backdrop-blur-xl border-t border-white/10 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border-b border-white/10">
                 <Activity className="w-4 h-4 text-white" />
                 <span className="text-xs font-semibold text-white">LIVE ACTIVITY</span>
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -541,16 +540,17 @@ export default function SecondaryMarketPage() {
             {marketTrends.hottestListing && (
               <div
                 onClick={() => router.push(`/secondary-market/${marketTrends.hottestListing.id}`)}
-                className="relative bg-gradient-to-br from-orange-600/90 to-red-600/90 backdrop-blur-xl rounded-xl p-5 overflow-hidden border border-orange-500/30 shadow-2xl hover:scale-105 transition-all cursor-pointer group"
+                className="relative bg-white/5 backdrop-blur-xl rounded-xl p-5 overflow-hidden border border-orange-500/30 shadow-2xl shadow-orange-500/20 hover:scale-105 hover:shadow-orange-500/30 transition-all cursor-pointer group"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 to-red-600/20"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <Flame className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-orange-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-orange-500/30">
+                      <Flame className="w-5 h-5 text-orange-400" />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-orange-100 uppercase tracking-wide">🔥 Hottest</div>
+                      <div className="text-xs font-semibold text-orange-300 uppercase tracking-wide">Hottest</div>
                       <div className="text-lg font-bold text-white">Biggest Return</div>
                     </div>
                   </div>
@@ -560,7 +560,7 @@ export default function SecondaryMarketPage() {
                   <div className="text-2xl font-bold text-white">
                     {formatCurrency(parseFloat(marketTrends.hottestListing.total_price || 0) * ((marketTrends.hottestListing.investment?.deal?.expected_roi || 0) / 100))}/yr
                   </div>
-                  <div className="text-xs text-orange-100 mt-1">
+                  <div className="text-xs text-orange-300 mt-1">
                     {marketTrends.hottestListing.investment?.deal?.expected_roi}% annual ROI
                   </div>
                 </div>
@@ -574,16 +574,17 @@ export default function SecondaryMarketPage() {
             {marketTrends.biggestDiscount && (
               <div
                 onClick={() => router.push(`/secondary-market/${marketTrends.biggestDiscount.id}`)}
-                className="relative bg-gradient-to-br from-green-600/90 to-emerald-600/90 backdrop-blur-xl rounded-xl p-5 overflow-hidden border border-green-500/30 shadow-2xl hover:scale-105 transition-all cursor-pointer group"
+                className="relative bg-white/5 backdrop-blur-xl rounded-xl p-5 overflow-hidden border border-green-500/30 shadow-2xl shadow-green-500/20 hover:scale-105 hover:shadow-green-500/30 transition-all cursor-pointer group"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 to-emerald-600/20"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <Tag className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-green-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-green-500/30">
+                      <Tag className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-green-100 uppercase tracking-wide">💰 Best Deal</div>
+                      <div className="text-xs font-semibold text-green-300 uppercase tracking-wide">Best Deal</div>
                       <div className="text-lg font-bold text-white">Biggest Discount</div>
                     </div>
                   </div>
@@ -593,7 +594,7 @@ export default function SecondaryMarketPage() {
                   <div className="text-3xl font-bold text-white">
                     {marketTrends.biggestDiscount.discount.toFixed(0)}% OFF
                   </div>
-                  <div className="text-xs text-green-100 mt-1">
+                  <div className="text-xs text-green-300 mt-1">
                     Save {formatCurrency((parseFloat(marketTrends.biggestDiscount.investment?.amount || 0) / (marketTrends.biggestDiscount.investment?.shares_issued || 1) * marketTrends.biggestDiscount.shares_for_sale) - parseFloat(marketTrends.biggestDiscount.total_price || 0))}
                   </div>
                 </div>
@@ -607,16 +608,17 @@ export default function SecondaryMarketPage() {
             {marketTrends.highestROI && (
               <div
                 onClick={() => router.push(`/secondary-market/${marketTrends.highestROI.id}`)}
-                className="relative bg-gradient-to-br from-purple-600/90 to-indigo-600/90 backdrop-blur-xl rounded-xl p-5 overflow-hidden border border-purple-500/30 shadow-2xl hover:scale-105 transition-all cursor-pointer group"
+                className="relative bg-white/5 backdrop-blur-xl rounded-xl p-5 overflow-hidden border border-purple-500/30 shadow-2xl shadow-purple-500/20 hover:scale-105 hover:shadow-purple-500/30 transition-all cursor-pointer group"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-indigo-600/20"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <Sparkles className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-purple-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-purple-500/30">
+                      <Sparkles className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-purple-100 uppercase tracking-wide">⭐ Premium</div>
+                      <div className="text-xs font-semibold text-purple-300 uppercase tracking-wide">Premium</div>
                       <div className="text-lg font-bold text-white">Highest ROI</div>
                     </div>
                   </div>
@@ -626,7 +628,7 @@ export default function SecondaryMarketPage() {
                   <div className="text-3xl font-bold text-white">
                     {marketTrends.highestROI.investment?.deal?.expected_roi}%
                   </div>
-                  <div className="text-xs text-purple-100 mt-1">
+                  <div className="text-xs text-purple-300 mt-1">
                     Annual return on investment
                   </div>
                 </div>
@@ -782,7 +784,7 @@ export default function SecondaryMarketPage() {
                     </button>
 
                     {showSavedSearchDropdown && (
-                      <div className="absolute top-full mt-2 left-0 w-72 bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                      <div className="absolute top-full mt-2 left-0 w-72 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
                         <div className="p-3 border-b border-white/10">
                           <h3 className="text-sm font-semibold text-white">Saved Searches</h3>
                         </div>
@@ -1031,8 +1033,8 @@ export default function SecondaryMarketPage() {
                     return (
                       <div
                         key={listing.id}
-                        className={`group bg-white/5 backdrop-blur-xl rounded-2xl border transition-all duration-300 overflow-hidden shadow-2xl hover:scale-[1.01] ${
-                          isSelected ? 'border-indigo-500/50 ring-2 ring-indigo-500/30' : 'border-white/10 hover:border-purple-500/30'
+                        className={`group bg-white/5 backdrop-blur-xl rounded-2xl border transition-all duration-300 overflow-hidden shadow-2xl hover:scale-[1.01] hover:shadow-purple-500/20 ${
+                          isSelected ? 'border-indigo-500/50 ring-2 ring-indigo-500/30 shadow-indigo-500/30' : 'border-white/10 hover:border-purple-500/30'
                         }`}
                       >
                         {/* Top indicator bar */}
@@ -1310,7 +1312,7 @@ export default function SecondaryMarketPage() {
           <div className="space-y-6">
             <div className="flex justify-end mb-4">
               <Link href="/portfolio">
-                <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center gap-2">
+                <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center gap-2 hover:scale-105">
                   <Plus className="w-5 h-5" />
                   Create Listing
                 </button>
@@ -1318,7 +1320,7 @@ export default function SecondaryMarketPage() {
             </div>
 
             {myListings.length === 0 ? (
-              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+              <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl">
                 <Tag className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
                 <p className="text-purple-200 text-lg mb-4">You haven't created any listings yet</p>
                 <Link href="/portfolio">
@@ -1428,7 +1430,7 @@ export default function SecondaryMarketPage() {
         {/* My Purchases Tab */}
         {activeTab === 'my-purchases' && (
           <div className="space-y-6">
-            <div className="bg-blue-600/20 border border-blue-500/30 rounded-xl p-5 mb-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-blue-500/30 rounded-xl p-5 mb-6 shadow-lg">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-blue-400" />
                 <p className="text-sm text-blue-300">
@@ -1436,7 +1438,7 @@ export default function SecondaryMarketPage() {
                 </p>
               </div>
             </div>
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl">
               <ShoppingCart className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
               <p className="text-purple-200 text-lg mb-4">Your secondary market purchases will appear here</p>
               <Link href="/investments">
@@ -1452,7 +1454,7 @@ export default function SecondaryMarketPage() {
         {/* My Offers Tab */}
         {activeTab === 'my-offers' && (
           <div className="space-y-6">
-            <div className="bg-blue-600/20 border border-blue-500/30 rounded-xl p-5 mb-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-blue-500/30 rounded-xl p-5 mb-6 shadow-lg">
               <div className="flex items-center gap-3">
                 <Target className="w-5 h-5 text-blue-400" />
                 <p className="text-sm text-blue-300">
@@ -1460,7 +1462,7 @@ export default function SecondaryMarketPage() {
                 </p>
               </div>
             </div>
-            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
+            <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl">
               <Target className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
               <p className="text-purple-200 text-lg mb-4">Your offers will appear here</p>
               <button
@@ -1477,7 +1479,7 @@ export default function SecondaryMarketPage() {
         {/* Save Search Modal */}
         {showSaveSearchModal && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-white">Save Search</h2>
                 <button
@@ -1505,7 +1507,7 @@ export default function SecondaryMarketPage() {
                 />
               </div>
 
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10 mb-6">
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 mb-6">
                 <p className="text-sm text-purple-300 mb-2">Current filters:</p>
                 <ul className="text-xs text-purple-200 space-y-1">
                   {filters.dealType && <li>• Type: {filters.dealType}</li>}
@@ -1520,7 +1522,7 @@ export default function SecondaryMarketPage() {
                   {sortBy !== 'newest' && <li>• Sort: {sortBy}</li>}
                   {showFavoritesOnly && <li>• Favorites only</li>}
                   {!filters.dealType && !filters.search && !filters.minPrice && !filters.maxPrice && !showFavoritesOnly && sortBy === 'newest' && (
-                    <li className="text-purple-400">No filters applied</li>
+                    <li className="text-purple-300">No filters applied</li>
                   )}
                 </ul>
               </div>
@@ -1550,7 +1552,7 @@ export default function SecondaryMarketPage() {
         {/* Comparison Floating Bar */}
         {compareMode && compareListings.length > 0 && (
           <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 backdrop-blur-xl rounded-2xl border border-indigo-500/30 shadow-2xl p-4 flex items-center gap-4">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-indigo-500/30 shadow-2xl shadow-indigo-500/30 p-4 flex items-center gap-4">
               <div className="text-white font-semibold">
                 {compareListings.length} listing{compareListings.length !== 1 ? 's' : ''} selected
               </div>
@@ -1581,13 +1583,13 @@ export default function SecondaryMarketPage() {
 
         {/* Notification Toast */}
         {showCopiedNotification && (
-          <div className="fixed bottom-8 right-8 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-slide-up">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <Check className="w-5 h-5" />
+          <div className="fixed bottom-8 right-8 bg-white/5 backdrop-blur-xl border border-green-500/30 text-white px-6 py-4 rounded-xl shadow-2xl shadow-green-500/30 z-50 flex items-center gap-3 animate-slide-up">
+            <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+              <Check className="w-5 h-5 text-green-400" />
             </div>
             <div>
               <div className="font-semibold">Link Copied!</div>
-              <div className="text-sm text-green-100">Share this filter configuration with others</div>
+              <div className="text-sm text-green-300">Share this filter configuration with others</div>
             </div>
           </div>
         )}
@@ -1621,7 +1623,7 @@ function OfferModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white">Make an Offer</h2>
           <button

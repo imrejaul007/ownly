@@ -12,8 +12,11 @@ import {
   Package, RefreshCw, Filter, MapPin, Clock, ArrowRight, Zap, CheckCircle,
   Shield, Star, Flame, Eye, Activity, Gem, BadgeCheck, Globe, TrendingDown as Down,
   Timer, PlayCircle, Wallet, ChevronDown, Quote, Verified, BellRing, HelpCircle,
-  Gift, Briefcase
+  Gift, Briefcase, Tag
 } from 'lucide-react';
+import TrustResultsShowcase from '@/components/TrustResultsShowcase';
+import CategoryShowcase from '@/components/CategoryShowcase';
+import MonthlyGrowthCalculator from '@/components/MonthlyGrowthCalculator';
 
 interface PlatformStats {
   totalInvestment: number;
@@ -391,6 +394,9 @@ export default function Marketplace() {
             </div>
           </div>
         </div>
+
+        {/* Trust, Results, and Opportunities Showcase */}
+        <TrustResultsShowcase stats={stats || undefined} />
 
         {/* 48-Hour Cancellation Policy Banner */}
         <div className="mb-12 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-blue-500/20 backdrop-blur-xl rounded-2xl border border-blue-500/30 p-6">
@@ -953,42 +959,8 @@ export default function Marketplace() {
           </div>
         </div>
 
-        {/* Monthly Payout Timeline Visualization */}
-        <div className="mb-12 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-3">See Your Money Grow Monthly</h2>
-            <p className="text-purple-200 text-lg">Visual timeline of investment growth with monthly payouts</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 backdrop-blur-xl rounded-xl border border-blue-500/30 p-6">
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-purple-200 text-sm">Example: AED 10,000 investment at 25% annual ROI</span>
-                <span className="text-green-400 font-bold">Monthly: AED 208</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-              {[1, 2, 3, 4, 5, 6].map((month) => (
-                <div key={month} className="bg-white/5 backdrop-blur-xl rounded-lg border border-purple-500/20 p-4 text-center hover:bg-white/10 transition-all group">
-                  <div className="text-xs text-purple-300 mb-2">Month {month}</div>
-                  <div className="flex items-center justify-center mb-2">
-                    <Wallet className="w-5 h-5 text-green-400 group-hover:scale-125 transition-transform" />
-                  </div>
-                  <div className="text-lg font-bold text-green-400">AED 208</div>
-                  <div className="text-xs text-purple-200 mt-1">Payout</div>
-                  <div className="mt-2 h-1 bg-green-500/30 rounded-full group-hover:bg-green-500/50 transition-all"></div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 bg-green-500/10 backdrop-blur-xl rounded-xl border border-green-500/30 p-4 text-center">
-              <div className="text-sm text-green-200 mb-2">After 12 Months</div>
-              <div className="text-3xl font-bold text-green-400">AED 2,500 Earned</div>
-              <div className="text-xs text-green-200 mt-1">+ Your original AED 10,000 principal returned</div>
-            </div>
-          </div>
-        </div>
+        {/* Monthly Payout Timeline Visualization - Interactive */}
+        <MonthlyGrowthCalculator />
 
         {/* Mobile App Download Section */}
         <div className="mb-12 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-xl rounded-2xl border border-purple-500/30 p-8">
@@ -1831,7 +1803,7 @@ export default function Marketplace() {
           </details>
         </div>
 
-        {/* Deals Grid */}
+        {/* Curated Deals Sections */}
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
@@ -1842,11 +1814,109 @@ export default function Marketplace() {
             <p className="text-purple-200">No deals found. Try adjusting your filters.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {deals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
-            ))}
-          </div>
+          <>
+            {/* Trending Deals Section */}
+            {(() => {
+              const trendingDeals = [...deals]
+                .sort((a, b) => {
+                  const progressA = calculateFundingProgress(a.current_funding || 0, a.funding_goal || 1);
+                  const progressB = calculateFundingProgress(b.current_funding || 0, b.funding_goal || 1);
+                  return progressB - progressA;
+                })
+                .slice(0, 4);
+
+              return trendingDeals.length > 0 && (
+                <div className="mb-12">
+                  <div className="flex items-center gap-3 mb-6">
+                    <TrendingUp className="w-7 h-7 text-orange-400" />
+                    <h3 className="text-2xl font-bold text-white">Trending Now</h3>
+                    <span className="px-3 py-1 bg-orange-500/20 text-orange-300 text-sm rounded-full border border-orange-500/30">Hot</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {trendingDeals.map((deal) => (
+                      <DealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* High Returns Section */}
+            {(() => {
+              const highReturnDeals = [...deals]
+                .sort((a, b) => (b.expected_return || 0) - (a.expected_return || 0))
+                .slice(0, 4);
+
+              return highReturnDeals.length > 0 && (
+                <div className="mb-12">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Gem className="w-7 h-7 text-green-400" />
+                    <h3 className="text-2xl font-bold text-white">Highest Returns</h3>
+                    <span className="px-3 py-1 bg-green-500/20 text-green-300 text-sm rounded-full border border-green-500/30">Premium</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {highReturnDeals.map((deal) => (
+                      <DealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Real Estate Deals */}
+            {(() => {
+              const realEstateDeals = deals.filter(d => d.type === 'real_estate').slice(0, 3);
+              return realEstateDeals.length > 0 && (
+                <div className="mb-12">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Building className="w-7 h-7 text-blue-400" />
+                    <h3 className="text-2xl font-bold text-white">Real Estate Opportunities</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {realEstateDeals.map((deal) => (
+                      <DealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Franchise Deals */}
+            {(() => {
+              const franchiseDeals = deals.filter(d => d.type === 'franchise').slice(0, 3);
+              return franchiseDeals.length > 0 && (
+                <div className="mb-12">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Store className="w-7 h-7 text-green-400" />
+                    <h3 className="text-2xl font-bold text-white">Franchise Opportunities</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {franchiseDeals.map((deal) => (
+                      <DealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Startup Deals */}
+            {(() => {
+              const startupDeals = deals.filter(d => d.type === 'startup').slice(0, 3);
+              return startupDeals.length > 0 && (
+                <div className="mb-12">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Rocket className="w-7 h-7 text-purple-400" />
+                    <h3 className="text-2xl font-bold text-white">Startup Opportunities</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {startupDeals.map((deal) => (
+                      <DealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </>
         )}
 
         {/* Investment Bundles Section */}
@@ -1987,130 +2057,9 @@ export default function Marketplace() {
           </div>
         </div>
 
-        {/* 8 Investment Categories */}
+        {/* 20 Investment Categories */}
         <div className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-3">
-              Invest Across 8 Real-World Categories
-            </h2>
-            <p className="text-purple-200 text-lg">
-              From mobility to luxury — diversify your portfolio across income-generating businesses
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: "🚗",
-                category: "Mobility",
-                examples: "Car fleets, logistics, bikes",
-                deals: 25,
-                avgROI: "16-20%",
-                minTicket: 500,
-                gradient: "from-blue-500/20 to-cyan-500/20",
-                border: "border-blue-500/30"
-              },
-              {
-                icon: "🏢",
-                category: "Workspace",
-                examples: "Co-working, offices, studios",
-                deals: 18,
-                avgROI: "14-18%",
-                minTicket: 750,
-                gradient: "from-purple-500/20 to-indigo-500/20",
-                border: "border-purple-500/30"
-              },
-              {
-                icon: "💆‍♀️",
-                category: "Lifestyle",
-                examples: "Salons, spas, gyms, clinics",
-                deals: 22,
-                avgROI: "15-22%",
-                minTicket: 500,
-                gradient: "from-pink-500/20 to-rose-500/20",
-                border: "border-pink-500/30"
-              },
-              {
-                icon: "🛍️",
-                category: "Retail & Trade",
-                examples: "Perfumes, fashion, FMCG",
-                deals: 20,
-                avgROI: "18-25%",
-                minTicket: 500,
-                gradient: "from-yellow-500/20 to-orange-500/20",
-                border: "border-yellow-500/30"
-              },
-              {
-                icon: "☕",
-                category: "Hospitality",
-                examples: "Cafés, restaurants, hotels",
-                deals: 16,
-                avgROI: "12-18%",
-                minTicket: 1000,
-                gradient: "from-amber-500/20 to-orange-600/20",
-                border: "border-amber-500/30"
-              },
-              {
-                icon: "🏠",
-                category: "Real Estate",
-                examples: "Commercial & residential",
-                deals: 30,
-                avgROI: "12-16%",
-                minTicket: 1000,
-                gradient: "from-green-500/20 to-emerald-500/20",
-                border: "border-green-500/30"
-              },
-              {
-                icon: "🏕️",
-                category: "Experience",
-                examples: "Glamping, events, travel",
-                deals: 12,
-                avgROI: "14-20%",
-                minTicket: 750,
-                gradient: "from-teal-500/20 to-cyan-500/20",
-                border: "border-teal-500/30"
-              },
-              {
-                icon: "💎",
-                category: "Luxury",
-                examples: "Yachts, supercars, premium",
-                deals: 8,
-                avgROI: "10-15%",
-                minTicket: 2000,
-                gradient: "from-violet-500/20 to-purple-600/20",
-                border: "border-violet-500/30"
-              }
-            ].map((cat, index) => (
-              <div
-                key={index}
-                className={`bg-gradient-to-br ${cat.gradient} backdrop-blur-xl rounded-2xl border ${cat.border} p-6 hover:scale-105 transition-all cursor-pointer group`}
-              >
-                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{cat.icon}</div>
-                <h3 className="text-xl font-bold text-white mb-2">{cat.category}</h3>
-                <p className="text-sm text-purple-300 mb-4">{cat.examples}</p>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-purple-400">Active Deals</span>
-                    <span className="font-bold text-white">{cat.deals} deals</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-purple-400">Avg. ROI</span>
-                    <span className="font-bold text-green-400">{cat.avgROI}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-purple-400">Min. Entry</span>
-                    <span className="font-bold text-white">AED {cat.minTicket}</span>
-                  </div>
-                </div>
-
-                <button className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-semibold transition-all flex items-center justify-center gap-2">
-                  Explore {cat.category}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+          <CategoryShowcase useNavigation={true} />
         </div>
 
         {/* 3 Investment Types Comparison */}
@@ -2148,7 +2097,7 @@ export default function Marketplace() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-purple-200">Auto-diversified across 8 categories</span>
+                  <span className="text-sm text-purple-200">Auto-diversified across 20 categories</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
@@ -3335,6 +3284,23 @@ function DealCard({ deal }: { deal: Deal }) {
             <MapPin className="w-4 h-4" />
             {deal.location}
           </div>
+
+          {/* Category & Subcategory Badges */}
+          {(deal.category || deal.subcategory) && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {deal.category && (
+                <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-2 py-0.5 rounded text-xs">
+                  <Tag className="w-3 h-3" />
+                  {deal.category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                </span>
+              )}
+              {deal.subcategory && (
+                <span className="inline-flex items-center gap-1 bg-purple-500/10 border border-purple-500/30 text-purple-300 px-2 py-0.5 rounded text-xs">
+                  {deal.subcategory.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Key Metrics */}
           <div className="grid grid-cols-2 gap-3 mb-4">

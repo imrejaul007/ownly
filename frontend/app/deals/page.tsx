@@ -5,6 +5,7 @@ import { dealAPI } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import CategoryShowcase from '@/components/CategoryShowcase';
 import {
   Building, Briefcase, Rocket, Gem, TrendingUp, MapPin,
   Clock, DollarSign, BarChart3, Shield, Search, Filter as FilterIcon,
@@ -26,8 +27,8 @@ export default function DealsPage() {
   const [searchName, setSearchName] = useState('');
   const [favoriteDealIds, setFavoriteDealIds] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [itemsToShow, setItemsToShow] = useState(12);
-  const [itemsPerPage] = useState(12);
+  const [itemsToShow, setItemsToShow] = useState(1000); // Show all deals by default
+  const [itemsPerPage] = useState(24);
   const [showCopiedNotification, setShowCopiedNotification] = useState(false);
   const [filters, setFilters] = useState({
     type: '',
@@ -41,6 +42,8 @@ export default function DealsPage() {
     maxHoldingPeriod: '',
     minTicket: '',
     maxTicket: '',
+    category: '',
+    subcategory: '',
   });
 
   useEffect(() => {
@@ -72,6 +75,8 @@ export default function DealsPage() {
       if (filters.minRoi) params.minRoi = filters.minRoi;
       if (filters.maxRoi) params.maxRoi = filters.maxRoi;
       if (filters.search) params.search = filters.search;
+      if (filters.category) params.category = filters.category;
+      if (filters.subcategory) params.subcategory = filters.subcategory;
 
       const response = await dealAPI.list(params);
       setDeals(response.data.data || []);
@@ -222,6 +227,8 @@ export default function DealsPage() {
       maxHoldingPeriod: '',
       minTicket: '',
       maxTicket: '',
+      category: '',
+      subcategory: '',
     });
     setSortBy('newest');
   };
@@ -262,6 +269,8 @@ export default function DealsPage() {
     if (filters.maxHoldingPeriod) count++;
     if (filters.minTicket) count++;
     if (filters.maxTicket) count++;
+    if (filters.category) count++;
+    if (filters.subcategory) count++;
     if (sortBy !== 'newest') count++;
     return count;
   };
@@ -735,71 +744,20 @@ export default function DealsPage() {
           </div>
         )}
 
-        {/* Asset Categories - Quick Filters */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8 -mt-8">
-          <button
-            onClick={() => setFilters({ ...filters, type: 'franchise' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-purple-500/30 transition-all ${
-              filters.type === 'franchise' ? 'ring-2 ring-purple-500 bg-purple-500/10' : ''
-            }`}
-          >
-            <Briefcase className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">Franchise</div>
-          </button>
-          <button
-            onClick={() => setFilters({ ...filters, type: 'real_estate' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-blue-500/30 transition-all ${
-              filters.type === 'real_estate' ? 'ring-2 ring-blue-500 bg-blue-500/10' : ''
-            }`}
-          >
-            <Building className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">Real Estate</div>
-          </button>
-          <button
-            onClick={() => setFilters({ ...filters, type: 'asset' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-yellow-500/30 transition-all ${
-              filters.type === 'asset' ? 'ring-2 ring-yellow-500 bg-yellow-500/10' : ''
-            }`}
-          >
-            <Gem className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">Luxury Assets</div>
-          </button>
-          <button
-            onClick={() => setFilters({ ...filters, type: 'startup' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-green-500/30 transition-all ${
-              filters.type === 'startup' ? 'ring-2 ring-green-500 bg-green-500/10' : ''
-            }`}
-          >
-            <Rocket className="w-6 h-6 text-green-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">Tech Ventures</div>
-          </button>
-          <button
-            onClick={() => setFilters({ ...filters, minRoi: '10' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-pink-500/30 transition-all ${
-              filters.minRoi === '10' ? 'ring-2 ring-pink-500 bg-pink-500/10' : ''
-            }`}
-          >
-            <Home className="w-6 h-6 text-pink-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">Rental Yield</div>
-          </button>
-          <button
-            onClick={() => setFilters({ ...filters, status: 'open' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-orange-500/30 transition-all ${
-              filters.status === 'open' ? 'ring-2 ring-orange-500 bg-orange-500/10' : ''
-            }`}
-          >
-            <Zap className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">Open Now</div>
-          </button>
-          <button
-            onClick={() => setFilters({ ...filters, minRoi: '15' })}
-            className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 hover:border-indigo-500/30 transition-all ${
-              filters.minRoi === '15' ? 'ring-2 ring-indigo-500 bg-indigo-500/10' : ''
-            }`}
-          >
-            <TrendingUp className="w-6 h-6 text-indigo-400 mx-auto mb-2" />
-            <div className="text-xs font-semibold text-white">High Yield</div>
-          </button>
+        {/* Category Showcase - Premium Display of All 20 Master Categories */}
+        <div className="mb-12 -mt-8">
+          <CategoryShowcase
+            selectedCategory={filters.category || undefined}
+            onCategorySelect={(categoryKey) => {
+              if (filters.category === categoryKey) {
+                // Deselect if clicking the same category
+                setFilters({ ...filters, category: '', subcategory: '' });
+              } else {
+                // Select new category
+                setFilters({ ...filters, category: categoryKey, subcategory: '' });
+              }
+            }}
+          />
         </div>
 
         {/* Advanced Filters Panel */}
@@ -1097,6 +1055,23 @@ export default function DealsPage() {
                           {typeConfig.label}
                         </span>
                       </div>
+
+                      {/* Category & Subcategory Badges */}
+                      {(deal.category || deal.subcategory) && (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {deal.category && (
+                            <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-2.5 py-1 rounded-lg text-xs font-medium">
+                              <Tag className="w-3 h-3" />
+                              {deal.category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                            </span>
+                          )}
+                          {deal.subcategory && (
+                            <span className="inline-flex items-center gap-1 bg-purple-500/10 border border-purple-500/30 text-purple-300 px-2.5 py-1 rounded-lg text-xs font-medium">
+                              {deal.subcategory.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       {/* Title */}
                       <h3 className="text-xl font-bold mb-2 line-clamp-2 text-white">{deal.title}</h3>

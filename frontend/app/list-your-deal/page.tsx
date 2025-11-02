@@ -307,9 +307,15 @@ export default function ListYourDealPage() {
       {/* Animated Background Orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
+
+      {/* Background Grid Pattern */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none" style={{
+        backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)',
+        backgroundSize: '40px 40px'
+      }}></div>
 
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -325,20 +331,20 @@ export default function ListYourDealPage() {
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-purple-300 text-sm font-semibold">For Asset Owners & Businesses</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-6 tracking-tight">
               List Your Deal on OWNLY
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8">
+            <p className="text-xl md:text-2xl text-purple-200 max-w-3xl mx-auto mb-8">
               Raise capital from 500+ investors. Fast, transparent, and
               <span className="text-purple-400 font-bold"> cost-effective fundraising</span> for your business or asset.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <a href="#apply" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl transition-all">
+              <a href="#apply" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-purple-500/30 transition-all hover:scale-105">
                 Apply to List
                 <ArrowRight className="w-5 h-5" />
               </a>
-              <a href="#process" className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all">
+              <a href="#process" className="inline-flex items-center justify-center gap-2 bg-white/5 backdrop-blur-xl border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all">
                 <Eye className="w-5 h-5" />
                 How It Works
               </a>
@@ -367,8 +373,10 @@ export default function ListYourDealPage() {
       <div className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Why List on OWNLY?</h2>
-            <p className="text-xl text-gray-400">Benefits that traditional fundraising can't match</p>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-4">
+              Why List on OWNLY?
+            </h2>
+            <p className="text-xl text-purple-200">Benefits that traditional fundraising can't match</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -392,8 +400,10 @@ export default function ListYourDealPage() {
       <div className="py-20 bg-gradient-to-r from-slate-950/50 to-gray-950/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">What Assets Can You List?</h2>
-            <p className="text-xl text-gray-400">We accept a wide range of income-generating and appreciating assets</p>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent mb-4">
+              What Assets Can You List?
+            </h2>
+            <p className="text-xl text-purple-200">We accept a wide range of income-generating and appreciating assets</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -443,8 +453,10 @@ export default function ListYourDealPage() {
       <div id="process" className="py-20 bg-gradient-to-r from-purple-950/30 to-blue-950/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">The Listing Process</h2>
-            <p className="text-xl text-gray-400">From application to funding in 6 simple steps</p>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-4">
+              The Listing Process
+            </h2>
+            <p className="text-xl text-purple-200">From application to funding in 6 simple steps</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -488,8 +500,10 @@ export default function ListYourDealPage() {
       <div className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Listing Requirements</h2>
-            <p className="text-xl text-gray-400">What you need to get started</p>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-green-100 to-white bg-clip-text text-transparent mb-4">
+              Listing Requirements
+            </h2>
+            <p className="text-xl text-purple-200">What you need to get started</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -532,9 +546,13 @@ export default function ListYourDealPage() {
       <div className="py-20 bg-gradient-to-r from-blue-950/30 to-purple-950/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <Star className="w-16 h-16 text-yellow-400 mx-auto mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Success Stories</h2>
-            <p className="text-xl text-gray-400">Real deals, real results from OWNLY listings</p>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl mb-6 shadow-lg shadow-yellow-500/30">
+              <Star className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent mb-4">
+              Success Stories
+            </h2>
+            <p className="text-xl text-purple-200">Real deals, real results from OWNLY listings</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -582,29 +600,33 @@ export default function ListYourDealPage() {
       <div className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <HelpCircle className="w-16 h-16 text-purple-400 mx-auto mb-6" />
-            <h2 className="text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-400">Common questions from asset owners and businesses</p>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl mb-6 shadow-lg shadow-purple-500/30">
+              <HelpCircle className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-purple-200">Common questions from asset owners and businesses</p>
           </div>
 
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
               <div
                 key={idx}
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden hover:border-purple-500/50 transition-all"
+                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden hover:border-purple-500/50 transition-all group"
               >
                 <button
                   onClick={() => setOpenFAQ(openFAQ === idx ? null : idx)}
-                  className="w-full flex items-center justify-between p-6 text-left"
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-all"
                 >
-                  <h3 className="font-bold text-lg text-white pr-4">{faq.q}</h3>
+                  <h3 className="font-bold text-lg text-white pr-4 group-hover:text-purple-200 transition-colors">{faq.q}</h3>
                   <ChevronDown className={`w-5 h-5 text-purple-400 flex-shrink-0 transition-transform ${
                     openFAQ === idx ? 'rotate-180' : ''
                   }`} />
                 </button>
                 {openFAQ === idx && (
-                  <div className="px-6 pb-6">
-                    <p className="text-gray-400 leading-relaxed">{faq.a}</p>
+                  <div className="px-6 pb-6 animate-fadeIn">
+                    <p className="text-purple-200 leading-relaxed">{faq.a}</p>
                   </div>
                 )}
               </div>
@@ -617,16 +639,38 @@ export default function ListYourDealPage() {
       <div id="apply" className="py-20 bg-gradient-to-r from-purple-950/50 to-pink-950/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <Rocket className="w-16 h-16 text-purple-400 mx-auto mb-6" />
-            <h2 className="text-4xl font-bold text-white mb-4">Apply to List Your Asset</h2>
-            <p className="text-gray-400">Fill out the form below and our team will contact you within 24 hours</p>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl mb-6 shadow-lg shadow-purple-500/30">
+              <Rocket className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-4">
+              Apply to List Your Asset
+            </h2>
+            <p className="text-purple-200 text-lg">Fill out the form below and our team will contact you within 24 hours</p>
+
+            {/* Progress Steps Indicator */}
+            <div className="mt-8 flex items-center justify-center gap-2 max-w-2xl mx-auto">
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-500/30">1</div>
+                <span className="text-sm font-medium text-white hidden sm:inline">Submit Form</span>
+              </div>
+              <div className="w-8 h-0.5 bg-white/20"></div>
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3">
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-purple-300 text-sm font-bold">2</div>
+                <span className="text-sm font-medium text-purple-300 hidden sm:inline">Review</span>
+              </div>
+              <div className="w-8 h-0.5 bg-white/20"></div>
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3">
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-purple-300 text-sm font-bold">3</div>
+                <span className="text-sm font-medium text-purple-300 hidden sm:inline">Launch</span>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-purple-200 mb-2">
                     <User className="w-4 h-4 inline mr-2" />
                     Full Name *
                   </label>
@@ -635,13 +679,14 @@ export default function ListYourDealPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+                    className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                     placeholder="Your name"
                   />
+                  <p className="text-xs text-purple-300 mt-1">Enter your full legal name</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-purple-200 mb-2">
                     <Mail className="w-4 h-4 inline mr-2" />
                     Email Address *
                   </label>
@@ -650,13 +695,14 @@ export default function ListYourDealPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+                    className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                     placeholder="your@email.com"
                   />
+                  <p className="text-xs text-purple-300 mt-1">We'll send updates to this email</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-purple-200 mb-2">
                     <Phone className="w-4 h-4 inline mr-2" />
                     Phone Number *
                   </label>
@@ -665,13 +711,14 @@ export default function ListYourDealPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+                    className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                     placeholder="+971 XX XXX XXXX"
                   />
+                  <p className="text-xs text-purple-300 mt-1">For quick follow-up calls</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-purple-200 mb-2">
                     <Building className="w-4 h-4 inline mr-2" />
                     Company Name
                   </label>
@@ -679,55 +726,64 @@ export default function ListYourDealPage() {
                     type="text"
                     value={formData.company}
                     onChange={(e) => setFormData({...formData, company: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+                    className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all"
                     placeholder="Your company (optional)"
                   />
+                  <p className="text-xs text-purple-300 mt-1">Optional if listing as individual</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-purple-200 mb-2">
                     <Package className="w-4 h-4 inline mr-2" />
                     Asset Type *
                   </label>
-                  <select
-                    required
-                    value={formData.assetType}
-                    onChange={(e) => setFormData({...formData, assetType: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none"
-                  >
-                    <option value="">Select type</option>
-                    <option value="real-estate">Real Estate</option>
-                    <option value="franchise">Franchise</option>
-                    <option value="business">Operating Business</option>
-                    <option value="luxury">Luxury Assets</option>
-                    <option value="trade">Trade Finance</option>
-                    <option value="development">Development Project</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.assetType}
+                      onChange={(e) => setFormData({...formData, assetType: e.target.value})}
+                      className="w-full appearance-none bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 pr-10 text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer"
+                    >
+                      <option value="" className="bg-slate-900">Select type</option>
+                      <option value="real-estate" className="bg-slate-900">Real Estate</option>
+                      <option value="franchise" className="bg-slate-900">Franchise</option>
+                      <option value="business" className="bg-slate-900">Operating Business</option>
+                      <option value="luxury" className="bg-slate-900">Luxury Assets</option>
+                      <option value="trade" className="bg-slate-900">Trade Finance</option>
+                      <option value="development" className="bg-slate-900">Development Project</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
+                  </div>
+                  <p className="text-xs text-purple-300 mt-1">Choose the category that best fits</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <label className="block text-sm font-semibold text-purple-200 mb-2">
                     <DollarSign className="w-4 h-4 inline mr-2" />
                     Asset Value *
                   </label>
-                  <select
-                    required
-                    value={formData.assetValue}
-                    onChange={(e) => setFormData({...formData, assetValue: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none"
-                  >
-                    <option value="">Select range</option>
-                    <option value="100-300k">AED 100K - 300K</option>
-                    <option value="300-500k">AED 300K - 500K</option>
-                    <option value="500k-1m">AED 500K - 1M</option>
-                    <option value="1m-5m">AED 1M - 5M</option>
-                    <option value="5m+">AED 5M+</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.assetValue}
+                      onChange={(e) => setFormData({...formData, assetValue: e.target.value})}
+                      className="w-full appearance-none bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 pr-10 text-white focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer"
+                    >
+                      <option value="" className="bg-slate-900">Select range</option>
+                      <option value="100-300k" className="bg-slate-900">AED 100K - 300K</option>
+                      <option value="300-500k" className="bg-slate-900">AED 300K - 500K</option>
+                      <option value="500k-1m" className="bg-slate-900">AED 500K - 1M</option>
+                      <option value="1m-5m" className="bg-slate-900">AED 1M - 5M</option>
+                      <option value="5m+" className="bg-slate-900">AED 5M+</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
+                  </div>
+                  <p className="text-xs text-purple-300 mt-1">Estimated current market value</p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-purple-200 mb-2">
                   <MessageSquare className="w-4 h-4 inline mr-2" />
                   Additional Details
                 </label>
@@ -735,56 +791,95 @@ export default function ListYourDealPage() {
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
                   rows={4}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+                  className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-white placeholder-purple-300/50 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
                   placeholder="Tell us more about your asset, expected returns, current status, etc."
                 />
+                <p className="text-xs text-purple-300 mt-1">Provide any relevant details about your asset</p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <input type="checkbox" required className="mt-1" />
-                <p className="text-sm text-gray-400">
-                  I agree to OWNLY's terms and conditions and understand that my application will be reviewed.
-                  I consent to being contacted by the OWNLY team regarding my application.
-                </p>
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    required
+                    className="mt-1 w-4 h-4 rounded border-purple-500/50 text-purple-600 focus:ring-purple-500/50 focus:ring-2 bg-white/5 cursor-pointer"
+                  />
+                  <p className="text-sm text-purple-200">
+                    I agree to OWNLY's terms and conditions and understand that my application will be reviewed.
+                    I consent to being contacted by the OWNLY team regarding my application.
+                  </p>
+                </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl transition-all"
+                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-purple-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Send className="w-5 h-5" />
                 Submit Application
               </button>
 
-              <p className="text-center text-sm text-gray-500">
-                Our team will review your application and respond within 24 hours
-              </p>
+              <div className="text-center">
+                <p className="text-sm text-purple-300 mb-2">
+                  Our team will review your application and respond within 24 hours
+                </p>
+                <div className="flex items-center justify-center gap-4 text-xs text-purple-400">
+                  <div className="flex items-center gap-1">
+                    <Shield className="w-3 h-3" />
+                    <span>Secure & Confidential</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>24hr Response</span>
+                  </div>
+                </div>
+              </div>
             </form>
           </div>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="py-20">
+      <div className="py-20 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-3xl p-12">
-            <Target className="w-16 h-16 text-purple-400 mx-auto mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Raise Capital?</h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Join 50+ successful asset owners who've raised capital on OWNLY.<br />
-              Fast, transparent, and cost-effective fundraising.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="#apply" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl transition-all">
-                Apply Now
-                <ArrowRight className="w-5 h-5" />
-              </a>
-              <Link href="/deals" className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all">
-                <Eye className="w-5 h-5" />
-                View Live Deals
-              </Link>
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-12 overflow-hidden">
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-blue-600/20 rounded-3xl"></div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl mb-6 shadow-lg shadow-purple-500/30">
+                <Target className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-6">
+                Ready to Raise Capital?
+              </h2>
+              <p className="text-xl text-purple-200 mb-8 max-w-2xl mx-auto">
+                Join 50+ successful asset owners who've raised capital on OWNLY.<br />
+                Fast, transparent, and cost-effective fundraising.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+                <a href="#apply" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-purple-500/30 transition-all hover:scale-105">
+                  Apply Now
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+                <Link href="/deals" className="inline-flex items-center justify-center gap-2 bg-white/5 backdrop-blur-xl border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all">
+                  <Eye className="w-5 h-5" />
+                  View Live Deals
+                </Link>
+              </div>
+              <div className="inline-flex items-center gap-6 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl">
+                <div className="flex items-center gap-2 text-sm text-purple-200">
+                  <Mail className="w-4 h-4 text-purple-400" />
+                  <span>listings@ownly.ae</span>
+                </div>
+                <div className="w-px h-4 bg-white/20"></div>
+                <div className="flex items-center gap-2 text-sm text-purple-200">
+                  <Phone className="w-4 h-4 text-purple-400" />
+                  <span>+971 XX XXX XXXX</span>
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-gray-500 mt-6">Questions? Email us at listings@ownly.ae or call +971 XX XXX XXXX</p>
           </div>
         </div>
       </div>

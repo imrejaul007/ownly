@@ -13,7 +13,7 @@ import {
   CheckCircle, Download, FileText, BarChart3, AlertTriangle, Target,
   Package, Sparkles, Info, ChevronRight, Wallet, Award, Lock, Star,
   Share2, RefreshCw, Calendar, Zap, Activity, TrendingDown, Eye,
-  MessageCircle, BookmarkPlus, ExternalLink, Plus, ArrowUpRight, ArrowRight
+  MessageCircle, BookmarkPlus, ExternalLink, Plus, ArrowUpRight, ArrowRight, Tag
 } from 'lucide-react';
 
 export default function DealDetailPage() {
@@ -347,6 +347,23 @@ export default function DealDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Category & Subcategory Badges */}
+          {(deal.category || deal.subcategory) && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {deal.category && (
+                <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-2.5 py-1 rounded-lg text-xs font-medium">
+                  <Tag className="w-3 h-3" />
+                  {deal.category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                </span>
+              )}
+              {deal.subcategory && (
+                <span className="inline-flex items-center gap-1 bg-purple-500/10 border border-purple-500/30 text-purple-300 px-2.5 py-1 rounded-lg text-xs font-medium">
+                  {deal.subcategory.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                </span>
+              )}
+            </div>
+          )}
 
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-3">
             {deal.title}

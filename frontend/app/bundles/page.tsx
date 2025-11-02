@@ -8,7 +8,7 @@ import {
   Package, TrendingUp, Shield, Clock, Users, Target,
   Zap, CheckCircle, ArrowRight, Filter, Sparkles, GitCompare,
   Heart, Download, Share2, Check, ChevronDown, SlidersHorizontal,
-  BarChart3, DollarSign, X, ArrowUpDown, Save, Bookmark
+  BarChart3, DollarSign, X, ArrowUpDown, Save, Bookmark, Tag
 } from 'lucide-react';
 
 interface Bundle {
@@ -758,16 +758,30 @@ export default function BundlesPage() {
           </div>
         </div>
 
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className="text-purple-200">
+            Showing <span className="font-semibold text-white">{Math.min(itemsToShow, filteredBundles.length)}</span> of <span className="font-semibold text-white">{filteredBundles.length}</span> bundles
+            {filteredBundles.length !== bundles.length && (
+              <span className="text-purple-300 ml-2">({bundles.length} total)</span>
+            )}
+            {sortBy !== 'newest' && (
+              <span className="text-purple-300 ml-2">• Sorted by: {sortBy.replace('-', ' ')}</span>
+            )}
+          </p>
+        </div>
+
         {/* Bundles Grid */}
         {filteredBundles.length === 0 ? (
           <div className="text-center py-20">
             <Package className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
-            <p className="text-purple-200 text-lg">No bundles found.</p>
+            <p className="text-purple-200 text-lg mb-2">No bundles found matching your criteria</p>
+            <p className="text-purple-300 text-sm mb-4">Try adjusting your filters or browse all available bundles</p>
             <button
               onClick={clearFilters}
-              className="mt-4 text-purple-400 hover:text-purple-300 transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all"
             >
-              Clear filters
+              Clear All Filters
             </button>
           </div>
         ) : (
@@ -786,26 +800,27 @@ export default function BundlesPage() {
               ))}
             </div>
 
-            {/* Pagination Controls */}
+            {/* Load More / Show All Section */}
             {itemsToShow < filteredBundles.length && (
-              <div className="mt-12 flex flex-col items-center gap-4">
-                <p className="text-purple-300 text-sm">
-                  Showing {itemsToShow} of {filteredBundles.length} bundles
-                </p>
-                <div className="flex gap-4">
+              <div className="mt-12 text-center">
+                <div className="inline-flex flex-col sm:flex-row items-center gap-4">
                   <button
                     onClick={loadMoreBundles}
-                    className="px-8 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 rounded-xl font-medium hover:bg-white/10 transition-all"
+                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all"
                   >
+                    <ChevronDown className="w-5 h-5" />
                     Load More ({Math.min(itemsPerPage, filteredBundles.length - itemsToShow)} more)
                   </button>
                   <button
                     onClick={showAllBundles}
-                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all"
+                    className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 text-purple-200 px-6 py-4 rounded-xl font-medium hover:bg-white/10 transition-all"
                   >
                     Show All ({filteredBundles.length - itemsToShow} remaining)
                   </button>
                 </div>
+                <p className="text-purple-300 text-sm mt-4">
+                  Viewing {itemsToShow} of {filteredBundles.length} bundles
+                </p>
               </div>
             )}
 
@@ -961,6 +976,17 @@ function BundleCard({
     return colors[type] || 'from-gray-500 to-gray-600';
   };
 
+  const getTypeIcon = (type: string) => {
+    const icons: any = {
+      'category_based': Target,
+      'roi_based': TrendingUp,
+      'thematic': Sparkles,
+      'community': Users,
+      'custom': Package,
+    };
+    return icons[type] || Package;
+  };
+
   const getRiskColor = (risk: string) => {
     const colors: any = {
       'low': 'text-green-400 bg-green-500/10 border-green-500/20',
@@ -972,6 +998,10 @@ function BundleCard({
 
   const avgROI = (parseFloat(bundle.expected_roi_min) + parseFloat(bundle.expected_roi_max)) / 2;
   const fundingProgress = (parseFloat(bundle.raised_amount) / parseFloat(bundle.target_amount)) * 100;
+  const TypeIcon = getTypeIcon(bundle.bundle_type);
+
+  // Count total deals in bundle (mock for now - could come from API)
+  const dealCount = bundle.features?.length || 0;
 
   const cardContent = (
     <div
@@ -992,8 +1022,8 @@ function BundleCard({
             onClick={handleFavoriteClick}
             className={`w-10 h-10 rounded-xl backdrop-blur-sm border-2 flex items-center justify-center transition-all ${
               isFavorite
-                ? 'bg-red-500 border-red-500 hover:bg-red-600'
-                : 'bg-white/10 border-white/30 hover:border-red-400 hover:bg-red-500/20'
+                ? 'bg-pink-600 border-pink-600 hover:bg-pink-700 shadow-lg shadow-pink-500/30'
+                : 'bg-white/10 border-white/30 hover:border-pink-400 hover:bg-pink-500/20'
             }`}
           >
             <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current text-white' : 'text-white'}`} />
@@ -1013,118 +1043,160 @@ function BundleCard({
           </div>
         )}
       </div>
-        {/* Header with Gradient */}
-        <div className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} p-6 text-white relative overflow-hidden`}>
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="relative">
-            <div className="text-xs font-semibold mb-2 opacity-90 uppercase tracking-wider">
+
+      {/* Deal Count Badge */}
+      {dealCount > 0 && !compareMode && (
+        <div className="absolute top-4 left-4 z-10">
+          <div className="bg-blue-600/90 backdrop-blur-sm border border-blue-400/30 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1">
+            <Package className="w-3 h-3" />
+            {dealCount} Deals
+          </div>
+        </div>
+      )}
+
+      {/* Header with Gradient */}
+      <div className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} p-6 text-white relative overflow-hidden`}>
+        <div className="absolute inset-0 bg-black/10"></div>
+
+        {/* Animated background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
+            backgroundSize: '24px 24px'
+          }}></div>
+        </div>
+
+        <div className="relative">
+          {/* Type Badge */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+              <TypeIcon className="w-4 h-4 text-white" />
+            </div>
+            <div className="text-xs font-semibold opacity-90 uppercase tracking-wider">
               {bundle.bundle_type.replace('_', ' ')}
             </div>
-            <h3 className="text-2xl font-bold mb-3 line-clamp-2">{bundle.name}</h3>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold">{avgROI.toFixed(1)}%</span>
-              <span className="text-sm opacity-90">Avg ROI</span>
+          </div>
+
+          <h3 className="text-2xl font-bold mb-4 line-clamp-2">{bundle.name}</h3>
+
+          {/* ROI Display */}
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className="text-4xl font-bold">{avgROI.toFixed(1)}%</span>
+            <span className="text-sm opacity-90">Expected ROI</span>
+          </div>
+          <div className="text-xs opacity-75">
+            Range: {bundle.expected_roi_min}% - {bundle.expected_roi_max}%
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 flex-1 flex flex-col">
+        {/* Category Badge */}
+        {bundle.category && (
+          <div className="mb-4">
+            <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-medium">
+              <Tag className="w-3 h-3" />
+              {bundle.category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+            </span>
+          </div>
+        )}
+
+        {/* Key Metrics */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+            <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+              <DollarSign className="w-3 h-3" />
+              Min. Investment
             </div>
-            <div className="text-xs opacity-75 mt-1">
-              {bundle.expected_roi_min}% - {bundle.expected_roi_max}% range
+            <div className="font-bold text-white text-sm">{formatCurrency(parseFloat(bundle.min_investment))}</div>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+            <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              Duration
             </div>
+            <div className="font-bold text-white text-sm">{bundle.holding_period_months}mo</div>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+            <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+              <Shield className="w-3 h-3" />
+              Risk Level
+            </div>
+            <div className={`font-semibold text-xs capitalize px-2 py-1 rounded-lg border inline-block ${getRiskColor(bundle.risk_level)}`}>
+              {bundle.risk_level}
+            </div>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+            <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
+              <Target className="w-3 h-3" />
+              Diversity
+            </div>
+            <div className="font-semibold text-white text-sm">{bundle.diversification_score}/100</div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6 flex-1 flex flex-col">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" />
-                Min. Investment
-              </div>
-              <div className="font-bold text-white">{formatCurrency(parseFloat(bundle.min_investment))}</div>
-            </div>
+        {/* Description */}
+        <div className="mb-4">
+          <p className="text-sm text-purple-200 line-clamp-2">
+            {bundle.description}
+          </p>
+        </div>
 
-            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                Duration
-              </div>
-              <div className="font-bold text-white">{bundle.holding_period_months} months</div>
+        {/* Funding Progress */}
+        {parseFloat(bundle.raised_amount) > 0 && (
+          <div className="mb-5">
+            <div className="flex items-center justify-between text-xs mb-2">
+              <span className="text-purple-300 flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                Funding Progress
+              </span>
+              <span className="font-semibold text-white">{fundingProgress.toFixed(1)}%</span>
             </div>
-
-            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
-                <Shield className="w-3 h-3" />
-                Risk Level
-              </div>
-              <div className={`font-semibold text-sm capitalize px-2 py-1 rounded-lg border ${getRiskColor(bundle.risk_level)}`}>
-                {bundle.risk_level}
-              </div>
+            <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
+              <div
+                className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} h-full transition-all duration-500`}
+                style={{ width: `${Math.min(fundingProgress, 100)}%` }}
+              ></div>
             </div>
-
-            <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-              <div className="text-xs text-purple-300 mb-1 flex items-center gap-1">
-                <Target className="w-3 h-3" />
-                Diversification
-              </div>
-              <div className="font-semibold text-white">{bundle.diversification_score}/100</div>
+            <div className="flex justify-between text-xs text-purple-300 mt-2">
+              <span>{formatCurrency(parseFloat(bundle.raised_amount))}</span>
+              <span>{formatCurrency(parseFloat(bundle.target_amount))}</span>
             </div>
           </div>
+        )}
 
-          {/* Funding Progress */}
-          {parseFloat(bundle.raised_amount) > 0 && (
-            <div className="mb-6">
-              <div className="flex items-center justify-between text-xs mb-2">
-                <span className="text-purple-300 flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  Funding Progress
-                </span>
-                <span className="font-semibold text-white">{fundingProgress.toFixed(1)}%</span>
-              </div>
-              <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
-                <div
-                  className={`bg-gradient-to-r ${getTypeColor(bundle.bundle_type)} h-full transition-all duration-500`}
-                  style={{ width: `${Math.min(fundingProgress, 100)}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-purple-300 mt-2">
-                {formatCurrency(parseFloat(bundle.raised_amount))} of {formatCurrency(parseFloat(bundle.target_amount))}
-              </div>
-            </div>
-          )}
-
-          {/* Description */}
-          <div className="mb-4">
-            <p className="text-sm text-purple-200 line-clamp-3">
-              {bundle.description}
-            </p>
-          </div>
-
-          {/* Features/Highlights */}
-          <div className="mt-auto">
-            <div className="text-sm font-semibold text-white mb-3">Key Features</div>
-            <ul className="space-y-2">
+        {/* Features/Highlights */}
+        {bundle.features && bundle.features.length > 0 && (
+          <div className="mt-auto mb-4">
+            <div className="text-xs font-semibold text-purple-200 mb-2">Key Features</div>
+            <ul className="space-y-1.5">
               {bundle.features.slice(0, 3).map((feature, idx) => (
-                <li key={idx} className="text-xs text-purple-200 flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                  <span>{feature}</span>
+                <li key={idx} className="text-xs text-purple-300 flex items-start gap-2">
+                  <CheckCircle className="w-3.5 h-3.5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span className="line-clamp-1">{feature}</span>
                 </li>
               ))}
             </ul>
           </div>
+        )}
 
-          {/* CTA */}
-          {!compareMode && (
-            <button className="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105">
-              View Bundle Details
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          )}
-          {compareMode && (
-            <div className="mt-6 w-full bg-white/10 border border-white/20 text-purple-200 py-3 rounded-xl font-semibold text-center">
-              {isSelected ? 'Selected for Comparison' : 'Click to Select'}
-            </div>
-          )}
-        </div>
+        {/* CTA */}
+        {!compareMode && (
+          <button className="mt-auto w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105">
+            View Bundle Details
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
+        {compareMode && (
+          <div className="mt-auto w-full bg-white/10 border border-white/20 text-purple-200 py-3 rounded-xl font-semibold text-center text-sm">
+            {isSelected ? 'Selected for Comparison' : 'Click to Select'}
+          </div>
+        )}
+      </div>
     </div>
   );
 

@@ -28,6 +28,28 @@ const Bundle = sequelize.define('Bundle', {
     },
     category: {
       type: DataTypes.ENUM(
+        // Main 20 categories
+        'real_estate',
+        'mobility_transport',
+        'hospitality_tourism',
+        'food_beverage',
+        'health_wellness',
+        'retail_franchises',
+        'education_training',
+        'media_entertainment',
+        'technology_innovation',
+        'home_services',
+        'events_experiences',
+        'agriculture_sustainable',
+        'ecommerce_digital',
+        'logistics_supply_chain',
+        'manufacturing_production',
+        'micro_investment_baskets',
+        'secondary_market',
+        'bundles_thematic',
+        'community_impact',
+        'ownly_exchange',
+        // Legacy bundle categories (kept for backward compatibility)
         'retail_mix',
         'luxury_basket',
         'property_pool',
@@ -40,6 +62,13 @@ const Bundle = sequelize.define('Bundle', {
         'custom'
       ),
       allowNull: true,
+      comment: 'Main Shariah-compliant category or bundle type',
+    },
+    // Subcategory (specific business type within category)
+    subcategory: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: 'Specific subcategory within main category',
     },
     description: {
       type: DataTypes.TEXT,

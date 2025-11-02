@@ -119,80 +119,88 @@ export default function InvestmentsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Animated Gradient Orbs */}
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-      <div className="fixed top-1/2 left-1/2 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      {/* Enhanced Animated Gradient Orbs */}
+      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="fixed top-1/2 left-1/2 w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
 
       {/* Background Pattern */}
       <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5"></div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-2">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Enhanced Header */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-3">
             My Investments
           </h1>
-          <p className="text-purple-300">
+          <p className="text-purple-300 text-lg">
             {investments.length} {investments.length === 1 ? 'Investment' : 'Investments'} • {investments.filter(i => i.status === 'active').length} Active
           </p>
         </div>
 
-        {/* Portfolio Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-white" />
+        {/* Enhanced Portfolio Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="group relative bg-gradient-to-br from-blue-600/10 via-blue-500/5 to-transparent backdrop-blur-xl rounded-3xl border border-blue-500/20 p-8 shadow-2xl hover:shadow-blue-500/20 hover:scale-105 transition-all duration-500 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 via-blue-500/0 to-transparent group-hover:from-blue-600/10 group-hover:via-blue-500/5 transition-all duration-500"></div>
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-500 mb-6">
+                <DollarSign className="w-8 h-8 text-white" />
               </div>
-            </div>
-            <div className="text-purple-300 text-sm mb-1">Total Invested</div>
-            <div className="text-3xl font-bold text-white">{formatCurrency(totalInvested)}</div>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-500 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="text-purple-300 text-sm mb-1">Current Value</div>
-            <div className="text-3xl font-bold text-white">{formatCurrency(totalCurrentValue)}</div>
-          </div>
-
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 bg-gradient-to-br ${totalGainLoss >= 0 ? 'from-green-600 to-green-500' : 'from-red-600 to-red-500'} rounded-xl flex items-center justify-center`}>
-                {totalGainLoss >= 0 ? <TrendingUp className="w-6 h-6 text-white" /> : <TrendingDown className="w-6 h-6 text-white" />}
-              </div>
-            </div>
-            <div className="text-purple-300 text-sm mb-1">Total Returns</div>
-            <div className={`text-3xl font-bold ${totalGainLoss >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {totalGainLoss >= 0 ? '+' : ''}{formatCurrency(totalGainLoss)}
+              <div className="text-blue-300 text-sm font-medium mb-2">Total Invested</div>
+              <div className="text-4xl font-bold text-white group-hover:text-blue-100 transition-colors">{formatCurrency(totalInvested)}</div>
             </div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl hover:scale-105 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 bg-gradient-to-br ${parseFloat(portfolioROI) >= 0 ? 'from-green-600 to-green-500' : 'from-red-600 to-red-500'} rounded-xl flex items-center justify-center`}>
-                <Target className="w-6 h-6 text-white" />
+          <div className="group relative bg-gradient-to-br from-purple-600/10 via-purple-500/5 to-transparent backdrop-blur-xl rounded-3xl border border-purple-500/20 p-8 shadow-2xl hover:shadow-purple-500/20 hover:scale-105 transition-all duration-500 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/0 via-purple-500/0 to-transparent group-hover:from-purple-600/10 group-hover:via-purple-500/5 transition-all duration-500"></div>
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-400 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-500 mb-6">
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <div className="text-purple-300 text-sm font-medium mb-2">Current Value</div>
+              <div className="text-4xl font-bold text-white group-hover:text-purple-100 transition-colors">{formatCurrency(totalCurrentValue)}</div>
+            </div>
+          </div>
+
+          <div className={`group relative bg-gradient-to-br ${totalGainLoss >= 0 ? 'from-green-600/10 via-green-500/5' : 'from-red-600/10 via-red-500/5'} to-transparent backdrop-blur-xl rounded-3xl border ${totalGainLoss >= 0 ? 'border-green-500/20' : 'border-red-500/20'} p-8 shadow-2xl hover:shadow-${totalGainLoss >= 0 ? 'green' : 'red'}-500/20 hover:scale-105 transition-all duration-500 overflow-hidden`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${totalGainLoss >= 0 ? 'from-green-600/0 via-green-500/0' : 'from-red-600/0 via-red-500/0'} to-transparent group-hover:${totalGainLoss >= 0 ? 'from-green-600/10 via-green-500/5' : 'from-red-600/10 via-red-500/5'} transition-all duration-500`}></div>
+            <div className="relative">
+              <div className={`w-16 h-16 bg-gradient-to-br ${totalGainLoss >= 0 ? 'from-green-600 to-green-400' : 'from-red-600 to-red-400'} rounded-2xl flex items-center justify-center shadow-lg shadow-${totalGainLoss >= 0 ? 'green' : 'red'}-500/50 group-hover:scale-110 transition-transform duration-500 mb-6`}>
+                {totalGainLoss >= 0 ? <TrendingUp className="w-8 h-8 text-white" /> : <TrendingDown className="w-8 h-8 text-white" />}
+              </div>
+              <div className={`${totalGainLoss >= 0 ? 'text-green-300' : 'text-red-300'} text-sm font-medium mb-2`}>Total Returns</div>
+              <div className={`text-4xl font-bold ${totalGainLoss >= 0 ? 'text-green-400 group-hover:text-green-300' : 'text-red-400 group-hover:text-red-300'} transition-colors`}>
+                {totalGainLoss >= 0 ? '+' : ''}{formatCurrency(totalGainLoss)}
               </div>
             </div>
-            <div className="text-purple-300 text-sm mb-1">Portfolio ROI</div>
-            <div className={`text-3xl font-bold ${parseFloat(portfolioROI) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {parseFloat(portfolioROI) >= 0 ? '+' : ''}{portfolioROI}%
+          </div>
+
+          <div className={`group relative bg-gradient-to-br ${parseFloat(portfolioROI) >= 0 ? 'from-green-600/10 via-emerald-500/5' : 'from-red-600/10 via-orange-500/5'} to-transparent backdrop-blur-xl rounded-3xl border ${parseFloat(portfolioROI) >= 0 ? 'border-green-500/20' : 'border-red-500/20'} p-8 shadow-2xl hover:shadow-${parseFloat(portfolioROI) >= 0 ? 'green' : 'red'}-500/20 hover:scale-105 transition-all duration-500 overflow-hidden`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${parseFloat(portfolioROI) >= 0 ? 'from-green-600/0 via-emerald-500/0' : 'from-red-600/0 via-orange-500/0'} to-transparent group-hover:${parseFloat(portfolioROI) >= 0 ? 'from-green-600/10 via-emerald-500/5' : 'from-red-600/10 via-orange-500/5'} transition-all duration-500`}></div>
+            <div className="relative">
+              <div className={`w-16 h-16 bg-gradient-to-br ${parseFloat(portfolioROI) >= 0 ? 'from-green-600 to-emerald-400' : 'from-red-600 to-orange-400'} rounded-2xl flex items-center justify-center shadow-lg shadow-${parseFloat(portfolioROI) >= 0 ? 'green' : 'red'}-500/50 group-hover:scale-110 transition-transform duration-500 mb-6`}>
+                <Target className="w-8 h-8 text-white" />
+              </div>
+              <div className={`${parseFloat(portfolioROI) >= 0 ? 'text-green-300' : 'text-red-300'} text-sm font-medium mb-2`}>Portfolio ROI</div>
+              <div className={`text-4xl font-bold ${parseFloat(portfolioROI) >= 0 ? 'text-green-400 group-hover:text-green-300' : 'text-red-400 group-hover:text-red-300'} transition-colors`}>
+                {parseFloat(portfolioROI) >= 0 ? '+' : ''}{portfolioROI}%
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Quick Overview Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Enhanced Quick Overview Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
           {/* Asset Allocation */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <PieChart className="w-6 h-6 text-purple-400" />
-              Asset Allocation
-            </h3>
+          <div className="group relative bg-gradient-to-br from-purple-600/10 via-purple-500/5 to-transparent backdrop-blur-xl rounded-3xl border border-purple-500/20 p-8 shadow-2xl hover:shadow-purple-500/20 hover:scale-105 transition-all duration-500 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/0 via-purple-500/0 to-transparent group-hover:from-purple-600/10 group-hover:via-purple-500/5 transition-all duration-500"></div>
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-400 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-500">
+                  <PieChart className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Asset Allocation</h3>
+              </div>
             <div className="space-y-4">
               {Object.entries(assetTypes).map(([type, amount]: [string, any]) => {
                 const percentage = totalInvested > 0 ? ((amount / totalInvested) * 100).toFixed(1) : '0';
@@ -214,13 +222,14 @@ export default function InvestmentsPage() {
                     </div>
                     <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/10">
                       <div
-                        className={`h-2 bg-gradient-to-r ${colors[type] || 'from-gray-500 to-gray-600'} rounded-full transition-all duration-500`}
+                        className={`h-2 bg-gradient-to-r ${colors[type] || 'from-gray-500 to-gray-600'} rounded-full transition-all duration-500 hover:shadow-lg hover:shadow-purple-500/30`}
                         style={{ width: `${percentage}%` }}
                       ></div>
                     </div>
                   </div>
                 );
               })}
+            </div>
             </div>
           </div>
 
@@ -231,92 +240,104 @@ export default function InvestmentsPage() {
             )[0];
 
             return bestPerformer && (
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Award className="w-6 h-6 text-yellow-400" />
-                  Best Performer
-                </h3>
-                <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl p-4 border border-green-500/30">
-                  <div className="text-sm text-green-300 mb-2">Top ROI</div>
-                  <div className="font-bold text-white mb-2 line-clamp-1">{bestPerformer.deal?.title}</div>
-                  <div className="text-3xl font-bold text-green-400">+{calculateROI(bestPerformer)}%</div>
-                </div>
-                <div className="mt-4 text-sm text-purple-300">
-                  Invested: {formatCurrency(bestPerformer.amount)}
+              <div className="group relative bg-gradient-to-br from-yellow-600/10 via-yellow-500/5 to-transparent backdrop-blur-xl rounded-3xl border border-yellow-500/20 p-8 shadow-2xl hover:shadow-yellow-500/20 hover:scale-105 transition-all duration-500 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/0 via-yellow-500/0 to-transparent group-hover:from-yellow-600/10 group-hover:via-yellow-500/5 transition-all duration-500"></div>
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-yellow-600 to-yellow-400 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/50 group-hover:scale-110 transition-transform duration-500">
+                      <Award className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white">Best Performer</h3>
+                  </div>
+                  <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl p-4 border border-green-500/30 hover:border-green-500/50 transition-all duration-500">
+                    <div className="text-sm text-green-300 mb-2">Top ROI</div>
+                    <div className="font-bold text-white mb-2 line-clamp-1">{bestPerformer.deal?.title}</div>
+                    <div className="text-3xl font-bold text-green-400">+{calculateROI(bestPerformer)}%</div>
+                  </div>
+                  <div className="mt-4 text-sm text-purple-300">
+                    Invested: <span className="font-bold text-white">{formatCurrency(bestPerformer.amount)}</span>
+                  </div>
                 </div>
               </div>
             );
           })()}
 
           {/* Quick Actions */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <Zap className="w-6 h-6 text-purple-400" />
-              Quick Actions
-            </h3>
-            <div className="space-y-3">
-              <Link href="/deals">
-                <button className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all font-semibold flex items-center justify-between group">
-                  <span className="flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    New Deals
-                  </span>
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </Link>
-              <Link href="/bundles">
-                <button className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-semibold flex items-center justify-between group">
-                  <span className="flex items-center gap-2">
-                    <Package className="w-5 h-5" />
-                    Bundles
-                  </span>
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </Link>
-              <Link href="/secondary-market">
-                <button className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all font-semibold flex items-center justify-between group">
-                  <span className="flex items-center gap-2">
-                    <RefreshCw className="w-5 h-5" />
-                    Marketplace
-                  </span>
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </Link>
+          <div className="group relative bg-gradient-to-br from-blue-600/10 via-blue-500/5 to-transparent backdrop-blur-xl rounded-3xl border border-blue-500/20 p-8 shadow-2xl hover:shadow-blue-500/20 hover:scale-105 transition-all duration-500 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 via-blue-500/0 to-transparent group-hover:from-blue-600/10 group-hover:via-blue-500/5 transition-all duration-500"></div>
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-400 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-500">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Quick Actions</h3>
+              </div>
+              <div className="space-y-3">
+                <Link href="/deals">
+                  <button className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-500 font-semibold flex items-center justify-between group">
+                    <span className="flex items-center gap-2">
+                      <Target className="w-5 h-5" />
+                      New Deals
+                    </span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </Link>
+                <Link href="/bundles">
+                  <button className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-xl hover:bg-white/10 hover:border-white/20 transition-all duration-500 font-semibold flex items-center justify-between group">
+                    <span className="flex items-center gap-2">
+                      <Package className="w-5 h-5" />
+                      Bundles
+                    </span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </Link>
+                <Link href="/secondary-market">
+                  <button className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-white rounded-xl hover:bg-white/10 hover:border-white/20 transition-all duration-500 font-semibold flex items-center justify-between group">
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-5 h-5" />
+                      Marketplace
+                    </span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 mb-6 shadow-2xl">
-          <div className="flex items-center gap-3">
-            <Filter className="w-5 h-5 text-purple-300" />
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        {/* Enhanced Filter Tabs */}
+        <div className="bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-xl rounded-3xl border border-white/10 p-6 mb-12 shadow-2xl">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-400 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+              <Filter className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide flex-1">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all duration-500 ${
                   filter === 'all'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-105'
+                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10 hover:border-white/20 hover:scale-105'
                 }`}
               >
                 All ({investments.length})
               </button>
               <button
                 onClick={() => setFilter('active')}
-                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all duration-500 ${
                   filter === 'active'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-105'
+                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10 hover:border-white/20 hover:scale-105'
                 }`}
               >
                 Active ({investments.filter((i) => i.status === 'active').length})
               </button>
               <button
                 onClick={() => setFilter('exited')}
-                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+                className={`px-6 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all duration-500 ${
                   filter === 'exited'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-105'
+                    : 'bg-white/5 backdrop-blur-sm border border-white/10 text-purple-200 hover:bg-white/10 hover:border-white/20 hover:scale-105'
                 }`}
               >
                 Exited ({investments.filter((i) => i.status === 'exited' || i.status === 'completed').length})
@@ -325,18 +346,18 @@ export default function InvestmentsPage() {
           </div>
         </div>
 
-        {/* Investments List */}
+        {/* Enhanced Investments List */}
         {filteredInvestments.length === 0 ? (
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-12 text-center shadow-2xl">
-            <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Activity className="w-10 h-10 text-purple-400" />
+          <div className="bg-gradient-to-br from-purple-600/10 via-purple-500/5 to-transparent backdrop-blur-xl rounded-3xl border border-purple-500/20 p-16 text-center shadow-2xl">
+            <div className="w-24 h-24 bg-gradient-to-br from-purple-600/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/30">
+              <Activity className="w-12 h-12 text-purple-400" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-2">No investments yet</h3>
-            <p className="text-purple-300 mb-6">
+            <h3 className="text-3xl font-bold text-white mb-3">No investments yet</h3>
+            <p className="text-purple-300 text-lg mb-8">
               Start building your fractional ownership portfolio today
             </p>
             <Link href="/deals">
-              <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-purple-500/30 transition-all">
+              <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-10 py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-500 hover:scale-105">
                 Browse Investment Opportunities
               </button>
             </Link>
@@ -353,7 +374,7 @@ export default function InvestmentsPage() {
               return (
                 <div
                   key={investment.id}
-                  className="group bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all overflow-hidden shadow-2xl hover:scale-[1.02] duration-300"
+                  className="group bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-purple-500/30 transition-all overflow-hidden shadow-2xl hover:scale-[1.02] hover:shadow-purple-500/20 duration-500"
                 >
                   {/* Top Status Bar */}
                   <div className={`h-2 ${isPositive ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-red-400 to-orange-500'}`}></div>
@@ -532,30 +553,35 @@ export default function InvestmentsPage() {
           </div>
         )}
 
-        {/* Tips */}
-        <div className="mt-8 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl p-6 border border-white/10 shadow-2xl">
-          <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-purple-400" />
-            Investment Tips
-          </h3>
-          <ul className="space-y-2 text-sm text-purple-200">
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
-              Diversify across multiple asset classes for balanced risk
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
-              Monitor portfolio regularly and track ROI trends
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
-              Use secondary market to exit positions when needed
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
-              Reinvest dividends for compound growth
-            </li>
-          </ul>
+        {/* Enhanced Tips */}
+        <div className="mt-12 group relative bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 via-purple-600/0 to-pink-600/0 group-hover:from-blue-600/5 group-hover:via-purple-600/5 group-hover:to-pink-600/5 transition-all duration-500"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-400 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-500">
+                <AlertCircle className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Investment Tips</h3>
+            </div>
+            <ul className="space-y-3 text-sm text-purple-200">
+              <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-500">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Diversify across multiple asset classes for balanced risk</span>
+              </li>
+              <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-500">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Monitor portfolio regularly and track ROI trends</span>
+              </li>
+              <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-500">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Use secondary market to exit positions when needed</span>
+              </li>
+              <li className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-500">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Reinvest dividends for compound growth</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
