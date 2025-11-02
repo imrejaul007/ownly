@@ -8,11 +8,14 @@ dist/
 build/
 out/
 
-# Environment files
+# Environment files - NEVER commit these!
 .env
 .env.local
+.env.production
 .env.*.local
 *.env
+!.env.example
+!.env.*.template
 
 # Logs
 logs/
