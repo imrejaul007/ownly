@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { sipAPI } from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   ArrowLeft, Calendar, DollarSign, TrendingUp, Package,
   Pause, Play, X, Clock, CheckCircle, AlertCircle,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function SIPSubscriptionDetailPage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const [subscription, setSubscription] = useState<any>(null);

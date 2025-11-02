@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { sipAPI } from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Calendar, DollarSign, TrendingUp, Pause, Play, X, Plus,
   RefreshCw, BarChart3, Clock, CheckCircle, AlertCircle,
@@ -16,6 +17,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function SIPDashboardPage() {
+  const { formatCurrency } = usePreferences();
   const router = useRouter();
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

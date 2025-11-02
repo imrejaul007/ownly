@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { investmentAPI } from '@/lib/api';
-import { formatCurrency, getDealTypeLabel } from '@/lib/utils';
+import { getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import Link from 'next/link';
 import axios from 'axios';
 import {
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function InvestmentsPage() {
+  const { formatCurrency } = usePreferences();
   const [investments, setInvestments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');

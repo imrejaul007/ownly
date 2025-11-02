@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { payoutScheduleAPI, dealAPI } from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 export default function PayoutSchedulesPage() {
+  const { formatCurrency } = usePreferences();
   const [schedules, setSchedules] = useState<any[]>([]);
   const [upcomingPayouts, setUpcomingPayouts] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);

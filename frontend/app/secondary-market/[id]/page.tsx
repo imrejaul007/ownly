@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { secondaryMarketAPI } from '@/lib/api';
-import { formatCurrency, formatDate, getDealTypeLabel } from '@/lib/utils';
+import { formatDate, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   ArrowLeft, Building, TrendingUp, TrendingDown, Clock, Shield, DollarSign, Users,
   CheckCircle, Package, AlertTriangle, Target, Star, Share2, RefreshCw, Calendar,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function ListingDetailPage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const [listing, setListing] = useState<any>(null);

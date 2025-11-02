@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Deal } from '@/types';
 import { dealAPI, secondaryMarketAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   TrendingUp, Clock, DollarSign, MapPin, Users, Target, Award,
   BarChart3, X, Plus, CheckCircle, ArrowLeft, Crown
@@ -443,6 +444,7 @@ function ComparisonRow({
 }
 
 export default function DealComparePage() {
+  const { formatCurrency } = usePreferences();
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">

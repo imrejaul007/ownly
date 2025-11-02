@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Investment, PortfolioSummary } from '@/types';
 import { investmentAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import axios from 'axios';
 import ActivityFeed from '@/components/ActivityFeed';
 import SmartRecommendations from '@/components/SmartRecommendations';
@@ -36,6 +37,7 @@ interface ActivityItem {
 }
 
 export default function DashboardPage() {
+  const { formatCurrency } = usePreferences();
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [summary, setSummary] = useState<PortfolioSummary | null>(null);
   const [monthlyPayouts, setMonthlyPayouts] = useState<MonthlyPayout[]>([]);

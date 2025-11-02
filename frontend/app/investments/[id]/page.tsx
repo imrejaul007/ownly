@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { investmentAPI } from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import Link from 'next/link';
 import axios from 'axios';
 
@@ -15,6 +15,7 @@ interface MonthlyPayout {
 }
 
 export default function InvestmentDetailPage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const [investment, setInvestment] = useState<any>(null);

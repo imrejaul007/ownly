@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { walletAPI } from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Wallet, TrendingUp, TrendingDown, Clock, DollarSign,
   ArrowUpRight, ArrowDownRight, Plus, Minus, X, Check,
@@ -47,6 +48,7 @@ interface Transaction {
 }
 
 export default function WalletPage() {
+  const { formatCurrency } = usePreferences();
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [stats, setStats] = useState<WalletStats | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);

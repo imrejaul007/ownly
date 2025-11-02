@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { announcementAPI, documentAPI, dealAPI } from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 export default function CommunicationsPage() {
+  const { formatCurrency } = usePreferences();
   const [activeTab, setActiveTab] = useState<'announcements' | 'documents'>('announcements');
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);

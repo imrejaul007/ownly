@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Investment, PortfolioSummary } from '@/types';
 import { investmentAPI, exportAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, formatDate, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, formatDate, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import axios from 'axios';
 
 interface MonthlyPayout {
@@ -17,6 +18,7 @@ interface MonthlyPayout {
 }
 
 export default function PortfolioPage() {
+  const { formatCurrency } = usePreferences();
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [summary, setSummary] = useState<PortfolioSummary | null>(null);
   const [monthlyPayouts, setMonthlyPayouts] = useState<MonthlyPayout[]>([]);

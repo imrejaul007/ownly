@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { secondaryMarketAPI } from '@/lib/api';
-import { formatCurrency, formatDate, getDealTypeLabel } from '@/lib/utils';
+import { formatDate, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   TrendingUp, DollarSign, Users, ArrowRight, Filter, X, ShoppingCart,
   Briefcase, Home, Building, Rocket, Gem, Calendar, MapPin, Award,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function SecondaryMarketPage() {
+  const { formatCurrency } = usePreferences();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'browse' | 'my-listings' | 'my-purchases' | 'my-offers'>('browse');
   const [listings, setListings] = useState<any[]>([]);

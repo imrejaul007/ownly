@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { dealAPI } from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import CategoryShowcase from '@/components/CategoryShowcase';
@@ -16,6 +16,7 @@ import {
 
 export default function DealsPage() {
   const router = useRouter();
+  const { formatCurrency } = usePreferences();
   const [deals, setDeals] = useState<any[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

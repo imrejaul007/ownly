@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatPercentage } from '@/lib/utils';
+import { formatPercentage } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Calculator, DollarSign, TrendingUp, Clock, Sparkles, Target,
   RefreshCw, BarChart3, ArrowRight, Info, Zap, Award
 } from 'lucide-react';
 
 export default function InvestmentCalculatorPage() {
+  const { formatCurrency } = usePreferences();
   const [investmentAmount, setInvestmentAmount] = useState(10000);
   const [annualROI, setAnnualROI] = useState(25);
   const [holdingPeriod, setHoldingPeriod] = useState(24);

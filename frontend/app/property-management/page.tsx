@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { propertyManagementAPI } from '@/lib/api';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 export default function PropertyManagementPage() {
+  const { formatCurrency } = usePreferences();
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);

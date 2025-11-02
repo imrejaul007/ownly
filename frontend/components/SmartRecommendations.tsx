@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 interface RecommendedDeal {
   id: string;
@@ -28,6 +29,7 @@ export default function SmartRecommendations({
   riskProfile = 'moderate',
   maxRecommendations = 4
 }: SmartRecommendationsProps) {
+  const { formatCurrency } = usePreferences();
   const [recommendations, setRecommendations] = useState<RecommendedDeal[]>([]);
   const [loading, setLoading] = useState(true);
 

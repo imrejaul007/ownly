@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   ArrowLeft, CheckCircle, Trophy, TrendingUp, Users, Activity, DollarSign,
   Target, Shield, Copy, Settings, BarChart3, Calendar, Award, Flame,
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function TraderProfilePage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const [copyAmount, setCopyAmount] = useState(5000);

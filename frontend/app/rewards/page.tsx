@@ -6,7 +6,7 @@ import {
   Gift, Award, Star, TrendingUp, Users, Zap, Crown, Target, CheckCircle,
   Copy, ShoppingBag, Percent, CreditCard, Coffee, Utensils, Tag, Sparkles
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 const referralEarnings = [
   {
@@ -156,6 +156,7 @@ const rewardTiers = [
 ];
 
 export default function RewardsPage() {
+  const { formatCurrency } = usePreferences();
   const [totalCommissionEarned] = useState(2640);
   const [totalGiftCardValue] = useState(700);
   const [monthlyPassiveIncome] = useState(880);

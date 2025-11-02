@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 interface Activity {
   id: string;
@@ -17,6 +17,7 @@ interface Activity {
 }
 
 export default function ActivityFeed({ maxItems = 10 }: { maxItems?: number }) {
+  const { formatCurrency } = usePreferences();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLive, setIsLive] = useState(true);
 

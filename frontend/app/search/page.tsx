@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Search, Filter, SlidersHorizontal, TrendingUp, Building, Store, Rocket,
   MapPin, DollarSign, Calendar, Users, Star, History, Bookmark, X,
@@ -25,6 +26,7 @@ interface Deal {
 }
 
 export default function SearchPage() {
+  const { formatCurrency } = usePreferences();
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [deals, setDeals] = useState<Deal[]>([]);

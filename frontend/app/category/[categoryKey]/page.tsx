@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { dealAPI } from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Building2, Car, Compass, Utensils, Heart, Store, GraduationCap,
   Film, Laptop, Home, Calendar, Leaf, ShoppingCart, Truck, Factory,
@@ -319,6 +319,7 @@ const CATEGORIES = [
 ];
 
 export default function CategoryPage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const categoryKey = params.categoryKey as string;

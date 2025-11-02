@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatPercentage } from '@/lib/utils';
+import { formatPercentage } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Users, TrendingUp, Copy, CheckCircle, Target, Award, Filter,
   BarChart3, Star, Clock, DollarSign, Zap, ArrowRight, Shield,
@@ -29,6 +30,7 @@ interface Trader {
 }
 
 export default function CopyTradingPage() {
+  const { formatCurrency } = usePreferences();
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'return' | 'copiers' | 'winRate'>('return');
   const [searchQuery, setSearchQuery] = useState('');

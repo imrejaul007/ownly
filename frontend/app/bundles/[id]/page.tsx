@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Package, TrendingUp, Shield, Clock, Users, Target, CheckCircle,
   ArrowLeft, Zap, DollarSign, Calendar, BarChart3, AlertCircle, Percent
@@ -51,6 +51,7 @@ interface Bundle {
 }
 
 export default function BundleDetailPage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const [bundle, setBundle] = useState<Bundle | null>(null);

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { scenarioAPI, dealAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage } from '@/lib/utils';
+import { formatPercentage } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 // Fallback templates in case backend API is unavailable
 const FALLBACK_TEMPLATES = [
@@ -100,6 +101,7 @@ const FALLBACK_TEMPLATES = [
 ];
 
 export default function ScenariosPage() {
+  const { formatCurrency } = usePreferences();
   const [templates, setTemplates] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [deals, setDeals] = useState<any[]>([]);

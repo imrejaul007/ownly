@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { dealAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Sparkles, Clock, TrendingUp, Users, Award, ChevronRight,
   Flame, Target, BarChart3, ArrowRight, Zap, Calendar, DollarSign, Tag
 } from 'lucide-react';
 
 export default function FeaturedOpportunitiesPage() {
+  const { formatCurrency } = usePreferences();
   const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');

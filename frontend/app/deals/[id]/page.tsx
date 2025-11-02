@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Deal } from '@/types';
 import { dealAPI, investmentAPI, walletAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, getDealTypeLabel, calculateFundingProgress, formatDate } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel, calculateFundingProgress, formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import ROICalculator from '@/components/ROICalculator';
 import DealSocialProof from '@/components/DealSocialProof';
 import {
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function DealDetailPage() {
+  const { formatCurrency } = usePreferences();
   const params = useParams();
   const router = useRouter();
   const [deal, setDeal] = useState<Deal | null>(null);

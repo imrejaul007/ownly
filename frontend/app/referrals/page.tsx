@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 interface ReferralStats {
   totalReferrals: number;
@@ -32,6 +32,7 @@ interface LeaderboardEntry {
 }
 
 export default function ReferralsPage() {
+  const { formatCurrency } = usePreferences();
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'leaderboard'>('overview');
 

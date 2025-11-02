@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatPercentage } from '@/lib/utils';
+import { formatPercentage } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Briefcase, DollarSign, TrendingUp, PieChart, Target, Sparkles,
   Plus, X, BarChart3, AlertCircle, Check, Filter, Package
@@ -18,6 +19,7 @@ interface PortfolioItem {
 }
 
 export default function PortfolioBuilderPage() {
+  const { formatCurrency } = usePreferences();
   const [totalBudget, setTotalBudget] = useState(100000);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { agentAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, formatDate } from '@/lib/utils';
+import { formatPercentage, formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 export default function AgentDashboardPage() {
+  const { formatCurrency } = usePreferences();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'commissions'>('overview');

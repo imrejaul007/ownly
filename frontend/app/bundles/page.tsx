@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Package, TrendingUp, Shield, Clock, Users, Target,
   Zap, CheckCircle, ArrowRight, Filter, Sparkles, GitCompare,
@@ -38,6 +38,7 @@ interface Bundle {
 }
 
 export default function BundlesPage() {
+  const { formatCurrency } = usePreferences();
   const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [filteredBundles, setFilteredBundles] = useState<Bundle[]>([]);

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Deal } from '@/types';
 import { dealAPI, secondaryMarketAPI } from '@/lib/api';
-import { formatCurrency, formatPercentage, getDealTypeLabel, calculateFundingProgress, getStatusColor } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel, calculateFundingProgress, getStatusColor } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import axios from 'axios';
 import {
   Sparkles, TrendingUp, DollarSign, Users, Building, Store, Rocket,
@@ -37,6 +38,7 @@ interface LiveActivity {
 }
 
 export default function Marketplace() {
+  const { formatCurrency } = usePreferences();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [bundles, setBundles] = useState<any[]>([]);
   const [secondaryListings, setSecondaryListings] = useState<any[]>([]);

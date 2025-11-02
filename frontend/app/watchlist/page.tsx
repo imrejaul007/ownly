@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency, formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { formatPercentage, getDealTypeLabel } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Star, TrendingUp, TrendingDown, DollarSign, Users, Building, Store,
   Rocket, Target, Zap, ArrowRight, Flame, Eye, Activity, Trash2,
@@ -24,6 +25,7 @@ interface WatchlistItem {
 }
 
 export default function WatchlistPage() {
+  const { formatCurrency } = usePreferences();
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');

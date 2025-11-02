@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 interface DealSocialProofProps {
   dealId: string;
@@ -20,6 +20,7 @@ export default function DealSocialProof({
   showTrending = true,
   compact = false
 }: DealSocialProofProps) {
+  const { formatCurrency } = usePreferences();
   const [recentInvestors, setRecentInvestors] = useState(0);
   const [viewingNow, setViewingNow] = useState(0);
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { sipAPI, bundleAPI } from '@/lib/api';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 import {
   Calendar, DollarSign, TrendingUp, Package, RefreshCw,
   Plus, ArrowRight, CheckCircle, Info, X, Zap, Target,
@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function SIPPlansPage() {
+  const { formatCurrency } = usePreferences();
   const router = useRouter();
   const [plans, setPlans] = useState<any[]>([]);
   const [bundles, setBundles] = useState<any[]>([]);

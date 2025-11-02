@@ -26,7 +26,8 @@ import {
   scenariosAPI,
   userPreferenceAPI,
 } from '@/lib/api';
-import { formatCurrency, formatPercentage, formatDate } from '@/lib/utils';
+import { formatPercentage, formatDate } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 type TabType =
   | 'dashboard'
@@ -55,6 +56,7 @@ type TabType =
   | 'settings';
 
 export default function AdminPage() {
+  const { formatCurrency } = usePreferences();
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);

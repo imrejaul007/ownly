@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 interface Question {
   id: number;
@@ -30,6 +30,7 @@ interface RiskProfile {
 }
 
 export default function RiskAssessmentPage() {
+  const { formatCurrency } = usePreferences();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);

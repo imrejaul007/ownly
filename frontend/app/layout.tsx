@@ -8,6 +8,9 @@ import { useState, useEffect } from 'react';
 import { walletAPI } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import MobileNav from '@/components/MobileNav';
+import { PreferencesProvider } from '@/context/PreferencesContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 import {
   TrendingUp, LayoutDashboard, Wallet, Wrench, GraduationCap, MoreHorizontal,
   ShoppingBag, Sparkles, Package, Repeat, Building2, ChevronDown, Menu, X,
@@ -284,6 +287,12 @@ function Header() {
               </div>
             )}
 
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
+            {/* Currency Switcher */}
+            <CurrencySwitcher />
+
             {/* User Menu */}
             {isLoggedIn ? (
               <div className="relative group">
@@ -432,12 +441,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-          <Header />
+        <PreferencesProvider>
+          <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+            <Header />
 
-          <main className="flex-1">
-            {children}
-          </main>
+            <main className="flex-1">
+              {children}
+            </main>
 
           {/* Footer */}
           <footer className="bg-slate-950/50 backdrop-blur-md border-t border-white/10 mt-auto">
@@ -558,7 +568,8 @@ export default function RootLayout({
 
           {/* Mobile Navigation */}
           <MobileNav />
-        </div>
+          </div>
+        </PreferencesProvider>
       </body>
     </html>
   );

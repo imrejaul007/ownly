@@ -5,7 +5,7 @@ import {
   Trophy, Star, Target, CheckCircle, Clock, Lock, TrendingUp,
   Gift, Zap, Award, Crown, DollarSign, PieChart, Shield
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { usePreferences } from '@/context/PreferencesContext';
 
 // Milestone types
 interface Milestone {
@@ -33,6 +33,7 @@ interface Badge {
 }
 
 export default function ProgressPage() {
+  const { formatCurrency } = usePreferences();
   const [overallProgress, setOverallProgress] = useState(66); // 4 out of 6 milestones
   const [animateProgress, setAnimateProgress] = useState(false);
 
