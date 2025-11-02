@@ -1,6 +1,7 @@
 import { Investment, Deal, SPV, Wallet, Transaction, User } from '../models/index.js';
 import { success, error } from '../utils/response.js';
 import sequelize from '../config/database.js';
+import { autoExecuteCopy } from './copyTradingController.js';
 
 export const invest = async (req, res, next) => {
   const t = await sequelize.transaction();
@@ -139,6 +140,17 @@ export const invest = async (req, res, next) => {
     }, { transaction: t });
 
     await t.commit();
+
+    // Trigger copy trading if this trader has followers
+    // Run in background - don't affect main investment response
+    try {
+      const copyTransaction = await sequelize.transaction();
+      await autoExecuteCopy(investment, copyTransaction);
+      await copyTransaction.commit();
+    } catch (copyError) {
+      console.error('Error in copy trading execution:', copyError);
+      // Don't fail the main investment if copy trading fails
+    }
 
     return success(res, {
       investment,

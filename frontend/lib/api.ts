@@ -378,6 +378,23 @@ export const exchangeAPI = {
   adminCancelOrder: (orderId: string) => api.post(`/exchange/orders/${orderId}/cancel`, {}),
 };
 
+// Copy Trading APIs
+export const copyTradingAPI = {
+  // Public routes
+  getTraders: (params?: any) => api.get('/copy-trading/traders', { params }),
+  getTraderProfile: (traderId: string) => api.get(`/copy-trading/traders/${traderId}`),
+  getTraderBundles: (traderId: string) => api.get(`/copy-trading/traders/${traderId}/bundles`),
+
+  // Protected routes
+  createBundle: (data: any) => api.post('/copy-trading/bundles', data),
+  updateBundle: (bundleId: string, data: any) => api.patch(`/copy-trading/bundles/${bundleId}`, data),
+  startCopying: (data: any) => api.post('/copy-trading/start', data),
+  stopCopying: (copyFollowerId: string) => api.delete(`/copy-trading/stop/${copyFollowerId}`),
+  getMyCopiers: () => api.get('/copy-trading/my-copiers'),
+  getMyFollowing: () => api.get('/copy-trading/my-following'),
+  updateTraderProfile: (data: any) => api.patch('/copy-trading/profile', data),
+};
+
 // Admin-specific APIs
 export const adminAPI = {
   // Deal transitions

@@ -1,166 +1,147 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatPercentage } from '@/lib/utils';
 import { usePreferences } from '@/context/PreferencesContext';
+import { copyTradingAPI } from '@/lib/api';
 import {
   Users, TrendingUp, Copy, CheckCircle, Target, Award, Filter,
   BarChart3, Star, Clock, DollarSign, Zap, ArrowRight, Shield,
-  Trophy, Flame, Eye, UserPlus, Activity, ChevronDown, Search
+  Trophy, Flame, Eye, UserPlus, Activity, ChevronDown, Search, X, AlertCircle
 } from 'lucide-react';
 
 interface Trader {
   id: string;
-  name: string;
-  username: string;
-  avatar: string;
-  verified: boolean;
-  rank: number;
-  totalReturn: number;
-  monthlyReturn: number;
-  copiers: number;
-  totalInvested: number;
-  winRate: number;
-  activeDeals: number;
-  riskLevel: 'low' | 'medium' | 'high';
+  user_id: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  is_active: boolean;
+  bio: string | null;
   specialty: string[];
-  joinedDate: string;
-  minCopyAmount: number;
+  min_copy_amount: number;
+  commission_rate: number;
+  total_copiers_count: number;
+  total_return: number;
+  monthly_return: number;
+  win_rate: number;
+  risk_level: 'low' | 'medium' | 'high';
+  created_at: string;
+  bundles?: any[];
+}
+
+interface CopyModalData {
+  trader: Trader;
+  showModal: boolean;
 }
 
 export default function CopyTradingPage() {
   const { formatCurrency } = usePreferences();
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'return' | 'copiers' | 'winRate'>('return');
+  const [sortBy, setSortBy] = useState<'total_return' | 'total_copiers_count' | 'win_rate'>('total_copiers_count');
   const [searchQuery, setSearchQuery] = useState('');
+  const [traders, setTraders] = useState<Trader[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const traders: Trader[] = [
-    {
-      id: '1',
-      name: 'Ahmed Al Mansoori',
-      username: '@realEstatePro',
-      avatar: 'A',
-      verified: true,
-      rank: 1,
-      totalReturn: 156.8,
-      monthlyReturn: 12.4,
-      copiers: 1247,
-      totalInvested: 2450000,
-      winRate: 94,
-      activeDeals: 18,
-      riskLevel: 'medium',
-      specialty: ['Real Estate', 'Commercial'],
-      joinedDate: '2023-01',
-      minCopyAmount: 5000,
-    },
-    {
-      id: '2',
-      name: 'Sarah Al Hashimi',
-      username: '@franchiseQueen',
-      avatar: 'S',
-      verified: true,
-      rank: 2,
-      totalReturn: 142.3,
-      monthlyReturn: 11.8,
-      copiers: 892,
-      totalInvested: 1850000,
-      winRate: 91,
-      activeDeals: 24,
-      riskLevel: 'low',
-      specialty: ['Franchises', 'F&B'],
-      joinedDate: '2023-03',
-      minCopyAmount: 3000,
-    },
-    {
-      id: '3',
-      name: 'Omar Al Falasi',
-      username: '@techInvestor',
-      avatar: 'O',
-      verified: true,
-      rank: 3,
-      totalReturn: 198.5,
-      monthlyReturn: 15.2,
-      copiers: 1456,
-      totalInvested: 3200000,
-      winRate: 87,
-      activeDeals: 32,
-      riskLevel: 'high',
-      specialty: ['Startups', 'Tech'],
-      joinedDate: '2022-11',
-      minCopyAmount: 10000,
-    },
-    {
-      id: '4',
-      name: 'Fatima Al Zaabi',
-      username: '@balancedInvestor',
-      avatar: 'F',
-      verified: true,
-      rank: 4,
-      totalReturn: 128.7,
-      monthlyReturn: 9.8,
-      copiers: 2103,
-      totalInvested: 1650000,
-      winRate: 96,
-      activeDeals: 15,
-      riskLevel: 'low',
-      specialty: ['Mixed Portfolio', 'Stable Returns'],
-      joinedDate: '2023-02',
-      minCopyAmount: 2000,
-    },
-    {
-      id: '5',
-      name: 'Khalid Al Nuaimi',
-      username: '@aggressiveGrowth',
-      avatar: 'K',
-      verified: false,
-      rank: 5,
-      totalReturn: 176.4,
-      monthlyReturn: 13.9,
-      copiers: 654,
-      totalInvested: 2100000,
-      winRate: 85,
-      activeDeals: 28,
-      riskLevel: 'high',
-      specialty: ['High Risk', 'Startups'],
-      joinedDate: '2023-04',
-      minCopyAmount: 8000,
-    },
-    {
-      id: '6',
-      name: 'Mariam Al Bloushi',
-      username: '@conservativeWins',
-      avatar: 'M',
-      verified: true,
-      rank: 6,
-      totalReturn: 115.2,
-      monthlyReturn: 8.5,
-      copiers: 1789,
-      totalInvested: 1420000,
-      winRate: 98,
-      activeDeals: 12,
-      riskLevel: 'low',
-      specialty: ['Real Estate', 'Low Risk'],
-      joinedDate: '2023-01',
-      minCopyAmount: 2500,
-    },
-  ];
+  // Copy modal state
+  const [copyModal, setCopyModal] = useState<CopyModalData | null>(null);
+  const [copyType, setCopyType] = useState<'full_profile' | 'bundle' | 'individual_deal'>('full_profile');
+  const [copyAmount, setCopyAmount] = useState(5000);
+  const [autoReinvest, setAutoReinvest] = useState(false);
+  const [stopLoss, setStopLoss] = useState(20);
+  const [selectedBundle, setSelectedBundle] = useState<string>('');
+  const [selectedDeal, setSelectedDeal] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchTraders();
+  }, [sortBy, selectedFilter]);
+
+  const fetchTraders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const params: any = { sortBy };
+
+      if (selectedFilter === 'verified') {
+        // Backend doesn't have verified filter yet, so we'll filter client-side
+      } else if (selectedFilter === 'low-risk') {
+        params.risk_level = 'low';
+      } else if (selectedFilter === 'high-return') {
+        params.min_return = 150;
+      }
+
+      const response = await copyTradingAPI.getTraders(params);
+      setTraders(response.data.data.traders || []);
+    } catch (err: any) {
+      console.error('Error fetching traders:', err);
+      setError(err.response?.data?.message || 'Failed to fetch traders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartCopying = (trader: Trader) => {
+    setCopyModal({ trader, showModal: true });
+    setCopyAmount(Math.max(trader.min_copy_amount, 5000));
+    setSelectedBundle('');
+    setSelectedDeal('');
+  };
+
+  const handleConfirmCopy = async () => {
+    if (!copyModal) return;
+
+    try {
+      setSubmitting(true);
+
+      const data: any = {
+        trader_user_id: copyModal.trader.user_id,
+        copy_type: copyType,
+        copy_amount: copyAmount,
+        auto_reinvest: autoReinvest,
+        stop_loss_percentage: stopLoss,
+      };
+
+      if (copyType === 'bundle' && selectedBundle) {
+        data.bundle_id = selectedBundle;
+      } else if (copyType === 'individual_deal' && selectedDeal) {
+        data.deal_id = selectedDeal;
+      }
+
+      await copyTradingAPI.startCopying(data);
+
+      alert(`Successfully started copying ${copyModal.trader.user.name}!`);
+      setCopyModal(null);
+
+      // Refresh traders list to update copier counts
+      fetchTraders();
+    } catch (err: any) {
+      console.error('Error starting copy:', err);
+      alert(err.response?.data?.message || 'Failed to start copying');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const filteredTraders = traders.filter(trader => {
     if (selectedFilter === 'all') return true;
-    if (selectedFilter === 'verified') return trader.verified;
-    if (selectedFilter === 'low-risk') return trader.riskLevel === 'low';
-    if (selectedFilter === 'high-return') return trader.totalReturn > 150;
+    if (selectedFilter === 'verified') return true; // All traders are "verified" for now
+    if (selectedFilter === 'low-risk') return trader.risk_level === 'low';
+    if (selectedFilter === 'high-return') return trader.total_return > 150;
     return true;
   }).filter(trader =>
-    trader.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    trader.username.toLowerCase().includes(searchQuery.toLowerCase())
+    trader.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    trader.user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedTraders = [...filteredTraders].sort((a, b) => {
-    if (sortBy === 'return') return b.totalReturn - a.totalReturn;
-    if (sortBy === 'copiers') return b.copiers - a.copiers;
-    if (sortBy === 'winRate') return b.winRate - a.winRate;
+    if (sortBy === 'total_return') return b.total_return - a.total_return;
+    if (sortBy === 'total_copiers_count') return b.total_copiers_count - a.total_copiers_count;
+    if (sortBy === 'win_rate') return b.win_rate - a.win_rate;
     return 0;
   });
 
@@ -208,28 +189,34 @@ export default function CopyTradingPage() {
                 <Users className="w-5 h-5 text-blue-400" />
                 <span className="text-sm text-blue-300">Total Traders</span>
               </div>
-              <div className="text-3xl font-bold text-white">{sortedTraders.length}</div>
+              <div className="text-3xl font-bold text-white">{traders.length}</div>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-green-400" />
                 <span className="text-sm text-green-300">Avg. Return</span>
               </div>
-              <div className="text-3xl font-bold text-green-400">+142%</div>
+              <div className="text-3xl font-bold text-green-400">
+                +{traders.length > 0 ? (traders.reduce((sum, t) => sum + t.total_return, 0) / traders.length).toFixed(1) : 0}%
+              </div>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Copy className="w-5 h-5 text-purple-400" />
                 <span className="text-sm text-purple-300">Active Copiers</span>
               </div>
-              <div className="text-3xl font-bold text-white">8.1K</div>
+              <div className="text-3xl font-bold text-white">
+                {traders.reduce((sum, t) => sum + t.total_copiers_count, 0).toLocaleString()}
+              </div>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="w-5 h-5 text-orange-400" />
                 <span className="text-sm text-orange-300">Win Rate</span>
               </div>
-              <div className="text-3xl font-bold text-orange-400">92%</div>
+              <div className="text-3xl font-bold text-orange-400">
+                {traders.length > 0 ? (traders.reduce((sum, t) => sum + t.win_rate, 0) / traders.length).toFixed(0) : 0}%
+              </div>
             </div>
           </div>
 
@@ -340,9 +327,9 @@ export default function CopyTradingPage() {
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="appearance-none bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-white text-sm font-medium focus:outline-none focus:border-purple-500/50 hover:bg-white/10 transition-all cursor-pointer"
                 >
-                  <option value="return">Total Return</option>
-                  <option value="copiers">Most Copiers</option>
-                  <option value="winRate">Win Rate</option>
+                  <option value="total_return">Total Return</option>
+                  <option value="total_copiers_count">Most Copiers</option>
+                  <option value="win_rate">Win Rate</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300 pointer-events-none" />
               </div>
@@ -357,128 +344,131 @@ export default function CopyTradingPage() {
           </p>
         </div>
 
+        {/* Loading & Error States */}
+        {loading && (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+            <p className="text-purple-300 mt-4">Loading traders...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 mb-6">
+            <p className="text-red-400">{error}</p>
+          </div>
+        )}
+
         {/* Traders Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {sortedTraders.map((trader) => (
-            <div
-              key={trader.id}
-              className="group relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300 hover:scale-[1.02] p-6 hover:shadow-2xl hover:shadow-purple-500/10"
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
-                      {trader.avatar}
-                    </div>
-                    {trader.verified && (
+        {!loading && !error && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            {sortedTraders.map((trader, index) => (
+              <div
+                key={trader.id}
+                className="group relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300 hover:scale-[1.02] p-6 hover:shadow-2xl hover:shadow-purple-500/10"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
+                        {trader.user.name.charAt(0).toUpperCase()}
+                      </div>
                       <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-slate-900">
                         <CheckCircle className="w-4 h-4 text-white" />
                       </div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold text-white group-hover:text-purple-200 transition-colors">{trader.name}</h3>
                     </div>
-                    <p className="text-sm text-purple-300">{trader.username}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2 py-0.5 rounded-full">
-                        <Trophy className="w-3 h-3 text-yellow-400" />
-                        <span className="text-xs text-yellow-400 font-semibold">Rank #{trader.rank}</span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-white group-hover:text-purple-200 transition-colors">{trader.user.name}</h3>
+                      </div>
+                      <p className="text-sm text-purple-300">{trader.user.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/30 px-2 py-0.5 rounded-full">
+                          <Trophy className="w-3 h-3 text-yellow-400" />
+                          <span className="text-xs text-yellow-400 font-semibold">Rank #{index + 1}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${getRiskColor(trader.riskLevel)}`}>
-                  {trader.riskLevel.toUpperCase()} RISK
-                </div>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                <div className="bg-green-500/10 rounded-xl p-3 border border-green-500/30 group-hover:bg-green-500/20 transition-all">
-                  <div className="flex items-center gap-1 text-xs text-green-300 mb-1.5">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>Total Return</span>
+                  <div className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${getRiskColor(trader.risk_level)}`}>
+                    {trader.risk_level.toUpperCase()} RISK
                   </div>
-                  <div className="text-2xl font-bold text-green-400">+{trader.totalReturn}%</div>
                 </div>
-                <div className="bg-blue-500/10 rounded-xl p-3 border border-blue-500/30 group-hover:bg-blue-500/20 transition-all">
-                  <div className="flex items-center gap-1 text-xs text-blue-300 mb-1.5">
-                    <BarChart3 className="w-3.5 h-3.5" />
-                    <span>Monthly</span>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="bg-green-500/10 rounded-xl p-3 border border-green-500/30 group-hover:bg-green-500/20 transition-all">
+                    <div className="flex items-center gap-1 text-xs text-green-300 mb-1.5">
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      <span>Total Return</span>
+                    </div>
+                    <div className="text-2xl font-bold text-green-400">+{trader.total_return.toFixed(1)}%</div>
                   </div>
-                  <div className="text-2xl font-bold text-blue-400">+{trader.monthlyReturn}%</div>
-                </div>
-                <div className="bg-purple-500/10 rounded-xl p-3 border border-purple-500/30 group-hover:bg-purple-500/20 transition-all">
-                  <div className="flex items-center gap-1 text-xs text-purple-300 mb-1.5">
-                    <Target className="w-3.5 h-3.5" />
-                    <span>Win Rate</span>
+                  <div className="bg-blue-500/10 rounded-xl p-3 border border-blue-500/30 group-hover:bg-blue-500/20 transition-all">
+                    <div className="flex items-center gap-1 text-xs text-blue-300 mb-1.5">
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      <span>Monthly</span>
+                    </div>
+                    <div className="text-2xl font-bold text-blue-400">+{trader.monthly_return.toFixed(1)}%</div>
                   </div>
-                  <div className="text-2xl font-bold text-purple-400">{trader.winRate}%</div>
+                  <div className="bg-purple-500/10 rounded-xl p-3 border border-purple-500/30 group-hover:bg-purple-500/20 transition-all">
+                    <div className="flex items-center gap-1 text-xs text-purple-300 mb-1.5">
+                      <Target className="w-3.5 h-3.5" />
+                      <span>Win Rate</span>
+                    </div>
+                    <div className="text-2xl font-bold text-purple-400">{trader.win_rate.toFixed(0)}%</div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Additional Info */}
-              <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 mb-6 space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-purple-300 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-purple-400" />
-                    Copiers
-                  </span>
-                  <span className="text-white font-semibold">{trader.copiers.toLocaleString()}</span>
+                {/* Additional Info */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 mb-6 space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-purple-300 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-purple-400" />
+                      Copiers
+                    </span>
+                    <span className="text-white font-semibold">{trader.total_copiers_count.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm border-t border-white/10 pt-3">
+                    <span className="text-purple-300 flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-purple-400" />
+                      Min. Copy Amount
+                    </span>
+                    <span className="text-white font-semibold">{formatCurrency(trader.min_copy_amount)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-purple-300 flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-purple-400" />
-                    Total Invested
-                  </span>
-                  <span className="text-white font-semibold">{formatCurrency(trader.totalInvested)}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-purple-300 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-purple-400" />
-                    Active Deals
-                  </span>
-                  <span className="text-white font-semibold">{trader.activeDeals}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm border-t border-white/10 pt-3">
-                  <span className="text-purple-300 flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-purple-400" />
-                    Min. Copy Amount
-                  </span>
-                  <span className="text-white font-semibold">{formatCurrency(trader.minCopyAmount)}</span>
-                </div>
-              </div>
 
-              {/* Specialty Tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {trader.specialty.map((spec, index) => (
-                  <span key={index} className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-lg text-xs font-medium">
-                    <Star className="w-3 h-3" />
-                    {spec}
-                  </span>
-                ))}
-              </div>
+                {/* Specialty Tags */}
+                {trader.specialty && trader.specialty.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {trader.specialty.map((spec, idx) => (
+                      <span key={idx} className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-3 py-1 rounded-lg text-xs font-medium">
+                        <Star className="w-3 h-3" />
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <Link href={`/copy-trading/${trader.id}`} className="flex-1">
-                  <button className="w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105">
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleStartCopying(trader)}
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group-hover:scale-105"
+                  >
                     <Copy className="w-4 h-4" />
                     Start Copying
                   </button>
-                </Link>
-                <Link href={`/copy-trading/${trader.id}`}>
-                  <button className="px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/10 text-purple-200 rounded-xl hover:bg-white/10 hover:border-purple-500/30 transition-all">
-                    <Eye className="w-5 h-5" />
-                  </button>
-                </Link>
+                  <Link href={`/copy-trading/${trader.id}`}>
+                    <button className="px-4 py-3 bg-white/5 backdrop-blur-xl border border-white/10 text-purple-200 rounded-xl hover:bg-white/10 hover:border-purple-500/30 transition-all">
+                      <Eye className="w-5 h-5" />
+                    </button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* How It Works Section */}
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8 md:p-12">
@@ -529,6 +519,164 @@ export default function CopyTradingPage() {
           </div>
         </div>
       </div>
+
+      {/* Copy Configuration Modal */}
+      {copyModal?.showModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-2xl border border-white/10 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Configure Copy Settings</h2>
+              <button
+                onClick={() => setCopyModal(null)}
+                className="text-purple-300 hover:text-white transition-all"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Copy Type Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-purple-300 mb-3">
+                  Copy Type
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => setCopyType('full_profile')}
+                    className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
+                      copyType === 'full_profile'
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10'
+                    }`}
+                  >
+                    Full Portfolio
+                  </button>
+                  <button
+                    onClick={() => setCopyType('bundle')}
+                    className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
+                      copyType === 'bundle'
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10'
+                    }`}
+                  >
+                    Specific Bundle
+                  </button>
+                  <button
+                    onClick={() => setCopyType('individual_deal')}
+                    className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
+                      copyType === 'individual_deal'
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10'
+                    }`}
+                  >
+                    Individual Deal
+                  </button>
+                </div>
+                <p className="text-xs text-purple-400 mt-2">
+                  {copyType === 'full_profile' && 'Copy all investments from this trader'}
+                  {copyType === 'bundle' && 'Copy only specific bundle of deals'}
+                  {copyType === 'individual_deal' && 'Copy only a specific deal'}
+                </p>
+              </div>
+
+              {/* Copy Amount */}
+              <div>
+                <label className="block text-sm font-semibold text-purple-300 mb-3">
+                  Copy Amount: {formatCurrency(copyAmount)}
+                </label>
+                <input
+                  type="range"
+                  min={copyModal.trader.min_copy_amount}
+                  max="50000"
+                  step="1000"
+                  value={copyAmount}
+                  onChange={(e) => setCopyAmount(parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-purple-400 mt-2">
+                  <span>Min: {formatCurrency(copyModal.trader.min_copy_amount)}</span>
+                  <span>Max: {formatCurrency(50000)}</span>
+                </div>
+              </div>
+
+              {/* Auto Reinvest */}
+              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                <div>
+                  <div className="text-white font-semibold mb-1">Auto-Reinvest Returns</div>
+                  <div className="text-sm text-purple-300">Automatically reinvest profits into new deals</div>
+                </div>
+                <button
+                  onClick={() => setAutoReinvest(!autoReinvest)}
+                  className={`w-14 h-8 rounded-full transition-all ${
+                    autoReinvest ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-600'
+                  }`}
+                >
+                  <div className={`w-6 h-6 bg-white rounded-full transition-all ${
+                    autoReinvest ? 'ml-7' : 'ml-1'
+                  }`}></div>
+                </button>
+              </div>
+
+              {/* Stop Loss */}
+              <div>
+                <label className="block text-sm font-semibold text-purple-300 mb-3">
+                  Stop Loss: {stopLoss}%
+                </label>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="5"
+                  value={stopLoss}
+                  onChange={(e) => setStopLoss(parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-purple-400 mt-2">
+                  <span>5%</span>
+                  <span>50%</span>
+                </div>
+                <p className="text-sm text-purple-300 mt-2">
+                  Automatically stop copying if portfolio drops by {stopLoss}%
+                </p>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/30">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-200">
+                    <p className="font-semibold mb-2">You're about to:</p>
+                    <ul className="space-y-1">
+                      <li>• Copy {copyModal.trader.user.name}'s {copyType.replace('_', ' ')} with {formatCurrency(copyAmount)}</li>
+                      <li>• Auto-reinvest: {autoReinvest ? 'Yes' : 'No'}</li>
+                      <li>• Stop loss set at {stopLoss}%</li>
+                      <li>• Trader commission: {copyModal.trader.commission_rate}% of profits</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setCopyModal(null)}
+                  className="flex-1 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 transition-all"
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmCopy}
+                  disabled={submitting}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Starting...' : 'Confirm & Start Copying'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

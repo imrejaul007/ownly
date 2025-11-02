@@ -33,6 +33,10 @@ import Bundle from './Bundle.js';
 import BundleDeal from './BundleDeal.js';
 import SIPPlan from './SIPPlan.js';
 import SIPSubscription from './SIPSubscription.js';
+import CopyTrader from './CopyTrader.js';
+import CopyFollower from './CopyFollower.js';
+import InvestorBundle from './InvestorBundle.js';
+import CopyTrade from './CopyTrade.js';
 
 // Define relationships
 
@@ -223,6 +227,36 @@ SIPSubscription.belongsTo(PaymentMethod, { foreignKey: 'payment_method_id', as: 
 SIPSubscription.hasMany(Investment, { foreignKey: 'sip_subscription_id', as: 'investments' });
 Investment.belongsTo(SIPSubscription, { foreignKey: 'sip_subscription_id', as: 'sipSubscription' });
 
+// Copy Trading relationships
+User.hasOne(CopyTrader, { foreignKey: 'user_id', as: 'copyTraderProfile' });
+CopyTrader.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+CopyTrader.hasMany(InvestorBundle, { foreignKey: 'trader_id', as: 'bundles' });
+InvestorBundle.belongsTo(CopyTrader, { foreignKey: 'trader_id', as: 'trader' });
+
+// Follower relationships
+User.hasMany(CopyFollower, { foreignKey: 'follower_user_id', as: 'copyFollowing' });
+CopyFollower.belongsTo(User, { foreignKey: 'follower_user_id', as: 'follower' });
+
+User.hasMany(CopyFollower, { foreignKey: 'trader_user_id', as: 'copiers' });
+CopyFollower.belongsTo(User, { foreignKey: 'trader_user_id', as: 'trader' });
+
+InvestorBundle.hasMany(CopyFollower, { foreignKey: 'bundle_id', as: 'followers' });
+CopyFollower.belongsTo(InvestorBundle, { foreignKey: 'bundle_id', as: 'bundle' });
+
+Deal.hasMany(CopyFollower, { foreignKey: 'deal_id', as: 'copyFollowers' });
+CopyFollower.belongsTo(Deal, { foreignKey: 'deal_id', as: 'deal' });
+
+// Copy Trade relationships
+CopyFollower.hasMany(CopyTrade, { foreignKey: 'copy_follower_id', as: 'copyTrades' });
+CopyTrade.belongsTo(CopyFollower, { foreignKey: 'copy_follower_id', as: 'copyFollower' });
+
+Investment.hasMany(CopyTrade, { foreignKey: 'original_investment_id', as: 'copiedFrom' });
+CopyTrade.belongsTo(Investment, { foreignKey: 'original_investment_id', as: 'originalInvestment' });
+
+Investment.hasMany(CopyTrade, { foreignKey: 'follower_investment_id', as: 'copiedTo' });
+CopyTrade.belongsTo(Investment, { foreignKey: 'follower_investment_id', as: 'followerInvestment' });
+
 // Export all models
 export {
   User,
@@ -260,6 +294,10 @@ export {
   BundleDeal,
   SIPPlan,
   SIPSubscription,
+  CopyTrader,
+  CopyFollower,
+  InvestorBundle,
+  CopyTrade,
 };
 
 export default {
@@ -298,4 +336,8 @@ export default {
   BundleDeal,
   SIPPlan,
   SIPSubscription,
+  CopyTrader,
+  CopyFollower,
+  InvestorBundle,
+  CopyTrade,
 };

@@ -65,7 +65,7 @@ function Header() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Streamlined */}
           <nav className="hidden lg:flex items-center space-x-1">
             {/* Invest Dropdown */}
             <div className="relative group">
@@ -123,27 +123,30 @@ function Header() {
               Portfolio
             </Link>
 
-            {/* Search Link */}
-            <Link href="/search" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-              <Search className="w-4 h-4" />
-              Search
-            </Link>
-
-            {/* Watchlist Link */}
-            <Link href="/watchlist" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-              <Star className="w-4 h-4" />
-              Watchlist
-            </Link>
-
-            {/* Tools Dropdown */}
+            {/* More Dropdown - Consolidated */}
             <div className="relative group">
               <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-                <Wrench className="w-4 h-4" />
-                Tools
+                <MoreHorizontal className="w-4 h-4" />
+                More
                 <ChevronDown className="w-3 h-3" />
               </button>
-              <div className="absolute left-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div className="absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 max-h-[80vh] overflow-y-auto">
                 <div className="py-2">
+                  {/* Quick Access */}
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quick Access</div>
+                  <Link href="/search" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+                    <Search className="w-4 h-4" />
+                    Search Deals
+                  </Link>
+                  <Link href="/watchlist" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+                    <Star className="w-4 h-4" />
+                    Watchlist
+                  </Link>
+
+                  <div className="border-t border-white/10 my-2"></div>
+
+                  {/* Tools */}
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tools & Analytics</div>
                   <Link href="/calculator" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Calculator className="w-4 h-4" />
                     ROI Calculator
@@ -151,10 +154,6 @@ function Header() {
                   <Link href="/portfolio-builder" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Target className="w-4 h-4" />
                     Portfolio Builder
-                  </Link>
-                  <Link href="/risk-assessment" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <Shield className="w-4 h-4" />
-                    Risk Assessment
                   </Link>
                   <Link href="/scenarios" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Lightbulb className="w-4 h-4" />
@@ -169,101 +168,32 @@ function Header() {
                     <span>Property Map</span>
                     <span className="ml-auto text-xs bg-teal-500/20 text-teal-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
                   </Link>
-                  <Link href="/analytics" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <BarChart3 className="w-4 h-4" />
-                    Analytics
-                  </Link>
-                </div>
-              </div>
-            </div>
 
-            {/* Learn Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-                <GraduationCap className="w-4 h-4" />
-                Learn
-                <ChevronDown className="w-3 h-3" />
-              </button>
-              <div className="absolute left-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div className="py-2">
+                  <div className="border-t border-white/10 my-2"></div>
+
+                  {/* Learn */}
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Learn & Support</div>
                   <Link href="/getting-started" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20 border-l-2 border-transparent hover:border-blue-500 transition-all">
                     <BookOpen className="w-4 h-4 text-blue-400" />
                     <span>Getting Started</span>
                     <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
                   </Link>
-                  <Link href="/how-to-invest" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <TrendingUp className="w-4 h-4" />
-                    How to Invest
-                  </Link>
                   <Link href="/help" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <HelpCircle className="w-4 h-4" />
                     Help Center
-                  </Link>
-                  <div className="border-t border-white/10 my-2"></div>
-                  <Link href="/how-it-works" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <HelpCircle className="w-4 h-4" />
-                    How It Works
-                  </Link>
-                  <Link href="/statistics" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <BarChart3 className="w-4 h-4" />
-                    Platform Statistics
-                  </Link>
-                  <Link href="/about" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <Building2 className="w-4 h-4" />
-                    About Us
-                  </Link>
-                  <Link href="/fees" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <CreditCard className="w-4 h-4" />
-                    Fees
-                  </Link>
-                  <Link href="/security" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <Shield className="w-4 h-4" />
-                    Security
-                  </Link>
-                  <Link href="/shariah-compliance" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <FileCheck className="w-4 h-4" />
-                    Shariah Compliance
                   </Link>
                   <Link href="/academy" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <GraduationCap className="w-4 h-4" />
                     Academy
                   </Link>
-                  <Link href="/faq" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <HelpCircle className="w-4 h-4" />
-                    FAQ
-                  </Link>
-                </div>
-              </div>
-            </div>
 
-            {/* More Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-                <MoreHorizontal className="w-4 h-4" />
-                <ChevronDown className="w-3 h-3" />
-              </button>
-              <div className="absolute right-0 mt-2 w-56 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 max-h-[80vh] overflow-y-auto">
-                <div className="py-2">
-                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">For Businesses</div>
-                  <Link href="/list-your-deal" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-green-500/20 hover:to-emerald-500/20 border-l-2 border-transparent hover:border-green-500 transition-all">
-                    <Building2 className="w-4 h-4 text-green-400" />
-                    List Your Deal
-                  </Link>
                   <div className="border-t border-white/10 my-2"></div>
+
+                  {/* Community */}
                   <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Community</div>
                   <Link href="/community" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Users className="w-4 h-4" />
                     Community Hub
-                  </Link>
-                  <Link href="/success-stories" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <Award className="w-4 h-4" />
-                    Success Stories
-                  </Link>
-                  <div className="border-t border-white/10 my-2"></div>
-                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Platform</div>
-                  <Link href="/platform-stats" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
-                    <BarChart3 className="w-4 h-4" />
-                    Platform Stats
                   </Link>
                   <Link href="/rewards" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                     <Award className="w-4 h-4" />
@@ -286,12 +216,6 @@ function Header() {
                 </div>
               </div>
             )}
-
-            {/* Language Switcher */}
-            <LanguageSwitcher />
-
-            {/* Currency Switcher */}
-            <CurrencySwitcher />
 
             {/* User Menu */}
             {isLoggedIn ? (
@@ -345,6 +269,17 @@ function Header() {
                       <span>Documents</span>
                       <span className="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold">NEW</span>
                     </Link>
+                    <div className="border-t border-white/10 my-2"></div>
+
+                    {/* Preferences Section */}
+                    <div className="px-4 py-1.5">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Preferences</div>
+                      <div className="space-y-2">
+                        <LanguageSwitcher />
+                        <CurrencySwitcher />
+                      </div>
+                    </div>
+
                     <div className="border-t border-white/10 my-2"></div>
                     <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
                       <Settings className="w-4 h-4" />

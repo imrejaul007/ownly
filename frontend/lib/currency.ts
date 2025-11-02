@@ -72,6 +72,31 @@ export function convertToAED(amount: number, sourceCurrency: CurrencyCode): numb
 }
 
 /**
+ * Helper function to format number with K/M notation
+ */
+function formatNumberWithSuffix(num: number, decimals: number = 0): string {
+  const absNum = Math.abs(num);
+
+  // For millions (1,000,000+)
+  if (absNum >= 1000000) {
+    const millions = num / 1000000;
+    return `${millions.toFixed(decimals === 0 ? 1 : decimals)}M`;
+  }
+
+  // For thousands (1,000+)
+  if (absNum >= 1000) {
+    const thousands = num / 1000;
+    return `${thousands.toFixed(decimals === 0 ? 1 : decimals)}K`;
+  }
+
+  // For smaller numbers, use regular formatting
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+/**
  * Format currency amount with proper symbol and formatting
  */
 export function formatCurrencyAmount(
@@ -81,19 +106,25 @@ export function formatCurrencyAmount(
     showSymbol?: boolean;
     showCode?: boolean;
     decimals?: number;
+    useCompact?: boolean;
   } = {}
 ): string {
   const {
     showSymbol = true,
     showCode = false,
     decimals = 0,
+    useCompact = true,
   } = options;
 
   const currencyInfo = CURRENCIES[currency];
-  const formattedAmount = amount.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+
+  // Use compact notation (K/M) by default for large numbers
+  const formattedAmount = useCompact
+    ? formatNumberWithSuffix(amount, decimals)
+    : amount.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
 
   if (showCode) {
     return `${formattedAmount} ${currencyInfo.code}`;

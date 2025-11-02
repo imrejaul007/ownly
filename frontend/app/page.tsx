@@ -3204,6 +3204,7 @@ export default function Marketplace() {
 }
 
 function DealCard({ deal }: { deal: Deal }) {
+  const { formatCurrency } = usePreferences();
   const fundingProgress = calculateFundingProgress(deal.raised_amount, deal.target_amount);
   const statusColor = getStatusColor(deal.status);
 

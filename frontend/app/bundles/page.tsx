@@ -797,6 +797,7 @@ export default function BundlesPage() {
                   onToggleSelect={() => toggleBundleSelection(bundle.id)}
                   isFavorite={favoriteBundleIds.includes(bundle.id)}
                   onToggleFavorite={() => toggleFavorite(bundle.id)}
+                  formatCurrency={formatCurrency}
                 />
               ))}
             </div>
@@ -941,6 +942,7 @@ interface BundleCardProps {
   onToggleSelect?: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  formatCurrency: (amount: number) => string;
 }
 
 function BundleCard({
@@ -949,7 +951,8 @@ function BundleCard({
   isSelected = false,
   onToggleSelect,
   isFavorite = false,
-  onToggleFavorite
+  onToggleFavorite,
+  formatCurrency
 }: BundleCardProps) {
   const handleClick = (e: React.MouseEvent) => {
     if (compareMode && onToggleSelect) {

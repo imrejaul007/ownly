@@ -8,7 +8,8 @@ import {
   Wallet, TrendingUp, TrendingDown, Clock, DollarSign,
   ArrowUpRight, ArrowDownRight, Plus, Minus, X, Check,
   History, CreditCard, Zap, Shield, Activity, Download,
-  Upload, ChevronRight, AlertCircle, CheckCircle2, XCircle, ArrowRight
+  Upload, ChevronRight, AlertCircle, CheckCircle2, XCircle, ArrowRight,
+  Building2, ArrowLeft, Copy, FileText, Banknote
 } from 'lucide-react';
 
 interface WalletData {
@@ -60,6 +61,13 @@ export default function WalletPage() {
   const [processing, setProcessing] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
+  // Enhanced flow states
+  const [depositStep, setDepositStep] = useState(1); // 1: Amount, 2: Method, 3: Confirm, 4: Success
+  const [withdrawStep, setWithdrawStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const [selectedBank, setSelectedBank] = useState('emirates_nbd');
+  const [transactionSuccess, setTransactionSuccess] = useState(false);
+
   useEffect(() => {
     fetchWalletData();
   }, []);
@@ -92,11 +100,11 @@ export default function WalletPage() {
       setProcessing(true);
       await walletAPI.addFunds({
         amount: parseFloat(addAmount),
-        description: 'Sandbox funds added'
+        description: `Deposit via ${paymentMethod.replace('_', ' ')}`
       });
 
-      setShowAddFunds(false);
-      setAddAmount('');
+      setDepositStep(4); // Success step
+      setTransactionSuccess(true);
       fetchWalletData();
     } catch (error: any) {
       console.error('Add funds error:', error);
@@ -118,17 +126,33 @@ export default function WalletPage() {
       setProcessing(true);
       await walletAPI.withdraw({
         amount: parseFloat(withdrawAmount),
-        description: 'Withdrawal request'
+        description: `Withdrawal to ${selectedBank.replace('_', ' ')}`
       });
 
-      setShowWithdraw(false);
-      setWithdrawAmount('');
+      setWithdrawStep(4); // Success step
+      setTransactionSuccess(true);
       fetchWalletData();
     } catch (error: any) {
       console.error('Withdrawal error:', error);
     } finally {
       setProcessing(false);
     }
+  };
+
+  const resetDepositModal = () => {
+    setShowAddFunds(false);
+    setDepositStep(1);
+    setAddAmount('');
+    setPaymentMethod('bank_transfer');
+    setTransactionSuccess(false);
+  };
+
+  const resetWithdrawModal = () => {
+    setShowWithdraw(false);
+    setWithdrawStep(1);
+    setWithdrawAmount('');
+    setSelectedBank('emirates_nbd');
+    setTransactionSuccess(false);
   };
 
   const getTransactionIcon = (type: string) => {

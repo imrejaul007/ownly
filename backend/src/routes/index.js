@@ -31,6 +31,7 @@ import bundleRoutes from './bundles.js';
 import sipRoutes from './sip.js';
 import adminRoutes from './admin.js';
 import categoriesRoutes from './categories.js';
+import copyTradingRoutes from './copyTrading.js';
 
 const router = express.Router();
 
@@ -78,5 +79,6 @@ router.use('/bundles', bundleRoutes);
 router.use('/sip', sipRoutes);
 router.use('/admin', adminRoutes);
 router.use('/categories', categoriesRoutes);
+router.use('/copy-trading', copyTradingRoutes);
 
 export default router;

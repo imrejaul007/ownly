@@ -163,6 +163,8 @@ export default function AdminPage() {
 
 // Dashboard Tab
 function DashboardTab({ analytics, loading }: { analytics: any; loading: boolean }) {
+  const { formatCurrency } = usePreferences();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -374,6 +376,7 @@ function MetricCard({
 
 // Deals Tab
 function DealsTab() {
+  const { formatCurrency } = usePreferences();
   const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -1068,6 +1071,7 @@ function KYCTab() {
 
 // Payouts Tab
 function PayoutsTab() {
+  const { formatCurrency } = usePreferences();
   const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -1225,6 +1229,7 @@ function PayoutsTab() {
 
 // SPVs Tab
 function SPVsTab() {
+  const { formatCurrency } = usePreferences();
   const [spvs, setSpvs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSPV, setSelectedSPV] = useState<any>(null);
@@ -1419,6 +1424,7 @@ function SPVsTab() {
 
 // Bundles Tab
 function BundlesTab() {
+  const { formatCurrency } = usePreferences();
   const [bundles, setBundles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -1642,6 +1648,7 @@ function BundleModal({ bundle, onClose, onSave }: any) {
 
 // SIP Plans Tab
 function SIPPlansTab() {
+  const { formatCurrency } = usePreferences();
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -2348,6 +2355,7 @@ function CreateDealForm() {
 
 // Operations Tab
 function OperationsTab() {
+  const { formatCurrency } = usePreferences();
   const [operations, setOperations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -2584,10 +2592,10 @@ function ReportsTab() {
     }
   };
 
-  const filteredReports = reports.filter((report) =>
+  const filteredReports = Array.isArray(reports) ? reports.filter((report) =>
     report.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     report.type?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) : [];
 
   return (
     <div className="space-y-6">
@@ -2804,6 +2812,7 @@ function WorkflowsTab() {
 
 // Properties Tab
 function PropertiesTab() {
+  const { formatCurrency } = usePreferences();
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -3074,6 +3083,7 @@ function ActivityLogsTab() {
 
 // Secondary Market Tab
 function SecondaryMarketTab() {
+  const { formatCurrency } = usePreferences();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -3489,6 +3499,7 @@ function DocumentsTab() {
 
 // Agents Tab
 function AgentsTab() {
+  const { formatCurrency } = usePreferences();
   const [agents, setAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -3797,6 +3808,7 @@ function WebhooksTab() {
 
 // Payments Tab
 function PaymentsTab() {
+  const { formatCurrency } = usePreferences();
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
