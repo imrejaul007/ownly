@@ -1,7 +1,7 @@
 import { CopyTrader, CopyFollower, InvestorBundle, CopyTrade, User, Investment, Deal, SPV, Wallet, Transaction } from '../models/index.js';
 import { success, error } from '../utils/response.js';
 import sequelize from '../config/database.js';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 
 // Get all copy traders with stats
 export const getTraders = async (req, res, next) => {
@@ -508,7 +508,7 @@ export const autoExecuteCopy = async (originalInvestment, transaction) => {
           { copy_type: 'individual_deal', deal_id: dealId },
           {
             copy_type: 'bundle',
-            '$bundle.deal_ids$': { [Op.contains]: [dealId] },
+            '$bundle.deal_ids$': { [Op.contains]: [Sequelize.cast(dealId, 'uuid')] },
           },
         ],
       },

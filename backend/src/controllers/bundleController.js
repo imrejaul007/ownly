@@ -290,13 +290,55 @@ export const investInBundle = async (req, res, next) => {
       const dealAmount = amount * allocation;
 
       if (dealAmount > 0) {
+        // Create SPV for deal if it doesn't have one
+        let spvId = deal.spv ? deal.spv.id : null;
+
+        if (!spvId) {
+          // Calculate total shares based on target amount and share price
+          const dealSharePrice = deal.share_price || 1;
+          const totalShares = Math.floor(parseFloat(deal.target_amount || 0) / dealSharePrice);
+
+          // Generate SPV code manually
+          const year = new Date().getFullYear();
+          const latestSPV = await SPV.findOne({
+            where: {
+              spv_code: {
+                [Op.like]: `SPV-${year}-%`
+              }
+            },
+            order: [['created_at', 'DESC']]
+          });
+
+          let sequence = 1;
+          if (latestSPV && latestSPV.spv_code) {
+            const match = latestSPV.spv_code.match(/SPV-\d{4}-(\d{4})/);
+            if (match) {
+              sequence = parseInt(match[1]) + 1;
+            }
+          }
+
+          const spvCode = `SPV-${year}-${String(sequence).padStart(4, '0')}`;
+
+          const newSpv = await SPV.create({
+            deal_id: deal.id,
+            spv_name: `${deal.title} SPV`,
+            spv_code: spvCode,
+            total_shares: totalShares,
+            share_price: dealSharePrice,
+            status: 'created',
+            escrow_balance: 0,
+            operating_balance: 0,
+          });
+          spvId = newSpv.id;
+        }
+
         const sharePrice = deal.share_price || 1;
         const sharesIssued = Math.floor(dealAmount / sharePrice);
 
         const investment = await Investment.create({
           user_id: userId,
           deal_id: deal.id,
-          spv_id: deal.spv.id,
+          spv_id: spvId,
           bundle_id: bundle.id,
           amount: dealAmount,
           shares_issued: sharesIssued,

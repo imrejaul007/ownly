@@ -65,13 +65,33 @@ export default function BundleDetailPage() {
   useEffect(() => {
     const fetchBundle = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles/${params.id}`);
-        const data = await response.json();
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles/${params.id}`, {
+          headers: {
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+          },
+        });
 
-        if (data.success) {
+        // Check if response is ok
+        if (!response.ok) {
+          console.error('API response not ok:', response.status, response.statusText);
+          setError(`Failed to load bundle (${response.status})`);
+          setLoading(false);
+          return;
+        }
+
+        const data = await response.json();
+        console.log('Bundle API response:', data);
+
+        if (data.success && data.data) {
+          // Filter out any null deals from the array
+          if (data.data.deals && Array.isArray(data.data.deals)) {
+            data.data.deals = data.data.deals.filter((deal: Deal | null) => deal !== null);
+          }
           setBundle(data.data);
         } else {
-          setError('Bundle not found');
+          console.error('API returned unsuccessful or no data:', data);
+          setError(data.message || 'Bundle not found');
         }
       } catch (err) {
         console.error('Error fetching bundle:', err);
@@ -91,10 +111,12 @@ export default function BundleDetailPage() {
     setInvestmentError(null);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles/${bundle.id}/invest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
         },
         body: JSON.stringify({
           amount: parseFloat(bundle.min_investment)
@@ -254,7 +276,7 @@ export default function BundleDetailPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {bundle.deals.map((deal) => {
+                  {bundle.deals.filter(deal => deal && deal.id).map((deal) => {
                     const allocation = parseFloat(deal.BundleDeal?.allocation_percentage || '0');
                     const isCore = deal.BundleDeal?.is_core || false;
 
@@ -262,7 +284,7 @@ export default function BundleDetailPage() {
                       <div key={deal.id}>
                         <div className="flex justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white">{deal.title}</span>
+                            <span className="font-semibold text-white">{deal.title || 'Untitled Deal'}</span>
                             {isCore && (
                               <span className="text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full px-2 py-0.5">
                                 CORE
@@ -279,7 +301,7 @@ export default function BundleDetailPage() {
                         </div>
                         <div className="text-sm text-purple-300 mt-1 flex items-center justify-between">
                           <span>{formatCurrency((minInvestment * allocation) / 100)} allocated</span>
-                          <span className="text-green-400">{deal.expected_roi}% ROI</span>
+                          <span className="text-green-400">{deal.expected_roi || '0'}% ROI</span>
                         </div>
                       </div>
                     );
@@ -320,11 +342,11 @@ export default function BundleDetailPage() {
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <Package className="w-6 h-6 text-blue-400" />
-                  <h2 className="text-2xl font-bold text-white">Included Deals ({bundle.deals.length})</h2>
+                  <h2 className="text-2xl font-bold text-white">Included Deals ({bundle.deals.filter(d => d && d.id).length})</h2>
                 </div>
 
                 <div className="space-y-3">
-                  {bundle.deals.map(deal => (
+                  {bundle.deals.filter(deal => deal && deal.id && deal.slug).map(deal => (
                     <Link
                       key={deal.id}
                       href={`/deals/${deal.slug}`}
@@ -332,11 +354,11 @@ export default function BundleDetailPage() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="font-semibold text-white mb-1">{deal.title}</div>
+                          <div className="font-semibold text-white mb-1">{deal.title || 'Untitled Deal'}</div>
                           <div className="flex items-center gap-3 text-sm text-purple-300">
-                            <span className="capitalize">{deal.type}</span>
+                            <span className="capitalize">{deal.type || 'N/A'}</span>
                             <span>•</span>
-                            <span className="text-green-400">{deal.expected_roi}% ROI</span>
+                            <span className="text-green-400">{deal.expected_roi || '0'}% ROI</span>
                             {deal.BundleDeal?.is_core && (
                               <>
                                 <span>•</span>

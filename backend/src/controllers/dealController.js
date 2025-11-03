@@ -65,33 +65,39 @@ export const getDeal = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const deal = await Deal.findByPk(id, {
-      include: [
-        {
-          model: SPV,
-          as: 'spv',
-          include: [
-            {
-              model: Investment,
-              as: 'investments',
-              attributes: ['id', 'amount', 'shares_issued', 'invested_at'],
-              include: [
-                {
-                  model: User,
-                  as: 'investor',
-                  attributes: ['id', 'name', 'avatar'],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          model: User,
-          as: 'creator',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
-    });
+    // Check if id is a UUID (contains dashes in UUID format)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    const includeOptions = [
+      {
+        model: SPV,
+        as: 'spv',
+        include: [
+          {
+            model: Investment,
+            as: 'investments',
+            attributes: ['id', 'amount', 'shares_issued', 'invested_at'],
+            include: [
+              {
+                model: User,
+                as: 'investor',
+                attributes: ['id', 'name', 'avatar'],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        model: User,
+        as: 'creator',
+        attributes: ['id', 'name', 'email'],
+      },
+    ];
+
+    // Lookup by UUID or slug
+    const deal = isUUID
+      ? await Deal.findByPk(id, { include: includeOptions })
+      : await Deal.findOne({ where: { slug: id }, include: includeOptions });
 
     if (!deal) {
       return error(res, 'Deal not found', 404);

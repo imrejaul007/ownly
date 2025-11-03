@@ -38,8 +38,8 @@ export default function SIPPlansPage() {
         sipAPI.list(),
         bundleAPI.list()
       ]);
-      setPlans(plansResponse.data.data.plans || []);
-      setBundles(bundlesResponse.data.data.bundles || []);
+      setPlans(plansResponse.data.data || []);
+      setBundles(bundlesResponse.data.data || []);
     } catch (error) {
       console.error('Error fetching SIP plans:', error);
     } finally {
@@ -50,7 +50,7 @@ export default function SIPPlansPage() {
   const handleSubscribe = (plan: any) => {
     setSelectedPlan(plan);
     setFormData({
-      monthly_amount: plan.min_amount || '',
+      monthly_amount: plan.monthly_amount_min || '',
       payment_method_id: '',
       auto_deduct: true
     });
@@ -269,10 +269,10 @@ export default function SIPPlansPage() {
                       <div className="text-center">
                         <p className="text-purple-300 text-xs font-semibold mb-1">MONTHLY INVESTMENT</p>
                         <p className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-                          {formatCurrency(plan.min_amount || 0)}
+                          {formatCurrency(plan.monthly_amount_min || 0)}
                         </p>
                         <p className="text-purple-300 text-xs">
-                          {plan.max_amount ? `up to ${formatCurrency(plan.max_amount)}` : 'Unlimited maximum'}
+                          {plan.monthly_amount_max ? `up to ${formatCurrency(plan.monthly_amount_max)}` : 'Unlimited maximum'}
                         </p>
                       </div>
                     </div>
@@ -490,16 +490,16 @@ export default function SIPPlansPage() {
                     value={formData.monthly_amount}
                     onChange={(e) => setFormData({ ...formData, monthly_amount: e.target.value })}
                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white text-lg font-semibold placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                    placeholder={`Min. ${formatCurrency(selectedPlan.min_amount || 0)}`}
-                    min={selectedPlan.min_amount}
-                    max={selectedPlan.max_amount || undefined}
+                    placeholder={`Min. ${formatCurrency(selectedPlan.monthly_amount_min || 0)}`}
+                    min={selectedPlan.monthly_amount_min}
+                    max={selectedPlan.monthly_amount_max || undefined}
                   />
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <p className="text-gray-400 text-xs">
-                    Range: {formatCurrency(selectedPlan.min_amount)} - {selectedPlan.max_amount ? formatCurrency(selectedPlan.max_amount) : 'Unlimited'}
+                    Range: {formatCurrency(selectedPlan.monthly_amount_min)} - {selectedPlan.monthly_amount_max ? formatCurrency(selectedPlan.monthly_amount_max) : 'Unlimited'}
                   </p>
-                  {formData.monthly_amount && parseFloat(formData.monthly_amount) >= selectedPlan.min_amount && (
+                  {formData.monthly_amount && parseFloat(formData.monthly_amount) >= selectedPlan.monthly_amount_min && (
                     <CheckCircle className="w-4 h-4 text-green-400" />
                   )}
                 </div>
@@ -532,7 +532,7 @@ export default function SIPPlansPage() {
               </button>
               <button
                 onClick={handleSubscribeSubmit}
-                disabled={subscribeLoading || !formData.monthly_amount || parseFloat(formData.monthly_amount) < selectedPlan.min_amount}
+                disabled={subscribeLoading || !formData.monthly_amount || parseFloat(formData.monthly_amount) < selectedPlan.monthly_amount_min}
                 className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-2xl hover:shadow-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold flex items-center justify-center gap-2"
               >
                 {subscribeLoading ? (

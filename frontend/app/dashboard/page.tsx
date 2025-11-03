@@ -135,22 +135,86 @@ export default function DashboardPage() {
       <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Welcome Header with Stats */}
+        {/* Enhanced Welcome Header with Stats */}
         <div className="mb-12">
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-3">
-                Portfolio Dashboard
-              </h1>
-              <p className="text-purple-300 text-lg">Track your investments and watch your wealth grow</p>
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-blue-600/20 blur-2xl opacity-50 animate-pulse"></div>
+              <div className="relative">
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent mb-3 animate-fade-in">
+                  Portfolio Dashboard
+                </h1>
+                <p className="text-purple-300 text-lg flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  Track your investments and watch your wealth grow
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="px-4 py-2 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10">
-                <div className="text-xs text-purple-400 mb-1">Last Updated</div>
-                <div className="text-sm font-semibold text-white">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+              <div className="group px-5 py-3 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/20 hover:border-purple-500/50 transition-all duration-500 hover:scale-105">
+                <div className="text-xs text-purple-400 mb-1 flex items-center gap-2">
+                  <Clock className="w-3 h-3" />
+                  Last Updated
+                </div>
+                <div className="text-sm font-bold text-white group-hover:text-purple-100 transition-colors">
+                  {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Portfolio Stats Bar */}
+          {summary && (
+            <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-blue-500/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-blue-500/20 hover:border-blue-500/40 transition-all group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Target className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-blue-300 font-medium">Total Invested</div>
+                    <div className="text-lg font-bold text-white">{formatCurrency(summary.totalInvested, 'USD').replace('.00', '')}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-500/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-green-500/20 hover:border-green-500/40 transition-all group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <TrendingUp className="w-6 h-6 text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-green-300 font-medium">Total Returns</div>
+                    <div className="text-lg font-bold text-white">{formatCurrency(summary.totalReturn, 'USD').replace('.00', '')}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-500/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-purple-500/20 hover:border-purple-500/40 transition-all group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Award className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-purple-300 font-medium">Avg ROI</div>
+                    <div className="text-lg font-bold text-white">{formatPercentage(summary.returnPercentage)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-pink-500/10 to-transparent backdrop-blur-sm rounded-2xl p-4 border border-pink-500/20 hover:border-pink-500/40 transition-all group">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Users className="w-6 h-6 text-pink-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-pink-300 font-medium">Active Deals</div>
+                    <div className="text-lg font-bold text-white">{investments.length}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Enhanced Hero Performance Cards */}
@@ -187,9 +251,25 @@ export default function DashboardPage() {
                   </div>
                   <div className="text-blue-300 text-sm font-medium mb-2">Total Portfolio Value</div>
                   <div className="text-4xl font-bold text-white mb-3 group-hover:text-blue-100 transition-colors">{formatCurrency(summary.totalCurrentValue)}</div>
-                  <div className="flex items-center text-green-400 text-sm font-semibold">
+                  <div className="flex items-center text-green-400 text-sm font-semibold mb-4">
                     <ArrowUpRight className="w-4 h-4 mr-1" />
                     {formatCurrency(summary.totalCurrentValue - summary.totalInvested)} gain
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mt-4 pt-4 border-t border-blue-500/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-blue-300">Growth Progress</span>
+                      <span className="text-xs font-bold text-blue-100">
+                        {Math.min(((summary.totalCurrentValue - summary.totalInvested) / summary.totalInvested * 100), 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-blue-500/10 rounded-full h-2">
+                      <div
+                        className="h-2 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full transition-all duration-1000 shadow-lg shadow-blue-500/50"
+                        style={{ width: `${Math.min(((summary.totalCurrentValue - summary.totalInvested) / summary.totalInvested * 100), 100)}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -224,7 +304,27 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-green-300 text-sm font-medium mb-2">Monthly Income</div>
                 <div className="text-4xl font-bold text-white mb-3 group-hover:text-green-100 transition-colors">{formatCurrency(avgMonthlyEarning)}</div>
-                <div className="text-green-300 text-sm font-semibold">Average per month</div>
+                <div className="text-green-300 text-sm font-semibold mb-4">Average per month</div>
+
+                {/* Monthly Trend Indicator */}
+                <div className="mt-4 pt-4 border-t border-green-500/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-green-300">Income Trend</span>
+                    <span className="text-xs font-bold text-green-100">
+                      {payoutGrowth >= 0 ? '+' : ''}{payoutGrowth.toFixed(1)}% MoM
+                    </span>
+                  </div>
+                  <div className="w-full bg-green-500/10 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-1000 shadow-lg ${
+                        payoutGrowth >= 0
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-400 shadow-green-500/50'
+                          : 'bg-gradient-to-r from-red-600 to-orange-400 shadow-red-500/50'
+                      }`}
+                      style={{ width: `${Math.min(Math.abs(payoutGrowth) * 2, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -336,6 +436,154 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Featured Investment Opportunities - NEW SECTION */}
+        {investments.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+                  <Sparkles className="w-8 h-8 text-yellow-400" />
+                  Your Active Investments
+                </h2>
+                <p className="text-purple-300 mt-2">Diverse portfolio across multiple sectors</p>
+              </div>
+              <Link href="/investments" className="text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-2 hover:gap-3 transition-all">
+                View Full Portfolio
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {investments.slice(0, 6).map((investment, index) => {
+                const dealType = investment.deal?.type || 'asset';
+                const category = investment.deal?.category || 'general';
+
+                // Different color schemes for different types
+                const typeStyles: Record<string, { gradient: string; iconBg: string; badge: string; shadow: string }> = {
+                  real_estate: {
+                    gradient: 'from-blue-600/10 via-cyan-500/5 to-transparent',
+                    iconBg: 'from-blue-600 to-cyan-500',
+                    badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+                    shadow: 'hover:shadow-blue-500/20'
+                  },
+                  franchise: {
+                    gradient: 'from-green-600/10 via-emerald-500/5 to-transparent',
+                    iconBg: 'from-green-600 to-emerald-500',
+                    badge: 'bg-green-500/20 text-green-300 border-green-500/30',
+                    shadow: 'hover:shadow-green-500/20'
+                  },
+                  startup: {
+                    gradient: 'from-orange-600/10 via-amber-500/5 to-transparent',
+                    iconBg: 'from-orange-600 to-amber-500',
+                    badge: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+                    shadow: 'hover:shadow-orange-500/20'
+                  },
+                  asset: {
+                    gradient: 'from-purple-600/10 via-pink-500/5 to-transparent',
+                    iconBg: 'from-purple-600 to-pink-500',
+                    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                    shadow: 'hover:shadow-purple-500/20'
+                  }
+                };
+
+                const style = typeStyles[dealType] || typeStyles.asset;
+                const roi = parseFloat(investment.earnings?.actualRoi || '0');
+                const isPositive = roi > 0;
+
+                return (
+                  <Link href={`/deals/${investment.deal?.id}`} key={investment.id}>
+                    <div className={`group relative bg-gradient-to-br ${style.gradient} backdrop-blur-xl rounded-3xl border border-white/10 p-6 hover:border-white/30 transition-all duration-500 shadow-2xl ${style.shadow} hover:scale-105 cursor-pointer overflow-hidden`}>
+                      {/* Animated background pattern */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{
+                        backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)',
+                        backgroundSize: '24px 24px'
+                      }}></div>
+
+                      {/* Top Badge */}
+                      {index < 3 && (
+                        <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-xs font-bold text-white shadow-lg flex items-center gap-1">
+                          <Star className="w-3 h-3" />
+                          Top {index + 1}
+                        </div>
+                      )}
+
+                      <div className="relative">
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`w-14 h-14 bg-gradient-to-br ${style.iconBg} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                            {dealType === 'real_estate' && <Building className="w-7 h-7 text-white" />}
+                            {dealType === 'franchise' && <ShoppingCart className="w-7 h-7 text-white" />}
+                            {dealType === 'startup' && <Zap className="w-7 h-7 text-white" />}
+                            {dealType === 'asset' && <Package className="w-7 h-7 text-white" />}
+                          </div>
+                          <div className={`px-3 py-1 rounded-full text-xs font-bold border ${style.badge}`}>
+                            {getDealTypeLabel(dealType)}
+                          </div>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="font-bold text-xl mb-3 text-white line-clamp-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-purple-200 group-hover:bg-clip-text transition-all">
+                          {investment.deal?.title || 'Investment Opportunity'}
+                        </h3>
+
+                        {/* Categories */}
+                        {(investment.deal?.category || investment.deal?.subcategory) && (
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {investment.deal?.category && (
+                              <span className="inline-flex items-center gap-1 bg-white/5 border border-white/20 text-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                                <Tag className="w-3 h-3" />
+                                {investment.deal.category.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                              </span>
+                            )}
+                            {investment.deal?.subcategory && (
+                              <span className="inline-flex items-center gap-1 bg-white/5 border border-white/20 text-blue-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                                {investment.deal.subcategory.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+                            <div className="text-xs text-purple-300 mb-1">Invested</div>
+                            <div className="text-sm font-bold text-white">{formatCurrency(investment.amount)}</div>
+                          </div>
+                          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+                            <div className="text-xs text-purple-300 mb-1">Current Value</div>
+                            <div className="text-sm font-bold text-green-400">{formatCurrency(investment.current_value || investment.amount)}</div>
+                          </div>
+                        </div>
+
+                        {/* ROI Display */}
+                        <div className="pt-4 border-t border-white/10">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-purple-300 font-medium">Return on Investment</span>
+                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold ${
+                              isPositive
+                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                            }`}>
+                              {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                              {formatPercentage(roi)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hover Arrow */}
+                        <div className="mt-4 flex items-center text-purple-400 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span>View Details</span>
+                          <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Smart Recommendations */}
         <div className="mb-12">
@@ -682,6 +930,42 @@ export default function DashboardPage() {
         {/* Live Activity Feed */}
         <div className="mb-12">
           <ActivityFeed maxItems={10} />
+        </div>
+
+        {/* Floating Action Button */}
+        <div className="fixed bottom-8 right-8 z-50 group">
+          {/* Quick Action Menu - Appears on Hover */}
+          <div className="absolute bottom-20 right-0 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+            <Link href="/deals" className="flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl shadow-lg hover:shadow-purple-500/50 transition-all group/item">
+              <span className="text-sm font-semibold whitespace-nowrap">Browse Deals</span>
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <ShoppingCart className="w-5 h-5" />
+              </div>
+            </Link>
+            <Link href="/bundles" className="flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl shadow-lg hover:shadow-green-500/50 transition-all group/item">
+              <span className="text-sm font-semibold whitespace-nowrap">Smart Bundles</span>
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <Package className="w-5 h-5" />
+              </div>
+            </Link>
+            <Link href="/exchange" className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl shadow-lg hover:shadow-blue-500/50 transition-all group/item">
+              <span className="text-sm font-semibold whitespace-nowrap">Trade Assets</span>
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <RefreshCw className="w-5 h-5" />
+              </div>
+            </Link>
+            <Link href="/wallet" className="flex items-center gap-3 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-xl shadow-lg hover:shadow-orange-500/50 transition-all group/item">
+              <span className="text-sm font-semibold whitespace-nowrap">Add Funds</span>
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <Wallet className="w-5 h-5" />
+              </div>
+            </Link>
+          </div>
+
+          {/* Main FAB Button */}
+          <button className="w-16 h-16 bg-gradient-to-br from-purple-600 via-pink-600 to-blue-600 rounded-full shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center transition-all duration-300 hover:scale-110 group-hover:rotate-45">
+            <Zap className="w-8 h-8 text-white" />
+          </button>
         </div>
       </div>
     </div>
