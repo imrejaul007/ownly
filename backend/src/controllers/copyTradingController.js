@@ -506,10 +506,7 @@ export const autoExecuteCopy = async (originalInvestment, transaction) => {
         [Op.or]: [
           { copy_type: 'full_profile' },
           { copy_type: 'individual_deal', deal_id: dealId },
-          {
-            copy_type: 'bundle',
-            '$bundle.deal_ids$': { [Op.contains]: [Sequelize.cast(dealId, 'uuid')] },
-          },
+          { copy_type: 'bundle' }, // Placeholder - will be filtered by include condition
         ],
       },
       include: [
@@ -532,12 +529,24 @@ export const autoExecuteCopy = async (originalInvestment, transaction) => {
       transaction,
     });
 
+    // Filter bundle followers manually to check if their bundle contains the dealId
+    const filteredFollowers = followers.filter(follower => {
+      if (follower.copy_type === 'bundle') {
+        // Check if bundle exists and contains the dealId
+        if (follower.bundle && follower.bundle.deal_ids && Array.isArray(follower.bundle.deal_ids)) {
+          return follower.bundle.deal_ids.includes(dealId);
+        }
+        return false; // Skip if bundle data is missing
+      }
+      return true; // Include non-bundle followers
+    });
+
     // Get SPV for share price calculation
     const spv = await SPV.findByPk(spvId, { transaction });
     if (!spv) return;
 
     // Process each follower
-    for (const follower of followers) {
+    for (const follower of filteredFollowers) {
       try {
         // Calculate proportional amount
         const copyAmount = parseFloat(follower.copy_amount);
